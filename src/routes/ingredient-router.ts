@@ -15,7 +15,7 @@ ingredientRouter.post("/", async (req, res) => {
 
 ingredientRouter.get("/test", async (req, res) => {
   try {
-    // await testDb();
+    // await insertIngredients();
     await randomlyFillDb();
   } catch (error) {
     console.log(error);

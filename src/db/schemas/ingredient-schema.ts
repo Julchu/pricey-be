@@ -64,3 +64,53 @@ export const ingredientTable = pgTable(
 
 export type SelectIngredient = InferSelectModel<typeof ingredientTable>;
 export type InsertIngredient = InferInsertModel<typeof ingredientTable>;
+
+export const tempIngredients: InsertIngredient[] = [
+  {
+    name: "Tomato",
+    price: 250,
+    unit: Unit.KILOGRAM,
+    image: "https://example.com/tomato.jpg",
+    capacity: 5,
+    quantity: 2,
+    userId: 0,
+    season: Season.SUMMER,
+  },
+  {
+    name: "Olive Oil",
+    price: 1000,
+    unit: Unit.LITRE,
+    image: "https://example.com/olive_oil.jpg",
+    capacity: 1,
+    quantity: 0.5,
+    userId: 1,
+  },
+  {
+    name: "Basil",
+    price: 150,
+    unit: Unit.ITEM,
+    image: "https://example.com/basil.jpg",
+    capacity: 3,
+    quantity: 1,
+    userId: 2,
+    season: Season.SPRING,
+  },
+  {
+    name: "Chicken Breast",
+    price: 700,
+    unit: Unit.KILOGRAM,
+    image: "https://example.com/chicken.jpg",
+    capacity: 2,
+    quantity: 1,
+    userId: 3,
+  },
+  {
+    name: "Garlic",
+    price: 300,
+    unit: Unit.KILOGRAM,
+    image: "https://example.com/garlic.jpg",
+    capacity: 2,
+    quantity: 1,
+    userId: 4,
+  },
+];

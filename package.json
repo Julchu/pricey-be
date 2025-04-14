@@ -11,7 +11,7 @@
     "db-generate": "drizzle-kit generate",
     "dev-env": "DATABASE_URL=$(grep DATABASE_URL -w .env.development | cut -d '=' -f2- | cut -d '\"' -f2 )",
     "dev-env-supabase": "pnpm run dev-env SUPABASE_CRT=$(grep SUPABASE_CRT -w .env.development | cut -d '=' -f2- | cut -d '\"' -f2 )",
-    "db-merge-dev": "pnpm run dev-env drizzle-kit migrate",
+    "db-migrate-dev": "pnpm run dev-env drizzle-kit migrate",
     "db-push-dev": "pnpm run dev-env drizzle-kit push",
     "db-studio-dev": "pnpm run dev-env drizzle-kit studio --port=3002",
     "clean-compiled-js": "tsc --build --clean",

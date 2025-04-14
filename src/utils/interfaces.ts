@@ -45,113 +45,56 @@ export enum Role {
   standard = "standard",
 }
 
-export interface Ingredient {
-  name: string;
-  price?: number;
-  unit?: Unit;
-  image?: string;
-  /** @param capacity and @param quantity used for @interfaceGroceryList */
-  capacity?: number;
-  quantity?: number;
-  userId: string;
-  season?: Season;
-  // createdAt?: Timestamp | FieldValue;
-  // lastUpdated?: Timestamp | FieldValue;
-}
-
-export const tempIngredientList: Ingredient[] = [
-  {
-    name: "Tomato",
-    price: 2.5,
-    unit: Unit.KILOGRAM,
-    image: "https://example.com/tomato.jpg",
-    capacity: 5,
-    quantity: 2,
-    userId: "user_123",
-    season: Season.SUMMER,
-  },
-  {
-    name: "Olive Oil",
-    price: 10,
-    unit: Unit.LITRE,
-    image: "https://example.com/olive_oil.jpg",
-    capacity: 1,
-    quantity: 0.5,
-    userId: "user_123",
-  },
-  {
-    name: "Basil",
-    price: 1.5,
-    unit: Unit.ITEM,
-    image: "https://example.com/basil.jpg",
-    capacity: 3,
-    quantity: 1,
-    userId: "user_123",
-    season: Season.SPRING,
-  },
-  {
-    name: "Chicken Breast",
-    price: 7,
-    unit: Unit.KILOGRAM,
-    image: "https://example.com/chicken.jpg",
-    capacity: 2,
-    quantity: 1,
-    userId: "user_123",
-  },
-  {
-    name: "Garlic",
-    price: 3,
-    unit: Unit.KILOGRAM,
-    image: "https://example.com/garlic.jpg",
-    capacity: 2,
-    quantity: 1,
-    userId: "user_123",
-  },
-];
-
-export interface PersonalIngredient extends Ingredient {
-  price: number;
-  unit: Unit;
-}
-
-export interface GroceryList {
-  name: string;
-  ingredients: Ingredient[];
-  public?: boolean;
-  userId: string;
-  // createdAt?: Timestamp | FieldValue;
-}
-
-export type Recipe = {
-  name: string;
-  ingredients: Ingredient[];
-  public?: boolean;
-  userId: string;
-};
-
-export type OmitType = Omit<GroceryList, "name">;
-
 // Public user data (aka not private auth data)
 export interface User {
-  uid: string;
+  id: number;
   email: string;
   photoURL?: string;
   name?: string;
   location?: Address;
-  // createdAt?: Timestamp;
-  /**
-   * @param: prefered units
-   * @param: dark/light mode
-   * @param: display name
-   * @param: publically viewable grocery list profile */
   preferences?: UserPreferences;
 }
 
+/**
+ * @param: prefered units
+ * @param: dark/light mode
+ * @param: display name
+ * @param: publically viewable grocery list profile */
 export type UserPreferences = {
   units?: UnitCategory;
   colorMode?: Color;
   displayName?: string;
 };
+
+export interface Ingredient {
+  id: number;
+  name: string;
+  userId: number;
+  price: number;
+  capacity: number;
+  quantity?: number;
+  unit: Unit;
+  image?: string;
+  season?: Season;
+}
+
+export interface GroceryList {
+  id: number;
+  name: string;
+  ingredients: Ingredient[];
+  userId: number;
+  public?: boolean;
+}
+
+export type Recipe = {
+  id: number;
+  name: string;
+  ingredients: Ingredient[];
+  userId: number;
+  public?: boolean;
+};
+
+export type OmitType = Omit<GroceryList, "name">;
 
 /* TODO: create Time-to-live (TTL) grocery list w/ ingredients */
 

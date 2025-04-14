@@ -20,3 +20,36 @@ export const groceryListTable = pgTable("grocery_list", {
 
 export type SelectGroceryList = InferSelectModel<typeof groceryListTable>;
 export type InsertGroceryList = InferInsertModel<typeof groceryListTable>;
+
+export const tempGroceryLists: InsertGroceryList[] = [
+  {
+    name: "Weekly Essentials",
+    ingredients: [1, 2, 3], // ingredient IDs
+    userId: 1,
+    public: true,
+  },
+  {
+    name: "BBQ Party",
+    ingredients: [4, 5, 6, 7],
+    userId: 2,
+    public: false,
+  },
+  {
+    name: "Vegan Meals",
+    ingredients: [8, 9],
+    userId: 3,
+    public: true,
+  },
+  {
+    name: "Baking Basics",
+    ingredients: [10, 11, 12],
+    userId: 1,
+    public: false,
+  },
+  {
+    name: "Holiday Dinner",
+    ingredients: [13, 14, 15, 16],
+    userId: 4,
+    public: true,
+  },
+];
