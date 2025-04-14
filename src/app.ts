@@ -9,6 +9,9 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import { indexRouter } from "./routes/index-router.ts";
 import { ingredientRouter } from "./routes/ingredient-router.ts";
+import { userRouter } from "./routes/user-router.ts";
+import { groceryListRouter } from "./routes/grocery-list-router.ts";
+import { recipeRouter } from "./routes/recipe-router.ts";
 
 const app = express();
 
@@ -24,7 +27,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
+app.use("/user", userRouter);
 app.use("/ingredient", ingredientRouter);
+app.use("/grocery-list", groceryListRouter);
+app.use("/recipe", recipeRouter);
 
 // catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: NextFunction) => {

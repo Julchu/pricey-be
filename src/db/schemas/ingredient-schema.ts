@@ -67,22 +67,12 @@ export type InsertIngredient = InferInsertModel<typeof ingredientTable>;
 
 export const tempIngredients: InsertIngredient[] = [
   {
-    name: "Tomato",
-    price: 250,
-    unit: Unit.KILOGRAM,
-    image: "https://example.com/tomato.jpg",
-    capacity: 5,
-    quantity: 2,
-    userId: 0,
-    season: Season.SUMMER,
-  },
-  {
     name: "Olive Oil",
     price: 1000,
     unit: Unit.LITRE,
     image: "https://example.com/olive_oil.jpg",
     capacity: 1,
-    quantity: 0.5,
+    quantity: 2,
     userId: 1,
   },
   {
@@ -112,5 +102,15 @@ export const tempIngredients: InsertIngredient[] = [
     capacity: 2,
     quantity: 1,
     userId: 4,
+  },
+  {
+    name: "Tomato",
+    price: 250,
+    unit: Unit.KILOGRAM,
+    image: "https://example.com/tomato.jpg",
+    capacity: 5,
+    quantity: 2,
+    userId: 5,
+    season: Season.SUMMER,
   },
 ];

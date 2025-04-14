@@ -33,6 +33,10 @@ export const updateRecipe = async (recipe: InsertRecipe) => {
   }
 };
 
-export const insertTempRecipes = () => {
-  return db.insert(recipeTable).values(tempRecipes).returning();
+export const insertTempRecipes = async () => {
+  try {
+    return await db.insert(recipeTable).values(tempRecipes).returning();
+  } catch (error) {
+    console.log("Error inserting temp recipes:", error);
+  }
 };

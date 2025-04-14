@@ -33,6 +33,10 @@ export const updateUser = async (user: InsertUser) => {
   }
 };
 
-export const insertTempUsers = () => {
-  return db.insert(userTable).values(tempUsers).returning();
+export const insertTempUsers = async () => {
+  try {
+    return await db.insert(userTable).values(tempUsers).returning();
+  } catch (error) {
+    console.log("Error inserting temp users:", error);
+  }
 };

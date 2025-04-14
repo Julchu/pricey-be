@@ -1,22 +1,24 @@
 import { Router } from "express";
-import { randomlyFillDb } from "../services/test-db.ts";
+import {
+  insertTempIngredients,
+  upsertIngredient,
+} from "../services/ingredient-handlers.ts";
 
 export const ingredientRouter = Router();
 
-/* GET home page. */
 ingredientRouter.get("/", async (req, res) => {
   res.send({ title: "The Pricey App" });
 });
 
 ingredientRouter.post("/", async (req, res) => {
   console.log("ingredient", req.body.ingredient);
+  await upsertIngredient(req.body.ingredient);
   res.send({ title: "The Pricey App" });
 });
 
-ingredientRouter.get("/test", async (req, res) => {
+ingredientRouter.post("/test", async (req, res) => {
   try {
-    // await insertIngredients();
-    await randomlyFillDb();
+    await insertTempIngredients();
   } catch (error) {
     console.log(error);
   }

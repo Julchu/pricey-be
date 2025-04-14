@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import {
   groceryListTable,
   type InsertGroceryList,
@@ -21,6 +21,19 @@ export const upsertGroceryList = async (groceryList: InsertGroceryList) => {
   }
 };
 
+export const getGroceryList = async (id: number) => {
+  try {
+    return await db
+      .select()
+      .from(groceryListTable)
+      .where(
+        and(eq(groceryListTable.id, id), eq(groceryListTable.name, "Dan")),
+      );
+  } catch (error) {
+    console.log("Error getting groceryList:", error);
+  }
+};
+
 export const updateGroceryList = async (groceryList: InsertGroceryList) => {
   try {
     await db
@@ -33,6 +46,13 @@ export const updateGroceryList = async (groceryList: InsertGroceryList) => {
   }
 };
 
-export const insertTempGroceryLists = () => {
-  return db.insert(groceryListTable).values(tempGroceryLists).returning();
+export const insertTempGroceryLists = async () => {
+  try {
+    return await db
+      .insert(groceryListTable)
+      .values(tempGroceryLists)
+      .returning();
+  } catch (error) {
+    console.log("Error inserting temp grcoery lists:", error);
+  }
 };
