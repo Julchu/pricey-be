@@ -1,5 +1,5 @@
 {
-  "id": "24d111c7-6a0f-4724-99c5-9b138d824817",
+  "id": "b9773531-fc63-4261-b90d-d1e0b42a93e4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -35,7 +35,7 @@
           "name": "ingredients",
           "type": "integer[]",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'{}'"
         },
         "userId": {
@@ -48,14 +48,14 @@
           "name": "public",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": false
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -88,7 +88,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "unique_userId_groceryListName": {
+          "name": "unique_userId_groceryListName",
+          "nullsNotDistinct": false,
+          "columns": [
+            "userId",
+            "name"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -124,20 +133,20 @@
           "name": "userId",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "price": {
           "name": "price",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 100
         },
         "capacity": {
           "name": "capacity",
           "type": "numeric",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": 1
         },
         "quantity": {
@@ -171,7 +180,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -204,7 +213,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "unique_userId_ingredientName": {
+          "name": "unique_userId_ingredientName",
+          "nullsNotDistinct": false,
+          "columns": [
+            "userId",
+            "name"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {
         "price_gt_0": {
@@ -253,7 +271,7 @@
           "name": "ingredients",
           "type": "integer[]",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'{}'"
         },
         "userId": {
@@ -266,14 +284,14 @@
           "name": "public",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": false
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -306,7 +324,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "unique_userId_recipeName": {
+          "name": "unique_userId_recipeName",
+          "nullsNotDistinct": false,
+          "columns": [
+            "userId",
+            "name"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -354,14 +381,14 @@
           "name": "preferences",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'{\"units\":{\"mass\":\"kg\",\"volume\":\"L\"},\"colorMode\":\"dark\",\"displayName\":\"\"}'::jsonb"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -383,6 +410,13 @@
       "uniqueConstraints": {
         "user_email_unique": {
           "name": "user_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        },
+        "unique_userEmail": {
+          "name": "unique_userEmail",
           "nullsNotDistinct": false,
           "columns": [
             "email"

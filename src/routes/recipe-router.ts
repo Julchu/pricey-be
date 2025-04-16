@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { upsertRecipe } from "../services/recipe-handlers.ts";
+import {
+  insertTempRecipes,
+  upsertRecipe,
+} from "../services/recipe-handlers.ts";
 
 export const recipeRouter = Router();
 
@@ -11,4 +14,14 @@ recipeRouter.post("/", async (req, res) => {
   console.log("recipe", req.body.recipe);
   await upsertRecipe(req.body.recipe);
   res.send({ title: "The Pricey App" });
+});
+
+recipeRouter.post("/seed", async (req, res) => {
+  try {
+    await insertTempRecipes();
+  } catch (error) {
+    console.log(error);
+  }
+
+  res.send({ test: "test" });
 });

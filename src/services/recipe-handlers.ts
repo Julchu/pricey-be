@@ -8,13 +8,7 @@ import {
 
 export const upsertRecipe = async (recipe: InsertRecipe) => {
   try {
-    return await db
-      .insert(recipeTable)
-      .values(recipe)
-      .onConflictDoUpdate({
-        target: [recipeTable.id, recipeTable.name],
-        set: recipe,
-      });
+    return await db.insert(recipeTable).values(recipe).returning();
   } catch (error) {
     console.log("Error upserting recipe:", error);
     throw error;

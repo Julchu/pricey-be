@@ -4,6 +4,7 @@ import {
   numeric,
   pgEnum,
   pgTable,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
 import { requiredColumns, timestamps } from "../utils/shared-schema.ts";
@@ -33,10 +34,11 @@ export const ingredientTable = pgTable(
   "ingredient",
   {
     ...requiredColumns,
-    name: varchar({ length: 255 }).notNull(),
-    userId: integer().references(() => userTable.id),
-    price: integer().default(100),
-    capacity: numeric({ scale: 3, mode: "number" }).default(1),
+    userId: integer()
+      .references(() => userTable.id)
+      .notNull(),
+    price: integer().default(100).notNull(),
+    capacity: numeric({ scale: 3, mode: "number" }).default(1).notNull(),
     quantity: integer().default(1),
     unit: unitEnum().notNull(),
     image: varchar({ length: 255 }),
@@ -59,6 +61,7 @@ export const ingredientTable = pgTable(
       sql`${table.quantity}
       > 0`,
     ),
+    unique("unique_userId_ingredientName").on(table.userId, table.name),
   ],
 );
 

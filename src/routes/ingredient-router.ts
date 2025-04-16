@@ -16,12 +16,12 @@ ingredientRouter.post("/", async (req, res) => {
   res.send({ title: "The Pricey App" });
 });
 
-ingredientRouter.post("/test", async (req, res) => {
+ingredientRouter.post("/seed", async (req, res) => {
   try {
     await insertTempIngredients();
+    res.status(200).send({ title: "The Pricey App" });
   } catch (error) {
     console.log(error);
+    res.status(500).send({ title: "The Pricey App" });
   }
-
-  res.send({ test: "test" });
 });

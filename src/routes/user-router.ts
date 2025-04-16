@@ -13,7 +13,7 @@ userRouter.post("/", async (req, res) => {
   res.send({ title: "The Pricey App" });
 });
 
-userRouter.post("/test", async (req, res) => {
+userRouter.post("/seed", async (req, res) => {
   try {
     await insertTempUsers();
   } catch (error) {

@@ -6,43 +6,34 @@ import {
   tempGroceryLists,
 } from "../db/schemas/grocery-list-schema.ts";
 
+// TODO: fix/test
 export const upsertGroceryList = async (groceryList: InsertGroceryList) => {
   try {
-    return await db
-      .insert(groceryListTable)
-      .values(groceryList)
-      .onConflictDoUpdate({
-        target: [groceryListTable.id, groceryListTable.name],
-        set: groceryList,
-      });
+    return await db.insert(groceryListTable).values(groceryList).returning();
   } catch (error) {
     console.log("Error upserting groceryList:", error);
     throw error;
   }
 };
 
-export const getGroceryList = async (id: number) => {
+// TODO
+export const getAllGroceryLists = async (id: string) => {
+  return id;
+};
+
+export const getGroceryList = async (groceryListId: number, userId: number) => {
   try {
     return await db
       .select()
       .from(groceryListTable)
       .where(
-        and(eq(groceryListTable.id, id), eq(groceryListTable.name, "Dan")),
+        and(
+          eq(groceryListTable.id, groceryListId),
+          eq(groceryListTable.userId, userId),
+        ),
       );
   } catch (error) {
     console.log("Error getting groceryList:", error);
-  }
-};
-
-export const updateGroceryList = async (groceryList: InsertGroceryList) => {
-  try {
-    await db
-      .update(groceryListTable)
-      .set(groceryList)
-      .where(eq(groceryListTable.name, "Dan"))
-      .returning({ updatedId: groceryListTable.id });
-  } catch (error) {
-    console.log("Error updating groceryList:", error);
   }
 };
 
@@ -53,6 +44,6 @@ export const insertTempGroceryLists = async () => {
       .values(tempGroceryLists)
       .returning();
   } catch (error) {
-    console.log("Error inserting temp grcoery lists:", error);
+    console.log("Error inserting temp grocery lists:", error);
   }
 };

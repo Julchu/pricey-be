@@ -8,25 +8,19 @@ import {
 
 export const upsertUser = async (user: InsertUser) => {
   try {
-    return await db
-      .insert(userTable)
-      .values(user)
-      .onConflictDoUpdate({
-        target: [userTable.id, userTable.email],
-        set: user,
-      });
+    return await db.insert(userTable).values(user).returning();
   } catch (error) {
     console.log("Error upserting user:", error);
     throw error;
   }
 };
 
-export const updateUser = async (user: InsertUser) => {
+export const updateUser = async (id: number, user: InsertUser) => {
   try {
     await db
       .update(userTable)
       .set(user)
-      .where(eq(userTable.name, "Dan"))
+      .where(eq(userTable.id, id))
       .returning({ updatedId: userTable.id });
   } catch (error) {
     console.log("Error updating user:", error);
