@@ -1,36 +1,54 @@
 import { db } from "../db";
-import { eq } from "drizzle-orm";
+import { type InsertRecipe, recipeTable } from "../db/schemas/recipe-schema.ts";
+import { and, eq } from "drizzle-orm";
 import {
-  type InsertRecipe,
-  recipeTable,
-  tempRecipes,
-} from "../db/schemas/recipe-schema.ts";
+  type InsertRecipeIngredient,
+  recipeIngredientTable,
+} from "../db/schemas/recipe-ingredient-schema.ts";
 
-export const upsertRecipe = async (recipe: InsertRecipe) => {
+export const upsertRecipe = async (
+  recipe: InsertRecipe,
+  recipeIngredients: InsertRecipeIngredient,
+) => {
   try {
-    return await db.insert(recipeTable).values(recipe).returning();
+    // TODO: transaction
+    return await db.transaction(async (tx) => {
+      await tx.insert(recipeTable).values(recipe).returning();
+      await tx
+        .insert(recipeIngredientTable)
+        .values(recipeIngredients)
+        .returning();
+      // TODO: upsert grocery list ingredients
+    });
   } catch (error) {
     console.log("Error upserting recipe:", error);
     throw error;
   }
 };
 
-export const updateRecipe = async (recipe: InsertRecipe) => {
+export const getAllRecipes = async (userId: number) => {
   try {
-    await db
-      .update(recipeTable)
-      .set(recipe)
-      .where(eq(recipeTable.name, "Dan"))
-      .returning({ updatedId: recipeTable.id });
+    return await db
+      .select()
+      .from(recipeTable)
+      .where(eq(recipeTable.userId, userId));
   } catch (error) {
-    console.log("Error updating recipe:", error);
+    console.log("Error getting recipe:", error);
   }
 };
 
-export const insertTempRecipes = async () => {
+export const getRecipe = async (recipeId: number, userId: number) => {
   try {
-    return await db.insert(recipeTable).values(tempRecipes).returning();
+    return await db
+      .select()
+      .from(recipeTable)
+      .where(and(eq(recipeTable.id, recipeId), eq(recipeTable.userId, userId)));
   } catch (error) {
-    console.log("Error inserting temp recipes:", error);
+    console.log("Error getting recipe:", error);
   }
+};
+
+// TODO: test delete cascading for groceries/recipes, users (does it remove itself from other tables)
+export const deleteRecipe = async (recipeId: number, userId: number) => {
+  return;
 };

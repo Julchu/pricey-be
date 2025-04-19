@@ -3,22 +3,29 @@ import { and, eq } from "drizzle-orm";
 import {
   groceryListTable,
   type InsertGroceryList,
-  tempGroceryLists,
 } from "../db/schemas/grocery-list-schema.ts";
 
 // TODO: fix/test
 export const upsertGroceryList = async (groceryList: InsertGroceryList) => {
   try {
+    // TODO: transaction
     return await db.insert(groceryListTable).values(groceryList).returning();
+    // TODO: upsert grocery list ingredients
   } catch (error) {
     console.log("Error upserting groceryList:", error);
     throw error;
   }
 };
 
-// TODO
-export const getAllGroceryLists = async (id: string) => {
-  return id;
+export const getAllGroceryLists = async (userId: number) => {
+  try {
+    return await db
+      .select()
+      .from(groceryListTable)
+      .where(eq(groceryListTable.userId, userId));
+  } catch (error) {
+    console.log("Error getting groceryList:", error);
+  }
 };
 
 export const getGroceryList = async (groceryListId: number, userId: number) => {
@@ -34,16 +41,5 @@ export const getGroceryList = async (groceryListId: number, userId: number) => {
       );
   } catch (error) {
     console.log("Error getting groceryList:", error);
-  }
-};
-
-export const insertTempGroceryLists = async () => {
-  try {
-    return await db
-      .insert(groceryListTable)
-      .values(tempGroceryLists)
-      .returning();
-  } catch (error) {
-    console.log("Error inserting temp grocery lists:", error);
   }
 };

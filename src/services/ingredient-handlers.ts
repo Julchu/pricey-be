@@ -2,8 +2,8 @@ import { db } from "../db";
 import {
   ingredientTable,
   type InsertIngredient,
-  tempIngredients,
 } from "../db/schemas/ingredient-schema.ts";
+import { and, eq } from "drizzle-orm";
 
 export const upsertIngredient = async (ingredient: InsertIngredient) => {
   try {
@@ -21,14 +21,29 @@ export const upsertIngredient = async (ingredient: InsertIngredient) => {
   }
 };
 
-export const insertTempIngredients = async () => {
+export const getAllIngredients = async (userId: number) => {
   try {
     return await db
-      .insert(ingredientTable)
-      .values(tempIngredients)
-      .onConflictDoNothing()
-      .returning();
+      .select()
+      .from(ingredientTable)
+      .where(eq(ingredientTable.userId, userId));
   } catch (error) {
-    console.log("Error inserting temp ingredients:", error);
+    console.log("Error getting groceryList:", error);
+  }
+};
+
+export const getIngredient = async (ingredientId: number, userId: number) => {
+  try {
+    return await db
+      .select()
+      .from(ingredientTable)
+      .where(
+        and(
+          eq(ingredientTable.id, ingredientId),
+          eq(ingredientTable.userId, userId),
+        ),
+      );
+  } catch (error) {
+    console.log("Error getting groceryList:", error);
   }
 };

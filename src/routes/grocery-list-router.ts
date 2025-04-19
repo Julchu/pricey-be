@@ -1,7 +1,6 @@
 import { Router } from "express";
 import {
   getAllGroceryLists,
-  insertTempGroceryLists,
   upsertGroceryList,
 } from "../services/grocery-list-handlers.ts";
 
@@ -16,18 +15,10 @@ groceryListRouter.get("/:userId", async (req, res) => {
   res.send({ title: "The Pricey App" });
 });
 
+// Verify that userId owns groceryListId before inserting ingredient
+// TODO: when inserting groceryList and groceryListIngredients, do as transaction to ensure failure doesn't save anything
 groceryListRouter.post("/", async (req, res) => {
   console.log("groceryList", req.body.groceryList);
   await upsertGroceryList(req.body.groceryList);
   res.send({ title: "The Pricey App" });
-});
-
-groceryListRouter.post("/seed", async (req, res) => {
-  try {
-    await insertTempGroceryLists();
-  } catch (error) {
-    console.log(error);
-  }
-
-  res.send({ test: "test" });
 });

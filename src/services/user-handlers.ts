@@ -1,10 +1,6 @@
 import { db } from "../db";
+import { type InsertUser, userTable } from "../db/schemas/user-schema.ts";
 import { eq } from "drizzle-orm";
-import {
-  type InsertUser,
-  tempUsers,
-  userTable,
-} from "../db/schemas/user-schema.ts";
 
 export const upsertUser = async (user: InsertUser) => {
   try {
@@ -15,22 +11,10 @@ export const upsertUser = async (user: InsertUser) => {
   }
 };
 
-export const updateUser = async (id: number, user: InsertUser) => {
+export const getUser = async (userId: number) => {
   try {
-    await db
-      .update(userTable)
-      .set(user)
-      .where(eq(userTable.id, id))
-      .returning({ updatedId: userTable.id });
+    return await db.select().from(userTable).where(eq(userTable.id, userId));
   } catch (error) {
-    console.log("Error updating user:", error);
-  }
-};
-
-export const insertTempUsers = async () => {
-  try {
-    return await db.insert(userTable).values(tempUsers).returning();
-  } catch (error) {
-    console.log("Error inserting temp users:", error);
+    console.log("Error getting groceryList:", error);
   }
 };

@@ -137,3 +137,5 @@ dist
 .pnp.*
 
 *.crt
+
+pgAdmin4

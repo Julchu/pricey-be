@@ -1,11 +1,11 @@
 {
-  "id": "b9773531-fc63-4261-b90d-d1e0b42a93e4",
+  "id": "b2fcc3b5-be8f-4ccc-84bb-57ab10357e70",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.grocery_list": {
-      "name": "grocery_list",
+    "public.grocery_list_ingredients": {
+      "name": "grocery_list_ingredients",
       "schema": "",
       "columns": {
         "id": {
@@ -15,7 +15,7 @@
           "notNull": true,
           "identity": {
             "type": "always",
-            "name": "grocery_list_id_seq",
+            "name": "grocery_list_ingredients_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -31,12 +31,136 @@
           "primaryKey": false,
           "notNull": true
         },
-        "ingredients": {
-          "name": "ingredients",
-          "type": "integer[]",
+        "userId": {
+          "name": "userId",
+          "type": "integer",
           "primaryKey": false,
+          "notNull": true
+        },
+        "groceryListId": {
+          "name": "groceryListId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "capacity": {
+          "name": "capacity",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "unit": {
+          "name": "unit",
+          "type": "unit",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "grocery_list_ingredients_userId_users_id_fk": {
+          "name": "grocery_list_ingredients_userId_users_id_fk",
+          "tableFrom": "grocery_list_ingredients",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "grocery_list_ingredients_groceryListId_grocery_lists_id_fk": {
+          "name": "grocery_list_ingredients_groceryListId_grocery_lists_id_fk",
+          "tableFrom": "grocery_list_ingredients",
+          "tableTo": "grocery_lists",
+          "columnsFrom": [
+            "groceryListId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "unique_userId_groceryListId_ingredientName": {
+          "name": "unique_userId_groceryListId_ingredientName",
+          "nullsNotDistinct": false,
+          "columns": [
+            "userId",
+            "groceryListId",
+            "name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.grocery_lists": {
+      "name": "grocery_lists",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
           "notNull": true,
-          "default": "'{}'"
+          "identity": {
+            "type": "always",
+            "name": "grocery_lists_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
         },
         "userId": {
           "name": "userId",
@@ -73,17 +197,17 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "grocery_list_userId_user_id_fk": {
-          "name": "grocery_list_userId_user_id_fk",
-          "tableFrom": "grocery_list",
-          "tableTo": "user",
+        "grocery_lists_userId_users_id_fk": {
+          "name": "grocery_lists_userId_users_id_fk",
+          "tableFrom": "grocery_lists",
+          "tableTo": "users",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -102,8 +226,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.ingredient": {
-      "name": "ingredient",
+    "public.ingredients": {
+      "name": "ingredients",
       "schema": "",
       "columns": {
         "id": {
@@ -113,7 +237,7 @@
           "notNull": true,
           "identity": {
             "type": "always",
-            "name": "ingredient_id_seq",
+            "name": "ingredients_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -198,17 +322,17 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "ingredient_userId_user_id_fk": {
-          "name": "ingredient_userId_user_id_fk",
-          "tableFrom": "ingredient",
-          "tableTo": "user",
+        "ingredients_userId_users_id_fk": {
+          "name": "ingredients_userId_users_id_fk",
+          "tableFrom": "ingredients",
+          "tableTo": "users",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -224,24 +348,11 @@
         }
       },
       "policies": {},
-      "checkConstraints": {
-        "price_gt_0": {
-          "name": "price_gt_0",
-          "value": "\"ingredient\".\"price\"\n      > 0"
-        },
-        "capacity_gt_0": {
-          "name": "capacity_gt_0",
-          "value": "\"ingredient\".\"capacity\"\n      > 0"
-        },
-        "quantity_gt_0": {
-          "name": "quantity_gt_0",
-          "value": "\"ingredient\".\"quantity\"\n      > 0"
-        }
-      },
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.recipe": {
-      "name": "recipe",
+    "public.recipe_ingredients": {
+      "name": "recipe_ingredients",
       "schema": "",
       "columns": {
         "id": {
@@ -251,7 +362,7 @@
           "notNull": true,
           "identity": {
             "type": "always",
-            "name": "recipe_id_seq",
+            "name": "recipe_ingredients_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -267,12 +378,136 @@
           "primaryKey": false,
           "notNull": true
         },
-        "ingredients": {
-          "name": "ingredients",
-          "type": "integer[]",
+        "userId": {
+          "name": "userId",
+          "type": "integer",
           "primaryKey": false,
+          "notNull": true
+        },
+        "recipeId": {
+          "name": "recipeId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "capacity": {
+          "name": "capacity",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "unit": {
+          "name": "unit",
+          "type": "unit",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "recipe_ingredients_userId_users_id_fk": {
+          "name": "recipe_ingredients_userId_users_id_fk",
+          "tableFrom": "recipe_ingredients",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "recipe_ingredients_recipeId_recipes_id_fk": {
+          "name": "recipe_ingredients_recipeId_recipes_id_fk",
+          "tableFrom": "recipe_ingredients",
+          "tableTo": "recipes",
+          "columnsFrom": [
+            "recipeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "unique_userId_recipeId_ingredientName": {
+          "name": "unique_userId_recipeId_ingredientName",
+          "nullsNotDistinct": false,
+          "columns": [
+            "userId",
+            "recipeId",
+            "name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.recipes": {
+      "name": "recipes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
           "notNull": true,
-          "default": "'{}'"
+          "identity": {
+            "type": "always",
+            "name": "recipes_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
         },
         "userId": {
           "name": "userId",
@@ -309,17 +544,17 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "recipe_userId_user_id_fk": {
-          "name": "recipe_userId_user_id_fk",
-          "tableFrom": "recipe",
-          "tableTo": "user",
+        "recipes_userId_users_id_fk": {
+          "name": "recipes_userId_users_id_fk",
+          "tableFrom": "recipes",
+          "tableTo": "users",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -338,8 +573,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user": {
-      "name": "user",
+    "public.users": {
+      "name": "users",
       "schema": "",
       "columns": {
         "id": {
@@ -349,7 +584,7 @@
           "notNull": true,
           "identity": {
             "type": "always",
-            "name": "user_id_seq",
+            "name": "users_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -408,8 +643,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "user_email_unique": {
-          "name": "user_email_unique",
+        "users_email_unique": {
+          "name": "users_email_unique",
           "nullsNotDistinct": false,
           "columns": [
             "email"
