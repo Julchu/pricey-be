@@ -51,3 +51,20 @@ export const ingredientTable = pgTable(
 
 export type SelectIngredient = InferSelectModel<typeof ingredientTable>;
 export type InsertIngredient = InferInsertModel<typeof ingredientTable>;
+
+// Foreign key (userId) is not created if checks are added (even if foreign key is added as a constraint rather than in-line)
+/*    // check(
+    //   "price_gt_0",
+    //   sql`${table.price}
+    //   > 0`,
+    // ),
+    // check(
+    //   "capacity_gt_0",
+    //   sql`${table.capacity}
+    //   > 0`,
+    // ),
+    // check(
+    //   "quantity_gt_0",
+    //   sql`${table.quantity}
+    //   > 0`,
+    // ),*/

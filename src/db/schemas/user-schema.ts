@@ -27,19 +27,3 @@ export const userTable = pgTable(
 
 export type SelectUser = InferSelectModel<typeof userTable>;
 export type InsertUser = InferInsertModel<typeof userTable>;
-
-/*    // check(
-    //   "price_gt_0",
-    //   sql`${table.price}
-    //   > 0`,
-    // ),
-    // check(
-    //   "capacity_gt_0",
-    //   sql`${table.capacity}
-    //   > 0`,
-    // ),
-    // check(
-    //   "quantity_gt_0",
-    //   sql`${table.quantity}
-    //   > 0`,
-    // ),*/
