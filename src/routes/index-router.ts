@@ -5,7 +5,7 @@ export const indexRouter = Router();
 
 /* GET home page. */
 indexRouter.get("/", (req, res) => {
-  res.render("index", { title: "The Pricey App" });
+  res.send({ title: "The Pricey App" });
 });
 
 indexRouter.post("/seed", async (req, res) => {

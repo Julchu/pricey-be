@@ -3,6 +3,7 @@ import {
   getAllIngredients,
   upsertIngredient,
 } from "../services/ingredient-handlers.ts";
+import type { AuthRequest } from "../utils/interfaces.ts";
 
 export const ingredientRouter = Router();
 
@@ -10,16 +11,14 @@ ingredientRouter.get("/", async (req, res) => {
   res.send({ title: "The Pricey App" });
 });
 
-ingredientRouter.get("/:userId", async (req, res) => {
-  const userId = parseInt(req.params.userId);
-
-  if (isNaN(userId)) {
+ingredientRouter.get("/:userId", async (req: AuthRequest, res) => {
+  if (!req.userId) {
     res.status(400).json({ error: "Invalid user ID" });
     return;
   }
 
   try {
-    const ingredients = await getAllIngredients(parseInt(req.params.userId));
+    const ingredients = await getAllIngredients(req.userId);
     res.json(ingredients);
   } catch (error) {
     console.error("Failed to get ingredients", error);

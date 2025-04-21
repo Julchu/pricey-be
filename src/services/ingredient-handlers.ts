@@ -16,8 +16,7 @@ export const upsertIngredient = async (ingredient: InsertIngredient) => {
       })
       .returning();
   } catch (error) {
-    console.log("Error upserting ingredient:", error);
-    throw error;
+    throw new Error("Error upserting ingredient:", { cause: error });
   }
 };
 
@@ -28,7 +27,7 @@ export const getAllIngredients = async (userId: number) => {
       .from(ingredientTable)
       .where(eq(ingredientTable.userId, userId));
   } catch (error) {
-    console.log("Error getting groceryList:", error);
+    throw new Error("Error getting groceryList:", { cause: error });
   }
 };
 
@@ -44,6 +43,6 @@ export const getIngredient = async (ingredientId: number, userId: number) => {
         ),
       );
   } catch (error) {
-    console.log("Error getting groceryList:", error);
+    throw new Error("Error getting groceryList:", { cause: error });
   }
 };

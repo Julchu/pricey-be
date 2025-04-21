@@ -1,3 +1,5 @@
+import type { Request } from "express";
+
 export enum Unit {
   // Mass
   KILOGRAM = "kg",
@@ -112,3 +114,12 @@ export interface Address {
   administrative_area_level_1: string;
   country: string;
 }
+
+export type AuthRequest<
+  TParams = Record<string, unknown>,
+  TResBody = unknown,
+  TReqBody = unknown,
+  TQuery = Record<string, unknown>,
+> = Request<TParams, TResBody, TReqBody, TQuery> & {
+  userId?: number;
+};

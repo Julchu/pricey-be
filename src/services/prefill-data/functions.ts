@@ -55,7 +55,7 @@ const insertTempRecipes = async () => {
       .onConflictDoNothing()
       .returning();
   } catch (error) {
-    throw new Error("Error inserting temp recipes:", { cause: error });
+    throw new Error("Error inserting temp recipes", { cause: error });
   }
 };
 
@@ -67,7 +67,7 @@ const insertTempIngredients = async () => {
       .onConflictDoNothing()
       .returning();
   } catch (error) {
-    throw new Error("Error inserting temp ingredients:", { cause: error });
+    throw new Error("Error inserting temp ingredients", { cause: error });
   }
 };
 
@@ -79,7 +79,7 @@ const insertTempGroceryLists = async () => {
       .onConflictDoNothing()
       .returning();
   } catch (error) {
-    throw new Error("Error inserting temp grocery lists:", { cause: error });
+    throw new Error("Error inserting temp grocery lists", { cause: error });
   }
 };
 
@@ -91,7 +91,7 @@ const insertTempGroceryListIngredients = async () => {
       .onConflictDoNothing()
       .returning();
   } catch (error) {
-    throw new Error("Error inserting temp users:", { cause: error });
+    throw new Error("Error inserting temp users", { cause: error });
   }
 };
 
@@ -103,7 +103,7 @@ const insertTempRecipeIngredients = async () => {
       .onConflictDoNothing()
       .returning();
   } catch (error) {
-    throw new Error("Error inserting temp users:", { cause: error });
+    throw new Error("Error inserting temp users", { cause: error });
   }
 };
 

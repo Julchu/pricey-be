@@ -1,24 +1,30 @@
 import { Router } from "express";
 import {
   getAllGroceryLists,
-  upsertGroceryList,
+  insertGroceryList,
 } from "../services/grocery-list-handlers.ts";
+import type { AuthRequest } from "../utils/interfaces.ts";
 
 export const groceryListRouter = Router();
 
-groceryListRouter.get("/", async (req, res) => {
-  res.send({ title: "The Pricey App" });
-});
+groceryListRouter.get("/", async (req: AuthRequest, res) => {
+  if (!req.userId) {
+    res.status(400).json({ error: "Invalid user ID" });
+    return;
+  }
 
-groceryListRouter.get("/:userId", async (req, res) => {
-  await getAllGroceryLists(req.body);
-  res.send({ title: "The Pricey App" });
+  try {
+    const groceryLists = await getAllGroceryLists(req.userId);
+    res.json(groceryLists);
+  } catch (error) {
+    console.error("Failed to get grocery lists", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 // Verify that userId owns groceryListId before inserting ingredient
-// TODO: when inserting groceryList and groceryListIngredients, do as transaction to ensure failure doesn't save anything
 groceryListRouter.post("/", async (req, res) => {
-  console.log("groceryList", req.body.groceryList);
-  await upsertGroceryList(req.body.groceryList);
+  const { ingredients, ...groceryList } = req.body.groceryList;
+  await insertGroceryList(groceryList, ingredients);
   res.send({ title: "The Pricey App" });
 });

@@ -8,22 +8,20 @@ import {
 
 export const upsertRecipe = async (
   recipe: InsertRecipe,
-  recipeIngredients: InsertRecipeIngredient,
+  recipeIngredients: InsertRecipeIngredient[],
 ) => {
-  try {
-    // TODO: transaction
-    return await db.transaction(async (tx) => {
-      await tx.insert(recipeTable).values(recipe).returning();
-      await tx
-        .insert(recipeIngredientTable)
-        .values(recipeIngredients)
-        .returning();
-      // TODO: upsert grocery list ingredients
-    });
-  } catch (error) {
-    console.log("Error upserting recipe:", error);
-    throw error;
-  }
+  if (recipeIngredients.some(() => {}))
+    try {
+      return await db.transaction(async (tx) => {
+        await tx.insert(recipeTable).values(recipe).returning();
+        await tx
+          .insert(recipeIngredientTable)
+          .values(recipeIngredients)
+          .returning();
+      });
+    } catch (error) {
+      throw new Error("Error upserting recipe:", { cause: error });
+    }
 };
 
 export const getAllRecipes = async (userId: number) => {
@@ -33,7 +31,7 @@ export const getAllRecipes = async (userId: number) => {
       .from(recipeTable)
       .where(eq(recipeTable.userId, userId));
   } catch (error) {
-    console.log("Error getting recipe:", error);
+    throw new Error("Error getting recipe:", { cause: error });
   }
 };
 
@@ -44,7 +42,7 @@ export const getRecipe = async (recipeId: number, userId: number) => {
       .from(recipeTable)
       .where(and(eq(recipeTable.id, recipeId), eq(recipeTable.userId, userId)));
   } catch (error) {
-    console.log("Error getting recipe:", error);
+    throw new Error("Error getting recipe", { cause: error });
   }
 };
 

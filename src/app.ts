@@ -12,6 +12,8 @@ import { ingredientRouter } from "./routes/ingredient-router.ts";
 import { userRouter } from "./routes/user-router.ts";
 import { groceryListRouter } from "./routes/grocery-list-router.ts";
 import { recipeRouter } from "./routes/recipe-router.ts";
+import rateLimit from "express-rate-limit";
+import type { AuthRequest } from "./utils/interfaces.ts";
 
 const app = express();
 
@@ -19,18 +21,60 @@ const app = express();
 const __dirname = import.meta.dirname;
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
-
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
-app.use("/user", userRouter);
-app.use("/ingredient", ingredientRouter);
-app.use("/grocery-list", groceryListRouter);
-app.use("/recipe", recipeRouter);
+// TODO: test/optimize rate limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  standardHeaders: "draft-7", // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+  keyGenerator: (req) => {
+    if (!req.headers.authorization) return "1";
+    return req.ip || "";
+  },
+});
+
+// Can pass values to req; ex: req.userId = "userId"; console.log(req['userId])
+const userRequired = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const token = req.header("Authorization")?.split("Bearer ")[1];
+    const auth = await authenticateUser(token);
+    if (auth) {
+      req.userId = auth.userId;
+      next();
+    } else res.send("Not authorized");
+  } catch (error) {
+    throw new Error("Unable to authenticate user", { cause: error });
+  }
+};
+
+export const authenticateUser = async (token?: string) => {
+  if (!token) return;
+  try {
+    // await getAuth().verifyIdToken(token);
+    return { userId: parseInt(token) };
+  } catch (error) {
+    throw new Error("Error authenticating user", { cause: error });
+  }
+};
+
+// Apply the rate limiting middleware to all requests.
+app.use(limiter);
+
+app.use("/", userRequired, indexRouter);
+app.use("/user", userRequired, userRouter);
+app.use("/ingredient", userRequired, ingredientRouter);
+app.use("/grocery-list", userRequired, groceryListRouter);
+app.use("/recipe", userRequired, recipeRouter);
 
 // catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: NextFunction) => {

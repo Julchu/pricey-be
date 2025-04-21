@@ -4,16 +4,43 @@ import {
   groceryListTable,
   type InsertGroceryList,
 } from "../db/schemas/grocery-list-schema.ts";
+import {
+  groceryListIngredientTable,
+  type InsertGroceryListIngredient,
+} from "../db/schemas/grocery-ingredient-schema.ts";
 
-// TODO: fix/test
-export const upsertGroceryList = async (groceryList: InsertGroceryList) => {
+// TODO: determine if upsert vs insert/update & removing schema unique conflict
+// TODO: test if insert accounts for uniqueness (can insert same name/list/userId ingredient, or if blocked)
+export const insertGroceryList = async (
+  groceryList: InsertGroceryList,
+  groceryIngredients: InsertGroceryListIngredient[],
+) => {
   try {
-    // TODO: transaction
-    return await db.insert(groceryListTable).values(groceryList).returning();
-    // TODO: upsert grocery list ingredients
+    return await db.transaction(async (tx) => {
+      await tx.insert(groceryListTable).values(groceryList).returning();
+      await tx
+        .insert(groceryListIngredientTable)
+        .values(groceryIngredients)
+        .returning();
+    });
   } catch (error) {
-    console.log("Error upserting groceryList:", error);
-    throw error;
+    throw new Error("Error inserting grocery list", { cause: error });
+  }
+};
+
+export const updateGroceryList = async (
+  groceryList: InsertGroceryList,
+  groceryIngredients: InsertGroceryListIngredient[],
+) => {
+  try {
+    return await db.transaction(async (tx) => {
+      await tx.insert(groceryListTable).values(groceryList).returning();
+      for (const ingredient of groceryIngredients) {
+        await tx.update(groceryListIngredientTable).set(ingredient).returning();
+      }
+    });
+  } catch (error) {
+    throw new Error("Error updating grocery list", { cause: error });
   }
 };
 
@@ -24,7 +51,7 @@ export const getAllGroceryLists = async (userId: number) => {
       .from(groceryListTable)
       .where(eq(groceryListTable.userId, userId));
   } catch (error) {
-    console.log("Error getting groceryList:", error);
+    throw new Error("Error getting grocery list", { cause: error });
   }
 };
 
@@ -40,6 +67,6 @@ export const getGroceryList = async (groceryListId: number, userId: number) => {
         ),
       );
   } catch (error) {
-    console.log("Error getting groceryList:", error);
+    throw new Error("Error getting groceryList:", { cause: error });
   }
 };
