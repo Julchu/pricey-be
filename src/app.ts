@@ -13,7 +13,7 @@ import { userRouter } from "./routes/user-router.ts";
 import { groceryListRouter } from "./routes/grocery-list-router.ts";
 import { recipeRouter } from "./routes/recipe-router.ts";
 import rateLimit from "express-rate-limit";
-import type { AuthRequest } from "./utils/interfaces.ts";
+import { userRequired } from "./services/auth-handlers.ts";
 
 const app = express();
 
@@ -39,39 +39,10 @@ const limiter = rateLimit({
   },
 });
 
-// Can pass values to req; ex: req.userId = "userId"; console.log(req['userId])
-const userRequired = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const token = req.header("Authorization")?.split("Bearer ")[1];
-    const auth = await authenticateUser(token);
-    if (auth) {
-      req.userId = auth.userId;
-      next();
-    } else res.send("Not authorized");
-  } catch (error) {
-    throw new Error("Unable to authenticate user", { cause: error });
-  }
-};
-
-export const authenticateUser = async (token?: string) => {
-  if (!token) return;
-  try {
-    // await getAuth().verifyIdToken(token);
-    return { userId: parseInt(token) };
-  } catch (error) {
-    throw new Error("Error authenticating user", { cause: error });
-  }
-};
-
 // Apply the rate limiting middleware to all requests.
 app.use(limiter);
-
-app.use("/", userRequired, indexRouter);
-app.use("/user", userRequired, userRouter);
+app.use("/", indexRouter);
+app.use("/user", userRouter);
 app.use("/ingredient", userRequired, ingredientRouter);
 app.use("/grocery-list", userRequired, groceryListRouter);
 app.use("/recipe", userRequired, recipeRouter);

@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { prefillDb } from "../services/prefill-data/functions.ts";
+import { userRequired } from "../services/auth-handlers.ts";
+import type { AuthRequest } from "../utils/interfaces.ts";
 
 export const indexRouter = Router();
 
@@ -8,7 +10,16 @@ indexRouter.get("/", (req, res) => {
   res.send({ title: "The Pricey App" });
 });
 
-indexRouter.post("/seed", async (req, res) => {
+indexRouter.get("/test", userRequired, async (req: AuthRequest, res) => {
+  if (!req.userId) {
+    res.status(400).json({ error: "Invalid user ID" });
+    return;
+  }
+
+  res.send({ title: "The Pricey App" });
+});
+
+indexRouter.post("/seed", userRequired, async (req, res) => {
   try {
     await prefillDb();
     res.send({ title: "The Pricey App" });

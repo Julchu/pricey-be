@@ -26,6 +26,7 @@
     "express-rate-limit": "^7.5.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "jose": "^6.0.10",
     "morgan": "~1.9.1",
     "postgres": "^3.4.5"
   },

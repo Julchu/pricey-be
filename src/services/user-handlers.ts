@@ -1,6 +1,7 @@
 import { db } from "../db";
 import { type InsertUser, userTable } from "../db/schemas/user-schema.ts";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { createToken } from "./auth-handlers.ts";
 
 export const getUser = async (userId: number) => {
   try {
@@ -10,23 +11,37 @@ export const getUser = async (userId: number) => {
   }
 };
 
-export const insertUser = async (user: InsertUser) => {
+const insertUser = async (user: InsertUser) => {
+  const { name, email } = user;
   try {
-    return await db.insert(userTable).values(user).returning();
+    return await db
+      .insert(userTable)
+      .values({ name, email })
+      .returning({ id: userTable.id });
   } catch (error) {
     throw new Error("Error upserting user", { cause: error });
   }
 };
 
 export const updateUser = async (userId: number, updatedUser: InsertUser) => {
-  // const existingUser = await db.query.userTable.findFirst({
-  //   where: (user) => eq(user.id, userId),
-  // });
-  //
-  // if (existingUser)
+  const { email, ...userInfo } = updatedUser;
   try {
-    return await db.update(userTable).set(updatedUser).returning();
+    const existingUser = await db.query.userTable.findFirst({
+      where: (user) => and(eq(user.id, userId), eq(user.email, email)),
+    });
+
+    if (existingUser)
+      return await db.update(userTable).set(userInfo).returning();
   } catch (error) {
     throw new Error("Error upserting user", { cause: error });
+  }
+};
+
+export const registerUser = async (user: InsertUser) => {
+  try {
+    const [createdUser] = await insertUser(user);
+    if (createdUser) return await createToken(createdUser.id);
+  } catch (error) {
+    throw new Error("Error registering new user", { cause: error });
   }
 };
