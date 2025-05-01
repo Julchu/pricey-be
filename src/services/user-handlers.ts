@@ -19,7 +19,7 @@ const insertUser = async (user: InsertUser) => {
       .values({ name, email })
       .returning({ id: userTable.id });
   } catch (error) {
-    throw new Error("Error upserting user", { cause: error });
+    throw new Error("Error inserting user", { cause: error });
   }
 };
 
@@ -33,7 +33,7 @@ export const updateUser = async (userId: number, updatedUser: InsertUser) => {
     if (existingUser)
       return await db.update(userTable).set(userInfo).returning();
   } catch (error) {
-    throw new Error("Error upserting user", { cause: error });
+    throw new Error("Error updating user", { cause: error });
   }
 };
 

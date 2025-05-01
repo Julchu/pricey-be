@@ -6,24 +6,6 @@ import { db } from "../db";
 import { userTable } from "../db/schemas/user-schema.ts";
 import { eq } from "drizzle-orm";
 
-// Need userRequired and AuthRequest req type to pass req.userId
-export const userRequired = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const token = req.header("Authorization")?.split("Bearer ")[1];
-    const auth = await verifyToken(token);
-    if (auth) {
-      req.userId = auth.payload.userId;
-      next();
-    } else res.send("Not authorized");
-  } catch (error) {
-    throw new Error("Unable to authenticate user", { cause: error });
-  }
-};
-
 type JwtPayload = {
   userId: number;
 };
@@ -60,6 +42,11 @@ export const createToken = async (userId: number) => {
     .sign(secret);
 };
 
+/**
+ * Login: checks existence of user before returning token
+ * Register: creates new user (if error isn't thrown) and returns token
+ * userRequired: checks header auth token in any API call (that isn't login/register)
+ * */
 export const loginCheck = async (email?: string) => {
   if (!email) return;
 
@@ -73,5 +60,23 @@ export const loginCheck = async (email?: string) => {
     return createToken(fetchedUser.id);
   } catch (error) {
     throw new Error("Failed to login", { cause: error });
+  }
+};
+
+// Need userRequired and AuthRequest req type to pass req.userId
+export const userRequired = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const token = req.header("Authorization")?.split("Bearer ")[1];
+    const auth = await verifyToken(token);
+    if (auth) {
+      req.userId = auth.payload.userId;
+      next();
+    } else res.send("Not authorized");
+  } catch (error) {
+    throw new Error("Unable to authenticate user", { cause: error });
   }
 };

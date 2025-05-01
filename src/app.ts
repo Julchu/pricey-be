@@ -41,11 +41,20 @@ const limiter = rateLimit({
 
 // Apply the rate limiting middleware to all requests.
 app.use(limiter);
+
+// Public routes
 app.use("/", indexRouter);
 app.use("/user", userRouter);
-app.use("/ingredient", userRequired, ingredientRouter);
-app.use("/grocery-list", userRequired, groceryListRouter);
-app.use("/recipe", userRequired, recipeRouter);
+
+// Protected routes
+const protectedRoutes = express.Router();
+
+protectedRoutes.use(userRequired);
+protectedRoutes.use("/ingredient", ingredientRouter);
+protectedRoutes.use("/grocery-list", groceryListRouter);
+protectedRoutes.use("/recipe", recipeRouter);
+
+app.use("/", protectedRoutes);
 
 // catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: NextFunction) => {
