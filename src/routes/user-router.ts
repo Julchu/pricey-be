@@ -69,7 +69,7 @@ userRouter.post("/register", async (req, res) => {
   try {
     const newUser = await registerUser(req.body.user);
     if (newUser) res.status(200).json(newUser);
-    else res.status(401).json({ error: "Could not create new user" });
+    else res.status(400).json({ error: "Could not create new user" });
   } catch (error) {
     console.error("Failed to get user", error);
     res.status(500).json({ error: "Internal Server Error" });
