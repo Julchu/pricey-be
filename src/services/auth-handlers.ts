@@ -75,7 +75,7 @@ export const userRequired = async (
     if (auth) {
       req.userId = auth.payload.userId;
       next();
-    } else res.send("Not authorized");
+    } else res.status(401).send("Unauthorized");
   } catch (error) {
     throw new Error("Unable to authenticate user", { cause: error });
   }
