@@ -76,7 +76,12 @@ userRouter.post("/register", async (req, res) => {
   }
 });
 
-userRouter.post("/logout", (req, res) => {
+userRouter.post("/logout", userRequired, (req: AuthRequest, res) => {
+  if (!req.userId) {
+    res.status(400).json({ error: "Invalid user ID" });
+    return;
+  }
+
   res.clearCookie("pricey_token");
   res.send({ message: "Logged out" });
 });
