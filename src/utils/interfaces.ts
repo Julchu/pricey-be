@@ -51,7 +51,7 @@ export enum Role {
 export interface User {
   id: number;
   email: string;
-  photoURL?: string;
+  image?: string;
   name?: string;
   location?: Address;
   preferences?: UserPreferences;

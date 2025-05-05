@@ -12,16 +12,16 @@ export const recipeRouter = Router();
 
 recipeRouter.get("/", async (req: AuthRequest, res) => {
   if (!req.userId) {
-    res.status(400).json({ error: "Invalid user ID" });
+    res.status(400).json({ success: false, error: "Invalid user ID" });
     return;
   }
 
   try {
     const recipes = await getAllRecipes(req.userId);
-    res.json(recipes);
+    res.json({ success: true, data: recipes });
   } catch (error) {
     console.error("Failed to get recipes", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 
@@ -29,11 +29,15 @@ recipeRouter.get(
   "/:recipeId",
   async (req: AuthRequest<{ recipeId: number }>, res) => {
     if (!req.userId) {
-      res.status(400).json({ error: "Invalid user ID" });
+      res.status(400).json({ success: false, error: "Invalid user ID" });
       return;
     }
 
-    res.json(await getRecipe(req.params.recipeId, req.userId));
+    const recipe = await getRecipe(req.params.recipeId, req.userId);
+    res.json({
+      success: true,
+      data: recipe,
+    });
     return;
   },
 );
@@ -50,16 +54,18 @@ recipeRouter.post(
     res,
   ) => {
     if (!req.userId) {
-      res.status(400).json({ error: "Invalid user ID" });
+      res.status(400).json({ success: false, error: "Invalid user ID" });
       return;
     }
 
     try {
       const recipe = await upsertRecipe(req.body.recipe, req.body.ingredients);
-      res.json(recipe);
+      res.json({ success: true, data: recipe });
     } catch (error) {
       console.error("Failed to update recipe", error);
-      res.status(500).json({ error: "Failed to update recipe" });
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to update recipe" });
     }
   },
 );

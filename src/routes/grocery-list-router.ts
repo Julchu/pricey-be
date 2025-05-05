@@ -9,16 +9,16 @@ export const groceryListRouter = Router();
 
 groceryListRouter.get("/", async (req: AuthRequest, res) => {
   if (!req.userId) {
-    res.status(400).json({ error: "Invalid user ID" });
+    res.status(400).json({ success: false, error: "Invalid user ID" });
     return;
   }
 
   try {
     const groceryLists = await getAllGroceryLists(req.userId);
-    res.json(groceryLists);
+    res.json({ success: true, data: groceryLists });
   } catch (error) {
     console.error("Failed to get grocery lists", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 

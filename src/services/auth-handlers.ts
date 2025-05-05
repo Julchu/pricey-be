@@ -2,9 +2,7 @@
 import type { AuthRequest } from "../utils/interfaces.ts";
 import type { NextFunction, Response } from "express";
 import { jwtVerify, SignJWT } from "jose";
-import { db } from "../db";
-import { userTable } from "../db/schemas/user-schema.ts";
-import { eq } from "drizzle-orm";
+import { getUserByEmail } from "./user-handlers.ts";
 
 type JwtPayload = {
   userId: number;
@@ -13,51 +11,65 @@ type JwtPayload = {
 export const verifyToken = async (token?: string) => {
   if (!token) return;
 
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+  const secret = new TextEncoder().encode(process.env.JWT_ACCESS_SECRET);
 
   try {
     return await jwtVerify<JwtPayload>(token, secret);
   } catch (error) {
-    throw new Error("Error authenticating user, invalid or expired token", {
-      cause: error,
-    });
+    throw new Error(
+      "Error authenticating user, invalid or expired accessToken",
+      {
+        cause: error,
+      },
+    );
   }
 };
 
-export const createToken = async (userId: number) => {
+export const createTokens = async (userId: number) => {
   if (!userId) return;
-
-  await db.select().from(userTable).where(eq(userTable.id, userId));
 
   const payload: JwtPayload = {
     userId,
   };
 
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+  const accessSecret = new TextEncoder().encode(process.env.JWT_ACCESS_SECRET);
+  const refreshSecret = new TextEncoder().encode(
+    process.env.JWT_REFRESH_SECRET,
+  );
 
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("1h")
-    .sign(secret);
+  return {
+    accessToken: await new SignJWT(payload)
+      .setProtectedHeader({ alg: "HS256" })
+      .setIssuedAt()
+      .setExpirationTime("1h")
+      .sign(accessSecret),
+    refreshToken: await new SignJWT(payload)
+      .setProtectedHeader({ alg: "HS256" })
+      .setIssuedAt()
+      .setExpirationTime("7d")
+      .sign(refreshSecret),
+  };
 };
 
 /**
- * Login: checks existence of user before returning token
- * Register: creates new user (if error isn't thrown) and returns token
- * userRequired: checks header auth token in any API call (that isn't login/register)
+ * Login: checks existence of user before returning accessToken
+ * Register: creates new user (if error isn't thrown) and returns accessToken
+ * userRequired: checks header auth accessToken in any API call (that isn't login/register)
  * */
 export const loginCheck = async (email?: string) => {
   if (!email) return;
 
   try {
-    const fetchedUser = await db.query.userTable.findFirst({
-      where: (user) => eq(user.email, email),
-    });
+    const fetchedUser = await getUserByEmail(email);
 
     if (!fetchedUser) return;
 
-    return createToken(fetchedUser.id);
+    const { id, ...userInfo } = fetchedUser;
+    const tokens = await createTokens(id);
+    return {
+      tokens,
+      userInfo,
+    };
   } catch (error) {
     throw new Error("Failed to login", { cause: error });
   }

@@ -107,6 +107,16 @@ export const tempUsers: InsertUser[] = [
       displayName: "jakester",
     },
   },
+  {
+    name: "Julian Chu",
+    email: "julianchutor@gmail.com",
+    image: "https://github.com/julchu.png",
+    preferences: {
+      units: { mass: Unit.POUND, volume: Unit.QUART },
+      colorMode: Color.DARK,
+      displayName: "julchu",
+    },
+  },
 ];
 
 export const tempIngredients: InsertIngredient[] = [

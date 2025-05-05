@@ -5,11 +5,20 @@ import {
 } from "../db/schemas/ingredient-schema.ts";
 import { and, eq } from "drizzle-orm";
 
-export const upsertIngredient = async (ingredient: InsertIngredient) => {
+export const upsertIngredient = async (
+  ingredient: Omit<InsertIngredient, "userId">,
+  userId: number,
+) => {
+  const insertIngredient: InsertIngredient = {
+    ...ingredient,
+    userId,
+  };
+  // TODO: test upserting ingredient
+  console.log("ingredient", insertIngredient);
   try {
     return await db
       .insert(ingredientTable)
-      .values(ingredient)
+      .values(insertIngredient)
       .onConflictDoUpdate({
         target: [ingredientTable.userId, ingredientTable.name],
         set: ingredient,
