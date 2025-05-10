@@ -49,10 +49,14 @@ export const updateUser = async (userId: number, updatedUser: InsertUser) => {
   }
 };
 
-export const registerUser = async (user: InsertUser) => {
+export const registerUser = async (userFormData: InsertUser) => {
   try {
-    const [createdUser] = await insertUser(user);
-    if (createdUser) return await createTokens(createdUser.id);
+    const [user] = await insertUser(userFormData);
+    if (user)
+      return {
+        tokens: await createTokens(user.id),
+        user,
+      };
   } catch (error) {
     throw new Error("Error registering new user", { cause: error });
   }

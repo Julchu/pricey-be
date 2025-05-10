@@ -92,3 +92,23 @@ export const userRequired = async (
     throw new Error("Unable to authenticate user", { cause: error });
   }
 };
+
+export const setAuthCookies = (
+  res: Response,
+  accessToken: string,
+  refreshToken: string,
+) => {
+  res.cookie("pricey_access_token", accessToken, {
+    httpOnly: true, // To make it inaccessible to JavaScript
+    secure: process.env.NODE_ENV === "production", // Only set over HTTPS in production
+    sameSite: "strict",
+    maxAge: 3600000, // 1 hour expiration time
+  });
+
+  res.cookie("pricey_refresh_token", refreshToken, {
+    httpOnly: true, // To make it inaccessible to JavaScript
+    secure: process.env.NODE_ENV === "production", // Only set over HTTPS in production
+    sameSite: "strict",
+    maxAge: 604800000, // 7 day expiration time
+  });
+};

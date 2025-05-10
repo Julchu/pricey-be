@@ -110,7 +110,7 @@ export const tempUsers: InsertUser[] = [
   {
     name: "Julian Chu",
     email: "julianchutor@gmail.com",
-    image: "https://github.com/julchu.png",
+    image: "https://avatars.githubusercontent.com/u/17052350?v=4",
     preferences: {
       units: { mass: Unit.POUND, volume: Unit.QUART },
       colorMode: Color.DARK,
@@ -127,7 +127,7 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/olive_oil.jpg",
     capacity: 1,
     quantity: 2,
-    userId: 1,
+    userId: 3,
   },
   {
     name: "Basil",
@@ -136,7 +136,7 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/basil.jpg",
     capacity: 3,
     quantity: 1,
-    userId: 2,
+    userId: 3,
     season: Season.SPRING,
   },
   {
@@ -155,7 +155,7 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/garlic.jpg",
     capacity: 2,
     quantity: 1,
-    userId: 4,
+    userId: 3,
   },
   {
     name: "Tomato",
@@ -164,7 +164,7 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/tomato.jpg",
     capacity: 5,
     quantity: 2,
-    userId: 5,
+    userId: 3,
     season: Season.SUMMER,
   },
 ];
@@ -172,12 +172,12 @@ export const tempIngredients: InsertIngredient[] = [
 export const tempGroceryLists: InsertGroceryList[] = [
   {
     name: "Soup",
-    userId: 1,
+    userId: 3,
     public: true,
   },
   {
     name: "BBQ Party",
-    userId: 2,
+    userId: 3,
     public: false,
   },
   {
@@ -187,12 +187,12 @@ export const tempGroceryLists: InsertGroceryList[] = [
   },
   {
     name: "Baking Basics",
-    userId: 1,
+    userId: 3,
     public: false,
   },
   {
     name: "Holiday Dinner",
-    userId: 4,
+    userId: 3,
     public: true,
   },
 ];
@@ -200,7 +200,7 @@ export const tempGroceryLists: InsertGroceryList[] = [
 export const tempGroceryListIngredients: InsertGroceryListIngredient[] = [
   {
     name: "Watercress",
-    userId: 1,
+    userId: 3,
     groceryListId: 1,
     capacity: 1,
     unit: Unit.ITEM,
@@ -208,14 +208,14 @@ export const tempGroceryListIngredients: InsertGroceryListIngredient[] = [
   },
   {
     name: "Pork Spare Rib",
-    userId: 1,
+    userId: 3,
     groceryListId: 1,
     capacity: 2,
     unit: Unit.POUND,
   },
   {
     name: "Gouda",
-    userId: 2,
+    userId: 3,
     groceryListId: 3,
     capacity: 1,
     unit: Unit.ITEM,
@@ -223,14 +223,14 @@ export const tempGroceryListIngredients: InsertGroceryListIngredient[] = [
   },
   {
     name: "Ground Beef",
-    userId: 2,
+    userId: 3,
     groceryListId: 3,
     capacity: 1.3,
     unit: Unit.POUND,
   },
   {
     name: "Eggs",
-    userId: 1,
+    userId: 3,
     groceryListId: 4,
     capacity: 1,
     unit: Unit.ITEM,
@@ -241,12 +241,12 @@ export const tempGroceryListIngredients: InsertGroceryListIngredient[] = [
 export const tempRecipes: InsertRecipe[] = [
   {
     name: "Spaghetti Bolognese",
-    userId: 1,
+    userId: 3,
     public: true,
   },
   {
     name: "Chicken Curry",
-    userId: 2,
+    userId: 3,
     public: true,
   },
   {
@@ -256,12 +256,12 @@ export const tempRecipes: InsertRecipe[] = [
   },
   {
     name: "Beef Tacos",
-    userId: 1,
+    userId: 3,
     public: true,
   },
   {
     name: "Quinoa Salad",
-    userId: 2,
+    userId: 3,
     public: false,
   },
 ];
@@ -269,7 +269,7 @@ export const tempRecipes: InsertRecipe[] = [
 export const tempRecipeIngredients: InsertRecipeIngredient[] = [
   {
     name: "Gouda",
-    userId: 1,
+    userId: 3,
     recipeId: 1,
     capacity: 3,
     quantity: 2,
@@ -277,22 +277,14 @@ export const tempRecipeIngredients: InsertRecipeIngredient[] = [
   },
   {
     name: "Ground Beef",
-    userId: 1,
+    userId: 3,
     recipeId: 1,
     capacity: 1.3,
     unit: Unit.POUND,
   },
   {
-    name: "Ground Beef",
-    userId: 1,
-    recipeId: 4,
-    capacity: 1.3,
-    unit: Unit.POUND,
-  },
-
-  {
     name: "Tomato",
-    userId: 2,
+    userId: 3,
     recipeId: 5,
     quantity: 5,
     unit: Unit.ITEM,
@@ -306,7 +298,7 @@ export const tempRecipeIngredients: InsertRecipeIngredient[] = [
   },
   {
     name: "Chicken Thighs",
-    userId: 2,
+    userId: 3,
     recipeId: 2,
     capacity: 0.35,
     quantity: 3,

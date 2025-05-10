@@ -23,8 +23,8 @@ import { recipeIngredientTable } from "../../db/schemas/recipe-ingredient-schema
 export const prefillDb = async () => {
   try {
     await insertTempUsers();
-    await insertTempRecipes();
     await insertTempIngredients();
+    await insertTempRecipes();
     await insertTempGroceryLists();
     await insertTempGroceryListIngredients();
     await insertTempRecipeIngredients();
