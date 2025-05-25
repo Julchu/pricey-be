@@ -1,5 +1,10 @@
 # pricey-be
 
+Installation reminders
+
+- `npm install <package>`: `pnpm add <package>`
+- `npm install --save-dev <package>`: `pnpm add -D <package>`
+
 Cleaning up migrations
 
 - Find the old .sql file(s) in `./drizzle` and copy name(s)
@@ -8,11 +13,11 @@ Cleaning up migrations
 - Remove the .sql file(s)
 - Remove the entries in `./drizzle/meta/_journal.json`
 
-Running postgres with Docker locally
+Running Postgres with Docker locally
 
 - ```
   docker run --name my-postgres -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydb -p 5432:5432 -d postgres
-  docker ps
+  docker ps -a
   docker exec -it my-postgres bash
   psql -U myuser -d mydb
   ```
@@ -23,11 +28,6 @@ Running postgres with Docker locally
     - `-e POSTGRES_DB=mydb`: Creates a database
     - `-p 5432:5432`: Exposes PostgreSQL on port 5432
     - `-d postgres`: Runs the official PostgreSQL image in the background
-- Restart container/local database
-  ```
-  docker container ls -a
-  docker container start my-postgres
-  ```
 
 - Drop DB:
   ```
@@ -35,4 +35,23 @@ Running postgres with Docker locally
   -- Inside psql:
   DROP DATABASE your_database_name;
   CREATE DATABASE your_database_name;
+  ```
+
+Running Redis with Docker locally
+
+- ```aiignore
+  docker run -d --name redis-dev -p 6379:6379 redis
+  docker ps -a
+  ```
+
+- Restart container/local database like local Postgres and Redis
+  ```
+  docker container ls -a
+  docker container start my-postgres
+  docker container start redis-dev
+  ```
+
+- Close container
+  ```aiignore
+  docker stop <container_id_or_name>
   ```

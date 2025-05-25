@@ -4,11 +4,29 @@ import type { NextFunction, Response } from "express";
 import { jwtVerify, SignJWT } from "jose";
 import { getUserByEmail } from "./user-handlers.ts";
 
+import { OAuth2Client } from "google-auth-library";
+
 type JwtPayload = {
   userId: number;
 };
 
-export const verifyToken = async (token?: string) => {
+export const verifyGoogleToken = async (idToken: string) => {
+  const client = new OAuth2Client();
+  const ticket = await client.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+  const payload = ticket.getPayload();
+  if (payload && payload.email_verified) {
+    return {
+      email: payload.email,
+      name: payload.name,
+      picture: payload.picture,
+    };
+  }
+};
+
+export const verifyPriceyToken = async (token?: string) => {
   if (!token) return;
 
   const secret = new TextEncoder().encode(process.env.JWT_ACCESS_SECRET);
@@ -52,16 +70,19 @@ export const createTokens = async (userId: number) => {
 };
 
 /**
- * Login: checks existence of user before returning accessToken
+ * Login: checks existence of user before returning accessToken; validates Google token
  * Register: creates new user (if error isn't thrown) and returns accessToken
  * userRequired: checks header auth accessToken in any API call (that isn't login/register)
  * */
-export const loginCheck = async (email?: string) => {
-  if (!email) return;
+export const loginCheck = async (idToken?: string) => {
+  if (!idToken) return;
 
   try {
-    const fetchedUser = await getUserByEmail(email);
+    const verifiedGoogleAccount = await verifyGoogleToken(idToken);
 
+    const fetchedUser = await getUserByEmail(verifiedGoogleAccount?.email);
+
+    // Register new account
     if (!fetchedUser) return;
 
     const { id, ...userInfo } = fetchedUser;
@@ -83,7 +104,7 @@ export const userRequired = async (
 ) => {
   try {
     const token = req.header("Authorization")?.split("Bearer ")[1];
-    const auth = await verifyToken(token);
+    const auth = await verifyPriceyToken(token);
     if (auth) {
       req.userId = auth.payload.userId;
       next();

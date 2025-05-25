@@ -57,7 +57,7 @@ userRouter.patch(
 
 userRouter.post("/login", async (req, res) => {
   try {
-    const loginResponse = await loginCheck(req.body.email);
+    const loginResponse = await loginCheck(req.body.idToken);
 
     if (!loginResponse || !loginResponse.tokens) {
       res.status(401).json({ success: false, error: "Unauthorized" });
@@ -70,7 +70,7 @@ userRouter.post("/login", async (req, res) => {
     } = loginResponse;
 
     setAuthCookies(res, accessToken, refreshToken);
-    res.json({ success: true, data: userInfo });
+    res.status(200).json({ success: true, data: userInfo });
   } catch (error) {
     console.error("Failed to login", error);
     res.status(500).json({ success: false, error: "Invalid login" });
@@ -89,11 +89,11 @@ userRouter.post("/register", async (req, res) => {
 
     const {
       tokens: { accessToken, refreshToken },
-      user,
+      userInfo,
     } = newUser;
 
     setAuthCookies(res, accessToken, refreshToken);
-    res.status(200).json({ success: true, data: user });
+    res.status(200).json({ success: true, data: userInfo });
   } catch (error) {
     console.error("Failed to get user", error);
     res.status(500).json({ success: false, error: "Internal Server Error" });

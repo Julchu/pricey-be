@@ -13,7 +13,8 @@ export const getUserById = async (userId: number) => {
   }
 };
 
-export const getUserByEmail = async (email: string) => {
+export const getUserByEmail = async (email?: string) => {
+  if (!email) return;
   try {
     return await db.query.userTable.findFirst({
       where: (user) => and(eq(user.email, email)),
@@ -51,11 +52,11 @@ export const updateUser = async (userId: number, updatedUser: InsertUser) => {
 
 export const registerUser = async (userFormData: InsertUser) => {
   try {
-    const [user] = await insertUser(userFormData);
-    if (user)
+    const [userInfo] = await insertUser(userFormData);
+    if (userInfo)
       return {
-        tokens: await createTokens(user.id),
-        user,
+        tokens: await createTokens(userInfo.id),
+        userInfo,
       };
   } catch (error) {
     throw new Error("Error registering new user", { cause: error });
