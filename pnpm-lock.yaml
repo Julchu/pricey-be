@@ -44,6 +44,9 @@ importers:
       postgres:
         specifier: ^3.4.5
         version: 3.4.5
+      zod:
+        specifier: ^3.24.4
+        version: 3.25.17
     devDependencies:
       '@eslint/js':
         specifier: ^9.24.0
@@ -2170,6 +2173,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@3.25.17:
+    resolution: {integrity: sha512-8hQzQ/kMOIFbwOgPrm9Sf9rtFHpFUMy4HvN0yEB0spw14aYi0uT5xG5CE2DB9cd51GWNsz+DNO7se1kztHMKnw==}
+
 snapshots:
 
   '@drizzle-team/brocli@0.10.2': {}
@@ -4049,3 +4055,5 @@ snapshots:
       window-size: 0.1.0
 
   yocto-queue@0.1.0: {}
+
+  zod@3.25.17: {}
