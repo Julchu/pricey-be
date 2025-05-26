@@ -1,7 +1,6 @@
 import { db } from "../db";
 import { type InsertUser, userTable } from "../db/schemas/user-schema.ts";
 import { and, eq } from "drizzle-orm";
-import { createTokens } from "./auth-handlers.ts";
 
 export const getUserById = async (userId: number) => {
   try {
@@ -24,13 +23,13 @@ export const getUserByEmail = async (email?: string) => {
   }
 };
 
-const insertUser = async (user: InsertUser) => {
-  const { name, email } = user;
+export const insertUser = async (user: InsertUser) => {
+  const { name, email, image } = user;
   try {
     return await db
       .insert(userTable)
-      .values({ name, email })
-      .returning({ id: userTable.id });
+      .values({ name, email, image })
+      .returning();
   } catch (error) {
     throw new Error("Error inserting user", { cause: error });
   }
@@ -47,18 +46,5 @@ export const updateUser = async (userId: number, updatedUser: InsertUser) => {
       return await db.update(userTable).set(userInfo).returning();
   } catch (error) {
     throw new Error("Error updating user", { cause: error });
-  }
-};
-
-export const registerUser = async (userFormData: InsertUser) => {
-  try {
-    const [userInfo] = await insertUser(userFormData);
-    if (userInfo)
-      return {
-        tokens: await createTokens(userInfo.id),
-        userInfo,
-      };
-  } catch (error) {
-    throw new Error("Error registering new user", { cause: error });
   }
 };

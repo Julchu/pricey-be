@@ -1,9 +1,5 @@
 import { type Response, Router } from "express";
-import {
-  getUserById,
-  registerUser,
-  updateUser,
-} from "../services/user-handlers.ts";
+import { getUserById, updateUser } from "../services/user-handlers.ts";
 import type { AuthRequest } from "../utils/interfaces.ts";
 import type { InsertUser } from "../db/schemas/user-schema.ts";
 import {
@@ -74,29 +70,6 @@ userRouter.post("/login", async (req, res) => {
   } catch (error) {
     console.error("Failed to login", error);
     res.status(500).json({ success: false, error: "Invalid login" });
-  }
-});
-
-userRouter.post("/register", async (req, res) => {
-  try {
-    const newUser = await registerUser(req.body.user);
-    if (!newUser || !newUser.tokens) {
-      res
-        .status(400)
-        .json({ success: false, error: "Could not create new user" });
-      return;
-    }
-
-    const {
-      tokens: { accessToken, refreshToken },
-      userInfo,
-    } = newUser;
-
-    setAuthCookies(res, accessToken, refreshToken);
-    res.status(200).json({ success: true, data: userInfo });
-  } catch (error) {
-    console.error("Failed to get user", error);
-    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 

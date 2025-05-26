@@ -2,7 +2,7 @@
 import type { AuthRequest } from "../utils/interfaces.ts";
 import type { NextFunction, Response } from "express";
 import { jwtVerify, SignJWT } from "jose";
-import { getUserByEmail } from "./user-handlers.ts";
+import { getUserByEmail, insertUser } from "./user-handlers.ts";
 
 import { OAuth2Client } from "google-auth-library";
 
@@ -80,9 +80,23 @@ export const loginCheck = async (idToken?: string) => {
   try {
     const verifiedGoogleAccount = await verifyGoogleToken(idToken);
 
-    const fetchedUser = await getUserByEmail(verifiedGoogleAccount?.email);
+    let fetchedUser = await getUserByEmail(verifiedGoogleAccount?.email);
 
     // Register new account
+    if (
+      !fetchedUser &&
+      verifiedGoogleAccount?.email &&
+      verifiedGoogleAccount?.name &&
+      verifiedGoogleAccount?.picture
+    ) {
+      const [newUser] = await insertUser({
+        email: verifiedGoogleAccount?.email || "",
+        name: verifiedGoogleAccount?.name || "",
+        image: verifiedGoogleAccount?.picture || "",
+      });
+      fetchedUser = newUser;
+    }
+
     if (!fetchedUser) return;
 
     const { id, ...userInfo } = fetchedUser;
