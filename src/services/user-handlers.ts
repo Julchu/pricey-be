@@ -2,7 +2,8 @@ import { db } from "../db";
 import { type InsertUser, userTable } from "../db/schemas/user-schema.ts";
 import { and, eq } from "drizzle-orm";
 
-export const getUserById = async (userId: number) => {
+export const getUserById = async (userId?: number) => {
+  if (!userId) return;
   try {
     return await db.query.userTable.findFirst({
       where: (user) => and(eq(user.id, userId)),

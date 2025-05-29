@@ -1,4 +1,4 @@
-import { type Response, Router } from "express";
+import { type Request, type Response, Router } from "express";
 import { getUserById, updateUser } from "../services/user-handlers.ts";
 import type { AuthRequest } from "../utils/interfaces.ts";
 import type { InsertUser } from "../db/schemas/user-schema.ts";
@@ -72,6 +72,30 @@ userRouter.post("/login", async (req, res) => {
     res.status(500).json({ success: false, error: "Invalid login" });
   }
 });
+
+userRouter.get(
+  "/login/google",
+  async (req: Request<unknown, unknown, unknown, { code: string }>, res) => {
+    try {
+      const loginResponse = await loginCheck(req.query.code);
+
+      if (!loginResponse || !loginResponse.tokens) {
+        res.status(401).json({ success: false, error: "Unauthorized" });
+        return;
+      }
+
+      const {
+        tokens: { accessToken, refreshToken },
+      } = loginResponse;
+
+      setAuthCookies(res, accessToken, refreshToken);
+
+      res.redirect(`${process.env.PRICEY_URL}/login`);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+);
 
 userRouter.post("/logout", (req, res) => {
   res.clearCookie("pricey_access_token");

@@ -10,12 +10,22 @@ type JwtPayload = {
   userId: number;
 };
 
-export const verifyGoogleToken = async (idToken: string) => {
-  const client = new OAuth2Client();
-  const ticket = await client.verifyIdToken({
-    idToken,
-    audience: process.env.GOOGLE_CLIENT_ID,
+export const verifyGoogleToken = async (code: string) => {
+  const client = new OAuth2Client({
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    redirectUri: process.env.GOOGLE_REDIRECT_URIS,
   });
+
+  const { tokens } = await client.getToken(code); // exchanges code for tokens
+
+  if (!tokens.id_token) return;
+
+  const ticket = await client.verifyIdToken({
+    idToken: tokens.id_token!,
+    audience: process.env.GOOGLE_CLIENT_ID!,
+  });
+
   const payload = ticket.getPayload();
   if (payload && payload.email_verified) {
     return {
@@ -86,13 +96,12 @@ export const loginCheck = async (idToken?: string) => {
     if (
       !fetchedUser &&
       verifiedGoogleAccount?.email &&
-      verifiedGoogleAccount?.name &&
-      verifiedGoogleAccount?.picture
+      verifiedGoogleAccount?.name
     ) {
       const [newUser] = await insertUser({
         email: verifiedGoogleAccount?.email || "",
         name: verifiedGoogleAccount?.name || "",
-        image: verifiedGoogleAccount?.picture || "",
+        image: verifiedGoogleAccount?.picture,
       });
       fetchedUser = newUser;
     }
