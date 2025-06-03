@@ -26,5 +26,5 @@ groceryListRouter.get("/", async (req: AuthRequest, res) => {
 groceryListRouter.post("/", async (req, res) => {
   const { ingredients, ...groceryList } = req.body.groceryList;
   await insertGroceryList(groceryList, ingredients);
-  res.send({ title: "The Pricey App" });
+  res.json({ title: "The Pricey App" });
 });

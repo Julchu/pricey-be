@@ -7,17 +7,28 @@ export const indexRouter = Router();
 
 /* GET home page. */
 indexRouter.get("/", (req, res) => {
-  res.send({ title: "The Pricey App" });
+  res.json({ title: "The Pricey App" });
 });
 
-indexRouter.get("/test", userRequired, async (req: AuthRequest, res) => {
-  if (!req.userId) {
-    res.status(400).json({ success: false, error: "Invalid user ID" });
-    return;
-  }
-
-  res.send({ title: "The Pricey App" });
+indexRouter.post("/test", (req, res) => {
+  const { stringField, numberField } = req.body;
+  console.log("typeof stringField", typeof stringField);
+  console.log("typeof numberField", typeof numberField);
+  res.json({ stringField, numberField });
 });
+
+indexRouter.get(
+  "/test-user-required",
+  userRequired,
+  async (req: AuthRequest, res) => {
+    if (!req.userId) {
+      res.status(400).json({ success: false, error: "Invalid user ID" });
+      return;
+    }
+
+    res.json({ title: "The Pricey App" });
+  },
+);
 
 indexRouter.post("/seed", async (req, res) => {
   try {
