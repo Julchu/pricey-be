@@ -36,13 +36,13 @@ export const verifyGoogleToken = async (code: string) => {
   }
 };
 
-export const verifyPriceyToken = async (token?: string) => {
-  if (!token) return;
+export const verifyPriceyToken = async (token?: string, secret?: string) => {
+  if (!token || !secret) return;
 
-  const secret = new TextEncoder().encode(process.env.JWT_ACCESS_SECRET);
+  const encodedSecret = new TextEncoder().encode(secret);
 
   try {
-    return await jwtVerify<JwtPayload>(token, secret);
+    return await jwtVerify<JwtPayload>(token, encodedSecret);
   } catch (error) {
     throw new Error(
       "Error authenticating user, invalid or expired accessToken",
@@ -53,7 +53,13 @@ export const verifyPriceyToken = async (token?: string) => {
   }
 };
 
-export const createTokens = async (userId: number) => {
+export const createTokens = async ({
+  userId,
+  refreshToken = false,
+}: {
+  userId: number;
+  refreshToken?: boolean;
+}) => {
   if (!userId) return;
 
   const payload: JwtPayload = {
@@ -71,11 +77,13 @@ export const createTokens = async (userId: number) => {
       .setIssuedAt()
       .setExpirationTime("1h")
       .sign(accessSecret),
-    refreshToken: await new SignJWT(payload)
-      .setProtectedHeader({ alg: "HS256" })
-      .setIssuedAt()
-      .setExpirationTime("7d")
-      .sign(refreshSecret),
+    ...(refreshToken && {
+      refreshToken: await new SignJWT(payload)
+        .setProtectedHeader({ alg: "HS256" })
+        .setIssuedAt()
+        .setExpirationTime("7d")
+        .sign(refreshSecret),
+    }),
   };
 };
 
@@ -109,7 +117,7 @@ export const loginCheck = async (idToken?: string) => {
     if (!fetchedUser) return;
 
     const { id, ...userInfo } = fetchedUser;
-    const tokens = await createTokens(id);
+    const tokens = await createTokens({ userId: id, refreshToken: true });
     return {
       tokens,
       userInfo,
@@ -119,40 +127,80 @@ export const loginCheck = async (idToken?: string) => {
   }
 };
 
-// Need userRequired and AuthRequest req type to pass req.userId
+// Need userRequired/refreshRequired and AuthRequest req type to pass req.userId
 export const userRequired = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const token = req.header("Authorization")?.split("Bearer ")[1];
-    const auth = await verifyPriceyToken(token);
+    const cookieToken = req.cookies?.pricey_access_token;
+    const headerToken = req.header("Authorization")?.split("Bearer ")[1];
+
+    const token = cookieToken || headerToken;
+    if (!token) {
+      res.status(401).json({ error: "Missing access token" });
+      return;
+    }
+
+    const auth = await verifyPriceyToken(token, process.env.JWT_ACCESS_SECRET);
     if (auth) {
       req.userId = auth.payload.userId;
       next();
-    } else res.status(401).send("Unauthorized");
+    } else res.status(401).json({ error: "Unauthorized" });
   } catch (error) {
-    throw new Error("Unable to authenticate user", { cause: error });
+    console.error(error);
+    res.status(401).json({ error: "Unauthorized" });
+    return;
   }
 };
 
+// Separated refreshRequired similar to authRequired for convention, since
+export const refreshRequired = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const cookieToken = req.cookies?.pricey_refresh_token;
+    const headerToken = req.header("Authorization")?.split("Bearer ")[1];
+
+    const token = cookieToken || headerToken;
+    if (!token) {
+      res.status(401).json({ error: "Missing refresh token" });
+      return;
+    }
+
+    const auth = await verifyPriceyToken(token, process.env.JWT_REFRESH_SECRET);
+    if (auth) {
+      req.userId = auth.payload.userId;
+      next();
+    } else res.status(401).json({ error: "Unauthorized" });
+  } catch (error) {
+    console.error("refresh token error", error);
+    // throw new Error("Unable to authenticate user", { cause: error });
+    res.status(401).json({ error: "Invalid or expired refresh token" });
+    return;
+  }
+};
 export const setAuthCookies = (
   res: Response,
-  accessToken: string,
-  refreshToken: string,
+  accessToken?: string,
+  refreshToken?: string,
 ) => {
-  res.cookie("pricey_access_token", accessToken, {
-    httpOnly: true, // To make it inaccessible to JavaScript
-    secure: process.env.NODE_ENV === "production", // Only set over HTTPS in production
-    sameSite: "strict",
-    maxAge: 3600000, // 1 hour expiration time
-  });
+  if (accessToken)
+    res.cookie("pricey_access_token", accessToken, {
+      httpOnly: true, // To make it inaccessible to JavaScript
+      secure: process.env.NODE_ENV === "production", // Only set over HTTPS in production
+      sameSite: "strict",
+      maxAge: 3600000, // 1 hour expiration time
+    });
 
-  res.cookie("pricey_refresh_token", refreshToken, {
-    httpOnly: true, // To make it inaccessible to JavaScript
-    secure: process.env.NODE_ENV === "production", // Only set over HTTPS in production
-    sameSite: "strict",
-    maxAge: 604800000, // 7 day expiration time
-  });
+  if (refreshToken)
+    res.cookie("pricey_refresh_token", refreshToken, {
+      httpOnly: true, // To make it inaccessible to JavaScript
+      secure: process.env.NODE_ENV === "production", // Only set over HTTPS in production
+      sameSite: "strict",
+      maxAge: 604800000, // 7 day expiration time
+    });
 };
