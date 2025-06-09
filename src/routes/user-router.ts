@@ -91,7 +91,7 @@ userRouter.get(
 
       setAuthCookies(res, accessToken, refreshToken);
 
-      res.redirect(`${process.env.PRICEY_URL}/login`);
+      res.redirect(`${process.env.PRICEY_URL}/`);
     } catch (error) {
       console.error(error);
     }
@@ -112,10 +112,10 @@ userRouter.post("/refresh", refreshRequired, async (req: AuthRequest, res) => {
       return;
     }
 
-    const { accessToken, refreshToken } = tokens;
+    const { accessToken } = tokens;
 
-    setAuthCookies(res, accessToken, refreshToken);
-    res.status(200).json({ success: true });
+    setAuthCookies(res, accessToken);
+    res.status(200).json({ success: true, data: accessToken });
   } catch (error) {
     res.status(500).json({ success: false, error: `Invalid login: ${error}` });
   }
