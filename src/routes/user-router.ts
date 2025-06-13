@@ -91,7 +91,7 @@ userRouter.get(
 
       setAuthCookies(res, accessToken, refreshToken);
 
-      res.redirect(`${process.env.PRICEY_URL}/`);
+      res.redirect(`${process.env.PRICEY_URL}/login`);
     } catch (error) {
       console.error(error);
     }
