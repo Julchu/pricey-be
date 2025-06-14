@@ -134,10 +134,8 @@ export const userRequired = async (
   next: NextFunction,
 ) => {
   try {
-    const cookieToken = req.cookies?.pricey_access_token;
-    const headerToken = req.header("Authorization")?.split("Bearer ")[1];
+    const token = req.header("Authorization")?.split("Bearer ")[1];
 
-    const token = cookieToken || headerToken;
     if (!token) {
       res.status(401).json({ error: "Missing access token" });
       return;
@@ -162,10 +160,8 @@ export const refreshRequired = async (
   next: NextFunction,
 ) => {
   try {
-    const cookieToken = req.cookies?.pricey_refresh_token;
-    const headerToken = req.header("Authorization")?.split("Bearer ")[1];
+    const token = req.header("Authorization")?.split("Bearer ")[1];
 
-    const token = cookieToken || headerToken;
     if (!token) {
       res.status(401).json({ error: "Missing refresh token" });
       return;
@@ -191,7 +187,7 @@ export const setAuthCookies = (
   if (accessToken)
     res.cookie("pricey_access_token", accessToken, {
       httpOnly: true, // To make it inaccessible to JavaScript
-      secure: process.env.NODE_ENV === "production", // Only set over HTTPS in production
+      secure: process.env.NODE_ENV === "production", // Only set true over HTTPS in production
       sameSite: "strict",
       maxAge: 3600000, // 1 hour expiration time
     });
@@ -199,7 +195,7 @@ export const setAuthCookies = (
   if (refreshToken)
     res.cookie("pricey_refresh_token", refreshToken, {
       httpOnly: true, // To make it inaccessible to JavaScript
-      secure: process.env.NODE_ENV === "production", // Only set over HTTPS in production
+      secure: process.env.NODE_ENV === "production", // Only set true over HTTPS in production
       sameSite: "strict",
       maxAge: 604800000, // 7 day expiration time
     });

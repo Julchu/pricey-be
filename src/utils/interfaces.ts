@@ -115,6 +115,12 @@ export interface Address {
   country: string;
 }
 
+/* Auth request parameters
+ * TParams: route params; /:recipeId
+ * TResBody: response body
+ * TReqBody: request body
+ * TQuery: url query params; ?recipeId=recipeId
+ */
 export type AuthRequest<
   TParams = Record<string, unknown>,
   TResBody = unknown,
