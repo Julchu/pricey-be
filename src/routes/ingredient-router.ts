@@ -43,7 +43,7 @@ ingredientRouter.post(
         req.body.ingredient,
         req.userId,
       );
-      res.json({ success: true, data: ingredient });
+      res.json({ success: true, data: ingredient[0] });
     } catch (error) {
       console.error("Failed to save new ingredient", error);
       res
