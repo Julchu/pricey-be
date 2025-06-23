@@ -11,10 +11,10 @@ export const upsertIngredient = async (
 ) => {
   const insertIngredient: InsertIngredient = {
     ...ingredient,
+    name: ingredient.name.toLowerCase(),
     userId,
   };
   // TODO: test upserting ingredient
-  console.log("ingredient", insertIngredient);
   try {
     return await db
       .insert(ingredientTable)
