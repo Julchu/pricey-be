@@ -10,7 +10,9 @@ import { recipeIngredientTable } from "./schemas/recipe-ingredient-schema.ts";
 export const db = drizzle({
   connection: {
     url: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === "production",
+    ssl:
+      process.env.NODE_ENV === "production" ||
+      process.env.NODE_ENV === "staging",
   },
   schema: {
     userTable,
