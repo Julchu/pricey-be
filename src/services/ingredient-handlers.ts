@@ -14,7 +14,10 @@ export const upsertIngredient = async (
     name: ingredient.name.toLowerCase(),
     userId,
   };
-  // TODO: test upserting ingredient
+
+  // TODO: add default values when upserting ingredient
+  // TODO: fix req.body.ingredient type; passing string in insertIngredient.quantity works, but not int
+  // Ex: this doesn't work: { quantity: ingredient.quantity || 1 }
   try {
     return await db
       .insert(ingredientTable)

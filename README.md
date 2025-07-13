@@ -16,6 +16,7 @@ Cleaning up migrations
 Running Postgres with Docker locally
 
 - ```
+  docker desktop start
   docker run --name my-postgres -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydb -p 5432:5432 -d postgres
   docker ps -a
   docker exec -it my-postgres bash
