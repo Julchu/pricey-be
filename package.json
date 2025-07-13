@@ -14,7 +14,7 @@
     "env-staging": "DATABASE_URL=$(grep DATABASE_URL -w .env.staging | cut -d '=' -f2- | cut -d '\"' -f2 )",
     "db-migrate-dev": "pnpm run env-dev drizzle-kit migrate",
     "db-push-dev": "pnpm run env-dev drizzle-kit push",
-    "db-studio-dev": "pnpm run env-dev drizzle-kit studio --port=3002",
+    "db-studio-dev": "pnpm run env-dev drizzle-kit studio --port=3002 --config=./drizzle.config.ts",
     "db-migrate-staging": "pnpm run env-staging drizzle-kit migrate",
     "db-push-staging": "pnpm run env-staging drizzle-kit push",
     "db-studio-staging": "pnpm run env-staging drizzle-kit studio --port=3002",

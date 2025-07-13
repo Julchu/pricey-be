@@ -9,25 +9,10 @@ import {
 import { requiredColumns, timestamps } from "../utils/shared-schema.ts";
 import { type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { userTable } from "./user-schema.ts";
-import { Season, Unit } from "../../utils/interfaces.ts";
+import { SeasonValues, UnitValues } from "../../utils/interfaces.ts";
 
-export const unitEnum = pgEnum("unit", [
-  Unit.KILOGRAM,
-  Unit.POUND,
-  Unit.LITRE,
-  Unit.QUART,
-  Unit.CUP,
-  Unit.TABLESPOON,
-  Unit.TEASPOON,
-  Unit.ITEM,
-]);
-
-export const seasonEnum = pgEnum("season", [
-  Season.SPRING,
-  Season.WINTER,
-  Season.SUMMER,
-  Season.FALL,
-]);
+export const unitEnum = pgEnum("unit", UnitValues);
+export const seasonEnum = pgEnum("season", SeasonValues);
 
 export const ingredientTable = pgTable(
   "ingredients",

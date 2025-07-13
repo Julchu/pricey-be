@@ -1,51 +1,70 @@
 import type { Request } from "express";
 
-export enum Unit {
+export const Unit = {
   // Mass
-  KILOGRAM = "kg",
-  POUND = "lb",
+  KILOGRAM: "kg",
+  POUND: "lb",
 
   // Volume
-  LITRE = "L",
-  QUART = "qt",
-  CUP = "cup",
-  TABLESPOON = "tbsp",
-  TEASPOON = "tsp",
+  LITRE: "L",
+  QUART: "qt",
+  CUP: "cup",
+  TABLESPOON: "tbsp",
+  TEASPOON: "tsp",
 
-  ITEM = "item",
-}
+  ITEM: "item",
+} as const;
 
-export type UnitType = MassType | LiquidType | OtherType;
+export const UnitValues = [
+  Unit.KILOGRAM,
+  Unit.POUND,
+  Unit.LITRE,
+  Unit.QUART,
+  Unit.CUP,
+  Unit.TABLESPOON,
+  Unit.TEASPOON,
+  Unit.ITEM,
+] as const;
+export const MassValues = [Unit.KILOGRAM, Unit.POUND] as const;
+export const VolumeValues = [Unit.LITRE, Unit.QUART] as const;
 
-export type OtherType = Unit.ITEM | Unit.CUP | Unit.TABLESPOON | Unit.TEASPOON;
-
-export type MassType = Unit.KILOGRAM | Unit.POUND;
-
-export type LiquidType = Unit.LITRE | Unit.QUART;
+export type UnitType = (typeof UnitValues)[number]; // "kg" | "lb" | "L" | "qt" | "cup" | "tbsp" | "tsp" | "item";
+export type MassType = (typeof MassValues)[number]; // "kg" | "lb"
+export type VolumeType = (typeof VolumeValues)[number]; // "L" | "qt"
 
 export type UnitCategory = {
   mass: MassType;
-  volume: LiquidType;
+  volume: VolumeType;
 };
 
-export enum Color {
-  LIGHT = "light",
-  DARK = "dark",
-}
+export const Color = {
+  LIGHT: "light",
+  DARK: "dark",
+} as const;
+export const ColorValues = [Color.LIGHT, Color.DARK] as const;
+export type ColorMode = (typeof ColorValues)[number];
 
-export type ColorMode = Color.LIGHT | Color.DARK;
+export const Season = {
+  SPRING: "spring",
+  WINTER: "winter",
+  SUMMER: "summer",
+  FALL: "fall",
+} as const;
 
-export enum Season {
-  SPRING = "spring",
-  WINTER = "winter",
-  SUMMER = "summer",
-  FALL = "fall",
-}
+export const SeasonValues = [
+  Season.SPRING,
+  Season.WINTER,
+  Season.SUMMER,
+  Season.FALL,
+] as const;
+export type SeasonType = (typeof SeasonValues)[number];
 
-export enum Role {
-  admin = "admin",
-  standard = "standard",
-}
+export const Role = {
+  admin: "admin",
+  standard: "standard",
+};
+export const RoleValues = [Role.admin, Role.standard];
+export type RoleType = (typeof RoleValues)[number];
 
 // Public user data (aka not private auth data)
 export interface User {
@@ -64,7 +83,7 @@ export interface User {
  * @param: publically viewable grocery list profile */
 export type UserPreferences = {
   units?: UnitCategory;
-  colorMode?: Color;
+  colorMode?: ColorMode;
   displayName?: string;
 };
 
@@ -75,9 +94,9 @@ export interface Ingredient {
   price: number;
   capacity: number;
   quantity?: number;
-  unit: Unit;
+  unit: UnitType;
   image?: string;
-  season?: Season;
+  season?: SeasonType;
 }
 
 export interface GroceryList {
