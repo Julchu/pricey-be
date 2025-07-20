@@ -1,9 +1,11 @@
 import { Router } from "express";
 import {
   getAllGroceryLists,
-  insertGroceryList,
+  upsertGroceryList,
 } from "../services/grocery-list-handlers.ts";
 import type { AuthRequest } from "../utils/interfaces.ts";
+import type { InsertGroceryList } from "../db/schemas/grocery-list-schema.ts";
+import type { InsertGroceryListIngredient } from "../db/schemas/grocery-ingredient-schema.ts";
 
 export const groceryListRouter = Router();
 
@@ -22,9 +24,29 @@ groceryListRouter.get("/", async (req: AuthRequest, res) => {
   }
 });
 
+type GroceryListFormData = {
+  groceryList: Omit<InsertGroceryList, "userId">;
+  ingredients: Omit<InsertGroceryListIngredient, "userId">[];
+};
+
 // Verify that userId owns groceryListId before inserting ingredient
-groceryListRouter.post("/", async (req, res) => {
-  const { ingredients, ...groceryList } = req.body.groceryList;
-  await insertGroceryList(groceryList, ingredients);
-  res.json({ title: "The Pricey App" });
-});
+groceryListRouter.post(
+  "/",
+  async (
+    req: AuthRequest<
+      unknown,
+      unknown,
+      { groceryListFormData: GroceryListFormData }
+    >,
+    res,
+  ) => {
+    if (!req.userId) {
+      res.status(400).json({ success: false, error: "Invalid user ID" });
+      return;
+    }
+
+    const { ingredients, groceryList } = req.body.groceryListFormData;
+    await upsertGroceryList(groceryList, ingredients, req.userId);
+    res.json({ title: "The Pricey App" });
+  },
+);

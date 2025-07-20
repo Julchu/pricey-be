@@ -11,16 +11,32 @@ import {
 
 // TODO: determine if upsert vs insert/update & removing schema unique conflict
 // TODO: test if insert accounts for uniqueness (can insert same name/list/userId ingredient, or if blocked)
-export const insertGroceryList = async (
-  groceryList: InsertGroceryList,
-  groceryIngredients: InsertGroceryListIngredient[],
+export const upsertGroceryList = async (
+  groceryList: Omit<InsertGroceryList, "userId">,
+  groceryIngredients: Omit<InsertGroceryListIngredient, "userId">[] = [],
+  userId: number,
 ) => {
+  const insertGroceryList: InsertGroceryList = {
+    ...groceryList,
+    name: groceryList.name.toLowerCase(),
+    userId,
+  };
+
+  const insertGroceryListIngredients: InsertGroceryListIngredient[] =
+    groceryIngredients.map((list) => {
+      return {
+        ...list,
+        name: list.name.toLowerCase(),
+        userId,
+        quantity: list.quantity || 1,
+      };
+    });
   try {
     return await db.transaction(async (tx) => {
-      await tx.insert(groceryListTable).values(groceryList).returning();
+      await tx.insert(groceryListTable).values(insertGroceryList).returning();
       await tx
         .insert(groceryListIngredientTable)
-        .values(groceryIngredients)
+        .values(insertGroceryListIngredients)
         .returning();
     });
   } catch (error) {
