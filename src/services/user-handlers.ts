@@ -1,7 +1,8 @@
 import { db } from "../db";
-import { type InsertUser, userTable } from "../db/schemas/user-schema.ts";
+import { type InsertPublicUser, userTable } from "../db/schemas/user-schema.ts";
 import { and, eq } from "drizzle-orm";
 
+// Type user to User from interfaces
 export const getUserById = async (userId?: string) => {
   if (!userId) return;
   try {
@@ -13,6 +14,7 @@ export const getUserById = async (userId?: string) => {
   }
 };
 
+// Type user to User from interfaces
 export const getUserByEmail = async (email?: string) => {
   if (!email) return;
   try {
@@ -24,7 +26,7 @@ export const getUserByEmail = async (email?: string) => {
   }
 };
 
-export const insertUser = async (user: InsertUser) => {
+export const insertUser = async (user: InsertPublicUser) => {
   const { name, email, image } = user;
   try {
     return await db
@@ -36,7 +38,10 @@ export const insertUser = async (user: InsertUser) => {
   }
 };
 
-export const updateUser = async (userId: string, updatedUser: InsertUser) => {
+export const updateUser = async (
+  userId: string,
+  updatedUser: InsertPublicUser,
+) => {
   const { email, ...userInfo } = updatedUser;
   try {
     const existingUser = await db.query.userTable.findFirst({

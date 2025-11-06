@@ -1,5 +1,10 @@
 import { boolean, pgTable, unique, uuid } from "drizzle-orm/pg-core";
-import { requiredColumns, timestamps } from "../utils/shared-schema.ts";
+import {
+  type PrivateFields,
+  type PrivateFormFields,
+  requiredColumns,
+  timestamps,
+} from "../utils/shared-schema.ts";
 import { userTable } from "./user-schema.ts";
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 
@@ -21,3 +26,8 @@ export const groceryListTable = pgTable(
 
 export type SelectGroceryList = InferSelectModel<typeof groceryListTable>;
 export type InsertGroceryList = InferInsertModel<typeof groceryListTable>;
+export type SelectPublicGroceryList = Omit<SelectGroceryList, PrivateFields>;
+export type InsertPublicGroceryList = Omit<
+  InsertGroceryList,
+  PrivateFormFields
+>;

@@ -1,28 +1,29 @@
 import { db } from "../db";
-import { type InsertRecipe, recipeTable } from "../db/schemas/recipe-schema.ts";
+import { recipeTable } from "../db/schemas/recipe-schema.ts";
 import { and, eq } from "drizzle-orm";
-import {
-  type InsertRecipeIngredient,
-  recipeIngredientTable,
-} from "../db/schemas/recipe-ingredient-schema.ts";
+// import {
+//   type InsertPublicRecipeIngredient,
+//   recipeIngredientTable,
+// } from "../db/schemas/recipe-ingredient-schema.ts";
 
-export const upsertRecipe = async (
-  recipe: InsertRecipe,
-  recipeIngredients: InsertRecipeIngredient[],
-) => {
-  if (recipeIngredients.some(() => {}))
-    try {
-      return await db.transaction(async (tx) => {
-        await tx.insert(recipeTable).values(recipe).returning();
-        await tx
-          .insert(recipeIngredientTable)
-          .values(recipeIngredients)
-          .returning();
-      });
-    } catch (error) {
-      throw new Error("Error upserting recipe:", { cause: error });
-    }
-};
+// export const insertRecipe = async (
+//   recipe: InsertPublicRecipe,
+//   recipeIngredients: InsertPublicRecipeIngredient[],
+//   userId: string,
+// ) => {
+//   if (recipeIngredients.some(() => {}))
+//     try {
+//       return await db.transaction(async (tx) => {
+//         await tx.insert(recipeTable).values(recipe).returning();
+//         await tx
+//           .insert(recipeIngredientTable)
+//           .values(recipeIngredients)
+//           .returning();
+//       });
+//     } catch (error) {
+//       throw new Error("Error upserting recipe:", { cause: error });
+//     }
+// };
 
 export const getAllRecipes = async (userId: string) => {
   try {

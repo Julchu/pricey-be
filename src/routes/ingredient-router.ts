@@ -4,7 +4,7 @@ import {
   upsertIngredient,
 } from "../services/ingredient-handlers.ts";
 import type { AuthRequest } from "../utils/interfaces.ts";
-import type { InsertIngredient } from "../db/schemas/ingredient-schema.ts";
+import type { InsertPublicIngredient } from "../db/schemas/ingredient-schema.ts";
 
 export const ingredientRouter = Router();
 
@@ -29,7 +29,7 @@ ingredientRouter.post(
     req: AuthRequest<
       unknown,
       unknown,
-      { ingredient: Omit<InsertIngredient, "userId"> }
+      { ingredient: Omit<InsertPublicIngredient, "userId"> }
     >,
     res,
   ) => {

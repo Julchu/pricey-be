@@ -1,7 +1,7 @@
 import { type Request, type Response, Router } from "express";
 import { getUserById, updateUser } from "../services/user-handlers.ts";
 import type { AuthRequest } from "../utils/interfaces.ts";
-import type { InsertUser } from "../db/schemas/user-schema.ts";
+import type { InsertPublicUser } from "../db/schemas/user-schema.ts";
 import {
   createTokens,
   loginCheck,
@@ -32,7 +32,7 @@ userRouter.patch(
   "/update",
   userRequired,
   async (
-    req: AuthRequest<unknown, unknown, { user: InsertUser }>,
+    req: AuthRequest<unknown, unknown, { user: InsertPublicUser }>,
     res: Response,
   ) => {
     if (!req.userId) {

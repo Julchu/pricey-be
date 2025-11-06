@@ -6,7 +6,12 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { requiredColumns, timestamps } from "../utils/shared-schema.ts";
+import {
+  type PrivateFields,
+  type PrivateFormFields,
+  requiredColumns,
+  timestamps,
+} from "../utils/shared-schema.ts";
 import { userTable } from "./user-schema.ts";
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { unitEnum } from "./ingredient-schema.ts";
@@ -44,4 +49,14 @@ export type SelectRecipeIngredient = InferSelectModel<
 
 export type InsertRecipeIngredient = InferInsertModel<
   typeof recipeIngredientTable
+>;
+
+export type SelectPublicRecipeIngredient = Omit<
+  SelectRecipeIngredient,
+  PrivateFields
+>;
+
+export type InsertPublicRecipeIngredient = Omit<
+  InsertRecipeIngredient,
+  PrivateFormFields
 >;

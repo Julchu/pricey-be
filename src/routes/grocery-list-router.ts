@@ -1,11 +1,9 @@
 import { Router } from "express";
 import {
   getAllGroceryLists,
-  upsertGroceryList,
+  insertGroceryList,
 } from "../services/grocery-list-handlers.ts";
-import type { AuthRequest } from "../utils/interfaces.ts";
-import type { InsertGroceryList } from "../db/schemas/grocery-list-schema.ts";
-import type { InsertGroceryListIngredient } from "../db/schemas/grocery-ingredient-schema.ts";
+import type { AuthRequest, GroceryList } from "../utils/interfaces.ts";
 
 export const groceryListRouter = Router();
 
@@ -15,6 +13,7 @@ groceryListRouter.get("/", async (req: AuthRequest, res) => {
     return;
   }
 
+  // TODO: combine grocery list with recipes
   try {
     const groceryLists = await getAllGroceryLists(req.userId);
     res.json({ success: true, data: groceryLists });
@@ -24,20 +23,11 @@ groceryListRouter.get("/", async (req: AuthRequest, res) => {
   }
 });
 
-type GroceryListFormData = {
-  groceryList: Omit<InsertGroceryList, "userId">;
-  ingredients: Omit<InsertGroceryListIngredient, "userId">[];
-};
-
 // Verify that userId owns groceryListId before inserting ingredient
 groceryListRouter.post(
   "/",
   async (
-    req: AuthRequest<
-      unknown,
-      unknown,
-      { groceryListFormData: GroceryListFormData }
-    >,
+    req: AuthRequest<unknown, unknown, { groceryList: GroceryList }>,
     res,
   ) => {
     if (!req.userId) {
@@ -46,9 +36,9 @@ groceryListRouter.post(
     }
 
     try {
-      const { ingredients, groceryList } = req.body.groceryListFormData;
-      const groceryLists = await upsertGroceryList(
-        groceryList,
+      const { ingredients, ...newGroceryList } = req.body.groceryList;
+      const groceryLists = await insertGroceryList(
+        newGroceryList,
         ingredients,
         req.userId,
       );

@@ -4,7 +4,7 @@ import type { InsertRecipe } from "../../db/schemas/recipe-schema.ts";
 import type { InsertIngredient } from "../../db/schemas/ingredient-schema.ts";
 import type { InsertGroceryList } from "../../db/schemas/grocery-list-schema.ts";
 import type { InsertRecipeIngredient } from "../../db/schemas/recipe-ingredient-schema.ts";
-import type { SeedGroceryListIngredient } from "../../db/schemas/grocery-ingredient-schema.ts";
+import type { InsertGroceryListIngredient } from "../../db/schemas/grocery-ingredient-schema.ts";
 
 export const tempUsers: InsertUser[] = [
   {
@@ -198,11 +198,11 @@ export const tempGroceryLists: InsertGroceryList[] = [
   },
 ];
 
-export const tempGroceryListIngredients: SeedGroceryListIngredient[] = [
+export const tempGroceryListIngredients: InsertGroceryListIngredient[] = [
   {
     name: "Watercress",
     userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    groceryListId: "1",
+    groceryListId: "5b25557d-b738-48c8-9f76-31599ebe73cd",
     capacity: 1,
     unit: Unit.ITEM,
     quantity: 2,
@@ -210,14 +210,14 @@ export const tempGroceryListIngredients: SeedGroceryListIngredient[] = [
   {
     name: "Pork Spare Rib",
     userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    groceryListId: "1",
+    groceryListId: "5b25557d-b738-48c8-9f76-31599ebe73cd",
     capacity: 2,
     unit: Unit.POUND,
   },
   {
     name: "Gouda",
     userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    groceryListId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    groceryListId: "a5e7c643-29e5-43e8-b2e4-3d600942d404",
     capacity: 1,
     unit: Unit.ITEM,
     quantity: 2,
@@ -225,14 +225,14 @@ export const tempGroceryListIngredients: SeedGroceryListIngredient[] = [
   {
     name: "Ground Beef",
     userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    groceryListId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    groceryListId: "a5e7c643-29e5-43e8-b2e4-3d600942d404",
     capacity: 1.3,
     unit: Unit.POUND,
   },
   {
     name: "Eggs",
     userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    groceryListId: "4",
+    groceryListId: "d817faad-7b5b-489d-9c3e-a74da009ebf9",
     capacity: 1,
     unit: Unit.ITEM,
     quantity: 30,
@@ -271,7 +271,7 @@ export const tempRecipeIngredients: InsertRecipeIngredient[] = [
   {
     name: "Gouda",
     userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    recipeId: "1",
+    recipeId: "455be346-38cd-43ea-badc-30f108b477c1",
     capacity: 3,
     quantity: 2,
     unit: Unit.TEASPOON,
@@ -279,28 +279,28 @@ export const tempRecipeIngredients: InsertRecipeIngredient[] = [
   {
     name: "Ground Beef",
     userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    recipeId: "1",
+    recipeId: "455be346-38cd-43ea-badc-30f108b477c1",
     capacity: 1.3,
     unit: Unit.POUND,
   },
   {
     name: "Tomato",
     userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    recipeId: "5",
+    recipeId: "ab35c5b2-7716-4af9-a536-fbaa213ad734",
     quantity: 5,
     unit: Unit.ITEM,
   },
   {
     name: "Salad",
     userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    recipeId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    recipeId: "ab35c5b2-7716-4af9-a536-fbaa213ad734",
     quantity: 1,
     unit: Unit.ITEM,
   },
   {
     name: "Chicken Thighs",
     userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    recipeId: "2",
+    recipeId: "48eb37d8-b1ae-4ca7-9a06-f5e20fbdf07e",
     capacity: 0.35,
     quantity: 3,
     unit: Unit.KILOGRAM,

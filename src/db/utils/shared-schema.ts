@@ -3,7 +3,7 @@ import { integer, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 export const timestamps = {
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => new Date())
-    .notNull(),
+    .defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),
 };
@@ -16,4 +16,4 @@ export const requiredColumns = {
 
 export type PrivateFields = "id" | "userId";
 
-export type PrivateFormFields = "id" | "userId" | "publicId" | "groceryListId";
+export type PrivateFormFields = "id" | "userId" | "publicId";

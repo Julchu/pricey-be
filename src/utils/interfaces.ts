@@ -1,4 +1,5 @@
 import type { Request } from "express";
+import type { SelectGroceryListIngredient } from "../db/schemas/grocery-ingredient-schema.ts";
 
 export const Unit = {
   // Mass
@@ -89,6 +90,7 @@ export type UserPreferences = {
 
 export interface Ingredient {
   id: number;
+  publicId: string;
   name: string;
   userId: string;
   price: number;
@@ -101,8 +103,9 @@ export interface Ingredient {
 
 export interface GroceryList {
   id: number;
+  publicId: string;
   name: string;
-  ingredients: Ingredient[];
+  ingredients: SelectGroceryListIngredient[];
   userId: string;
   public?: boolean;
 }

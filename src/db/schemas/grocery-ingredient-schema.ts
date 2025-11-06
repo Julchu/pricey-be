@@ -43,16 +43,22 @@ export const groceryListIngredientTable = pgTable(
   ],
 );
 
-export type SelectGroceryListIngredient = Omit<
-  InferSelectModel<typeof groceryListIngredientTable>,
+export type SelectGroceryListIngredient = InferSelectModel<
+  typeof groceryListIngredientTable
+>;
+
+export type InsertGroceryListIngredient = InferInsertModel<
+  typeof groceryListIngredientTable
+>;
+
+export type SelectPublicGroceryListIngredient = Omit<
+  SelectGroceryListIngredient,
   PrivateFields
 >;
 
-export type InsertGroceryListIngredient = Omit<
-  InferInsertModel<typeof groceryListIngredientTable>,
+export type InsertPublicGroceryListIngredient = Omit<
+  InsertGroceryListIngredient,
   PrivateFormFields
 >;
 
-export type SeedGroceryListIngredient = InferInsertModel<
-  typeof groceryListIngredientTable
->;
+export type SeedGroceryListIngredient = Omit<InsertGroceryListIngredient, "">;

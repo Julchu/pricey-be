@@ -1,15 +1,15 @@
 import { db } from "../db";
 import {
   ingredientTable,
-  type InsertIngredient,
+  type InsertPublicIngredient,
 } from "../db/schemas/ingredient-schema.ts";
 import { and, eq } from "drizzle-orm";
 
 export const upsertIngredient = async (
-  ingredient: Omit<InsertIngredient, "userId">,
+  ingredient: Omit<InsertPublicIngredient, "userId">,
   userId: string,
 ) => {
-  const insertIngredient: InsertIngredient = {
+  const insertIngredient: InsertPublicIngredient = {
     ...ingredient,
     name: ingredient.name.toLowerCase(),
     userId,

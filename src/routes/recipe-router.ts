@@ -1,12 +1,8 @@
 import { Router } from "express";
-import {
-  getAllRecipes,
-  getRecipe,
-  upsertRecipe,
-} from "../services/recipe-handlers.ts";
+import { getAllRecipes, getRecipe } from "../services/recipe-handlers.ts";
 import type { AuthRequest } from "../utils/interfaces.ts";
-import type { InsertRecipe } from "../db/schemas/recipe-schema.ts";
-import type { InsertRecipeIngredient } from "../db/schemas/recipe-ingredient-schema.ts";
+import type { InsertPublicRecipe } from "../db/schemas/recipe-schema.ts";
+import type { InsertPublicRecipeIngredient } from "../db/schemas/recipe-ingredient-schema.ts";
 
 export const recipeRouter = Router();
 
@@ -49,7 +45,10 @@ recipeRouter.post(
     req: AuthRequest<
       unknown,
       unknown,
-      { recipe: InsertRecipe; ingredients: InsertRecipeIngredient[] }
+      {
+        recipe: InsertPublicRecipe;
+        ingredients: InsertPublicRecipeIngredient[];
+      }
     >,
     res,
   ) => {
@@ -59,8 +58,8 @@ recipeRouter.post(
     }
 
     try {
-      const recipe = await upsertRecipe(req.body.recipe, req.body.ingredients);
-      res.json({ success: true, data: recipe });
+      // const recipe = await insertRecipe(req.body.recipe, req.body.ingredients);
+      res.json({ success: true, data: "recipe" });
     } catch (error) {
       console.error("Failed to update recipe", error);
       res
