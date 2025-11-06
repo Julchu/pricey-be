@@ -45,8 +45,19 @@ groceryListRouter.post(
       return;
     }
 
-    const { ingredients, groceryList } = req.body.groceryListFormData;
-    await upsertGroceryList(groceryList, ingredients, req.userId);
-    res.json({ title: "The Pricey App" });
+    try {
+      const { ingredients, groceryList } = req.body.groceryListFormData;
+      const groceryLists = await upsertGroceryList(
+        groceryList,
+        ingredients,
+        req.userId,
+      );
+      res.json({ success: true, data: groceryLists });
+    } catch (error) {
+      console.error("Failed to save new grocery list", error);
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to save new grocery list" });
+    }
   },
 );

@@ -33,7 +33,7 @@ indexRouter.get(
 indexRouter.post("/seed", async (req, res) => {
   try {
     const token = req.header("Authorization")?.split("Bearer ")[1];
-    if (token === process.env.SEED_KEY) {
+    if (token === process.env.MASTER_KEY) {
       const prefilledInfo = await prefillDb();
       res.status(200).json({ success: true, data: prefilledInfo });
       return;

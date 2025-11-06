@@ -7,7 +7,7 @@ import { and, eq } from "drizzle-orm";
 
 export const upsertIngredient = async (
   ingredient: Omit<InsertIngredient, "userId">,
-  userId: number,
+  userId: string,
 ) => {
   const insertIngredient: InsertIngredient = {
     ...ingredient,
@@ -32,29 +32,29 @@ export const upsertIngredient = async (
   }
 };
 
-export const getAllIngredients = async (userId: number) => {
+export const getAllIngredients = async (userId: string) => {
   try {
     return await db
       .select()
       .from(ingredientTable)
       .where(eq(ingredientTable.userId, userId));
   } catch (error) {
-    throw new Error("Error getting groceryList:", { cause: error });
+    throw new Error("Error getting list of all ingredients:", { cause: error });
   }
 };
 
-export const getIngredient = async (ingredientId: number, userId: number) => {
+export const getIngredient = async (ingredientId: string, userId: string) => {
   try {
     return await db
       .select()
       .from(ingredientTable)
       .where(
         and(
-          eq(ingredientTable.id, ingredientId),
+          eq(ingredientTable.publicId, ingredientId),
           eq(ingredientTable.userId, userId),
         ),
       );
   } catch (error) {
-    throw new Error("Error getting groceryList:", { cause: error });
+    throw new Error("Error getting specific ingredient:", { cause: error });
   }
 };

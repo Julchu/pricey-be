@@ -2,11 +2,11 @@ import { db } from "../db";
 import { type InsertUser, userTable } from "../db/schemas/user-schema.ts";
 import { and, eq } from "drizzle-orm";
 
-export const getUserById = async (userId?: number) => {
+export const getUserById = async (userId?: string) => {
   if (!userId) return;
   try {
     return await db.query.userTable.findFirst({
-      where: (user) => and(eq(user.id, userId)),
+      where: (user) => and(eq(user.publicId, userId)),
     });
   } catch (error) {
     throw new Error("Error getting user", { cause: error });
@@ -36,11 +36,11 @@ export const insertUser = async (user: InsertUser) => {
   }
 };
 
-export const updateUser = async (userId: number, updatedUser: InsertUser) => {
+export const updateUser = async (userId: string, updatedUser: InsertUser) => {
   const { email, ...userInfo } = updatedUser;
   try {
     const existingUser = await db.query.userTable.findFirst({
-      where: (user) => and(eq(user.id, userId), eq(user.email, email)),
+      where: (user) => and(eq(user.publicId, userId), eq(user.email, email)),
     });
 
     if (existingUser)

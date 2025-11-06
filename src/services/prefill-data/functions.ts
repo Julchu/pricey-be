@@ -23,15 +23,38 @@ import { recipeIngredientTable } from "../../db/schemas/recipe-ingredient-schema
 export const prefillDb = async () => {
   try {
     await insertTempUsers();
+  } catch (error) {
+    console.error("Error prefilling temp users", error);
+  }
+
+  try {
     await insertTempIngredients();
+  } catch (error) {
+    console.error("Error prefilling temp ingredients", error);
+  }
+
+  try {
     await insertTempRecipes();
+  } catch (error) {
+    console.error("Error prefilling temp recipes", error);
+  }
+
+  try {
     await insertTempGroceryLists();
+  } catch (error) {
+    console.error("Error prefilling temp grocery lists", error);
+  }
+
+  try {
     await insertTempGroceryListIngredients();
+  } catch (error) {
+    console.error("Error prefilling temp grocery list ingredients", error);
+  }
+
+  try {
     await insertTempRecipeIngredients();
   } catch (error) {
-    throw new Error("Error prefilling db", {
-      cause: error,
-    });
+    console.error("Error prefilling temp recipe ingredients", error);
   }
 };
 
@@ -91,7 +114,9 @@ const insertTempGroceryListIngredients = async () => {
       .onConflictDoNothing()
       .returning();
   } catch (error) {
-    throw new Error("Error inserting temp users", { cause: error });
+    throw new Error("Error inserting temp grocery list ingredients", {
+      cause: error,
+    });
   }
 };
 
@@ -103,7 +128,9 @@ const insertTempRecipeIngredients = async () => {
       .onConflictDoNothing()
       .returning();
   } catch (error) {
-    throw new Error("Error inserting temp users", { cause: error });
+    throw new Error("Error inserting temp recipe ingredients", {
+      cause: error,
+    });
   }
 };
 
@@ -118,7 +145,7 @@ export const testIngredientDb = async () => {
     unit: Unit.KILOGRAM,
     capacity: 5,
     quantity: 2,
-    userId: 0,
+    userId: "0",
     season: Season.SUMMER,
   };
 

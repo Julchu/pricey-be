@@ -24,7 +24,7 @@ export const upsertRecipe = async (
     }
 };
 
-export const getAllRecipes = async (userId: number) => {
+export const getAllRecipes = async (userId: string) => {
   try {
     return await db
       .select()
@@ -35,18 +35,20 @@ export const getAllRecipes = async (userId: number) => {
   }
 };
 
-export const getRecipe = async (recipeId: number, userId: number) => {
+export const getRecipe = async (recipeId: string, userId: string) => {
   try {
     return await db
       .select()
       .from(recipeTable)
-      .where(and(eq(recipeTable.id, recipeId), eq(recipeTable.userId, userId)));
+      .where(
+        and(eq(recipeTable.publicId, recipeId), eq(recipeTable.userId, userId)),
+      );
   } catch (error) {
     throw new Error("Error getting recipe", { cause: error });
   }
 };
 
 // TODO: test delete cascading for groceries/recipes, users (does it remove itself from other tables)
-export const deleteRecipe = async (recipeId: number, userId: number) => {
+export const deleteRecipe = async (recipeId: string, userId: string) => {
   return;
 };

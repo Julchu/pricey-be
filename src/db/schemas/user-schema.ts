@@ -22,7 +22,10 @@ export const userTable = pgTable(
       .notNull(),
     ...timestamps,
   },
-  (table) => [unique("unique_userEmail").on(table.email)],
+  (table) => [
+    unique("unique_user").on(table.publicId),
+    unique("unique_userEmail").on(table.email),
+  ],
 );
 
 export type SelectUser = InferSelectModel<typeof userTable>;

@@ -138,5 +138,6 @@ dist
 .pnp.*
 
 *.crt
+*.apps.googleusercontent.com.json
 
 pgAdmin4

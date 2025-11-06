@@ -1,14 +1,19 @@
-import { integer, timestamp, varchar } from "drizzle-orm/pg-core";
+import { integer, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const timestamps = {
-  updated_at: timestamp()
+  updatedAt: timestamp("updated_at")
     .$onUpdate(() => new Date())
     .notNull(),
-  created_at: timestamp().defaultNow(),
-  deleted_at: timestamp(),
+  createdAt: timestamp("created_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
 };
 
 export const requiredColumns = {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  publicId: uuid("public_id").defaultRandom().notNull(),
   name: varchar({ length: 255 }).notNull(),
 };
+
+export type PrivateFields = "id" | "userId";
+
+export type PrivateFormFields = "id" | "userId" | "publicId" | "groceryListId";

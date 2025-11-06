@@ -3,9 +3,15 @@ import {
   numeric,
   pgTable,
   unique,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { requiredColumns, timestamps } from "../utils/shared-schema.ts";
+import {
+  type PrivateFields,
+  type PrivateFormFields,
+  requiredColumns,
+  timestamps,
+} from "../utils/shared-schema.ts";
 import { userTable } from "./user-schema.ts";
 import { type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { groceryListTable } from "./grocery-list-schema.ts";
@@ -15,11 +21,11 @@ export const groceryListIngredientTable = pgTable(
   "grocery_list_ingredients",
   {
     ...requiredColumns,
-    userId: integer()
-      .references(() => userTable.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => userTable.publicId, { onDelete: "cascade" })
       .notNull(),
-    groceryListId: integer()
-      .references(() => groceryListTable.id, { onDelete: "cascade" })
+    groceryListId: uuid("grocery_list_id")
+      .references(() => groceryListTable.publicId, { onDelete: "cascade" })
       .notNull(),
     capacity: numeric({ scale: 3, mode: "number" }).default(1),
     quantity: integer().default(1),
@@ -28,6 +34,7 @@ export const groceryListIngredientTable = pgTable(
     ...timestamps,
   },
   (table) => [
+    unique("unique_groceryListIngredients").on(table.publicId),
     unique("unique_userId_groceryListId_ingredientName").on(
       table.userId,
       table.groceryListId,
@@ -36,9 +43,16 @@ export const groceryListIngredientTable = pgTable(
   ],
 );
 
-export type SelectGroceryListIngredient = InferSelectModel<
-  typeof groceryListIngredientTable
+export type SelectGroceryListIngredient = Omit<
+  InferSelectModel<typeof groceryListIngredientTable>,
+  PrivateFields
 >;
-export type InsertGroceryListIngredient = InferInsertModel<
+
+export type InsertGroceryListIngredient = Omit<
+  InferInsertModel<typeof groceryListIngredientTable>,
+  PrivateFormFields
+>;
+
+export type SeedGroceryListIngredient = InferInsertModel<
   typeof groceryListIngredientTable
 >;

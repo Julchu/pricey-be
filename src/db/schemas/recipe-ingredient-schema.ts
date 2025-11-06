@@ -3,6 +3,7 @@ import {
   numeric,
   pgTable,
   unique,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { requiredColumns, timestamps } from "../utils/shared-schema.ts";
@@ -15,11 +16,11 @@ export const recipeIngredientTable = pgTable(
   "recipe_ingredients",
   {
     ...requiredColumns,
-    userId: integer()
-      .references(() => userTable.id, { onDelete: "cascade" })
+    userId: uuid("user_id")
+      .references(() => userTable.publicId, { onDelete: "cascade" })
       .notNull(),
-    recipeId: integer()
-      .references(() => recipeTable.id, { onDelete: "cascade" })
+    recipeId: uuid("recipe_id")
+      .references(() => recipeTable.publicId, { onDelete: "cascade" })
       .notNull(),
     capacity: numeric({ scale: 3, mode: "number" }).default(1),
     quantity: integer().default(1),
@@ -28,6 +29,7 @@ export const recipeIngredientTable = pgTable(
     ...timestamps,
   },
   (table) => [
+    unique("unique_recipeIngredients").on(table.publicId),
     unique("unique_userId_recipeId_ingredientName").on(
       table.userId,
       table.recipeId,
@@ -39,6 +41,7 @@ export const recipeIngredientTable = pgTable(
 export type SelectRecipeIngredient = InferSelectModel<
   typeof recipeIngredientTable
 >;
+
 export type InsertRecipeIngredient = InferInsertModel<
   typeof recipeIngredientTable
 >;

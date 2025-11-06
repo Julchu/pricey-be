@@ -14,7 +14,7 @@ import {
 export const upsertGroceryList = async (
   groceryList: Omit<InsertGroceryList, "userId">,
   groceryIngredients: Omit<InsertGroceryListIngredient, "userId">[] = [],
-  userId: number,
+  userId: string,
 ) => {
   const insertGroceryList: InsertGroceryList = {
     ...groceryList,
@@ -31,13 +31,35 @@ export const upsertGroceryList = async (
         quantity: list.quantity || 1,
       };
     });
+
   try {
     return await db.transaction(async (tx) => {
-      await tx.insert(groceryListTable).values(insertGroceryList).returning();
-      await tx
-        .insert(groceryListIngredientTable)
-        .values(insertGroceryListIngredients)
+      const insertedGroceryList = await tx
+        .insert(groceryListTable)
+        .values(insertGroceryList)
+        .onConflictDoUpdate({
+          target: [groceryListTable.userId, groceryListTable.name],
+          set: insertGroceryList,
+        })
         .returning();
+
+      // TODO: check commented code
+      await tx
+        .update(groceryListTable)
+        .set({
+          name: "Cheese",
+        })
+        .where(eq(groceryListTable.name, "banana"))
+        .returning();
+      // const insertedGroceryListIngredients = await tx
+      //   .insert(groceryListIngredientTable)
+      //   .values(insertGroceryListIngredients)
+      //   .returning();
+
+      return {
+        insertedGroceryList: insertedGroceryList[0],
+        // ingredients: insertedGroceryListIngredients,
+      };
     });
   } catch (error) {
     throw new Error("Error inserting grocery list", { cause: error });
@@ -60,7 +82,7 @@ export const updateGroceryList = async (
   }
 };
 
-export const getAllGroceryLists = async (userId: number) => {
+export const getAllGroceryLists = async (userId: string) => {
   try {
     return await db
       .select()
@@ -71,14 +93,14 @@ export const getAllGroceryLists = async (userId: number) => {
   }
 };
 
-export const getGroceryList = async (groceryListId: number, userId: number) => {
+export const getGroceryList = async (groceryListId: string, userId: string) => {
   try {
     return await db
       .select()
       .from(groceryListTable)
       .where(
         and(
-          eq(groceryListTable.id, groceryListId),
+          eq(groceryListTable.publicId, groceryListId),
           eq(groceryListTable.userId, userId),
         ),
       );

@@ -90,7 +90,7 @@ export type UserPreferences = {
 export interface Ingredient {
   id: number;
   name: string;
-  userId: number;
+  userId: string;
   price: number;
   capacity: number;
   quantity?: number;
@@ -103,7 +103,7 @@ export interface GroceryList {
   id: number;
   name: string;
   ingredients: Ingredient[];
-  userId: number;
+  userId: string;
   public?: boolean;
 }
 
@@ -111,7 +111,7 @@ export type Recipe = {
   id: number;
   name: string;
   ingredients: Ingredient[];
-  userId: number;
+  userId: string;
   public?: boolean;
 };
 
@@ -146,5 +146,5 @@ export type AuthRequest<
   TReqBody = unknown,
   TQuery = Record<string, unknown>,
 > = Request<TParams, TResBody, TReqBody, TQuery> & {
-  userId?: number;
+  userId?: string;
 };

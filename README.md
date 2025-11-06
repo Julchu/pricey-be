@@ -30,13 +30,24 @@ Running Postgres with Docker locally
     - `-p 5432:5432`: Exposes PostgreSQL on port 5432
     - `-d postgres`: Runs the official PostgreSQL image in the background
 
-- Drop DB:
-  ```
-  psql -U postgres -d postgres
-  -- Inside psql:
-  DROP DATABASE your_database_name;
-  CREATE DATABASE your_database_name;
-  ```
+
+- Drop and recreate DB: log into separate database (`postgres`) to modify/delete main database (`mydb`)
+    - `-U`: user
+    - `-d`: database name
+
+```
+psql -U postgres -d postgres
+```
+
+- Inside psql:
+    - `\l`: view all databases
+    - `\du`: view all users
+    - Note: don't drop `postgres`, `template0`, or `template1` databases
+
+```postgresql
+DROP DATABASE your_database_name;
+CREATE DATABASE your_database_name;
+```
 
 Running Redis with Docker locally
 

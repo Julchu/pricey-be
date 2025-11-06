@@ -7,7 +7,7 @@ import { getUserByEmail, insertUser } from "./user-handlers.ts";
 import { OAuth2Client } from "google-auth-library";
 
 type JwtPayload = {
-  userId: number;
+  userId: string;
 };
 
 export const verifyGoogleToken = async (code: string) => {
@@ -39,6 +39,10 @@ export const verifyGoogleToken = async (code: string) => {
 export const verifyPriceyToken = async (token?: string, secret?: string) => {
   if (!token || !secret) return;
 
+  if (token === process.env.MASTER_KEY) {
+    const userInfo = await getUserByEmail(process.env.MASTER_TEST_EMAIL);
+    return { payload: { userId: userInfo?.publicId } };
+  }
   const encodedSecret = new TextEncoder().encode(secret);
 
   try {
@@ -57,7 +61,7 @@ export const createTokens = async ({
   userId,
   refreshToken = false,
 }: {
-  userId: number;
+  userId: string;
   refreshToken?: boolean;
 }) => {
   if (!userId) return;
@@ -100,7 +104,7 @@ export const loginCheck = async (idToken?: string) => {
 
     let fetchedUser = await getUserByEmail(verifiedGoogleAccount?.email);
 
-    // Register new account
+    // Register a new account
     if (
       !fetchedUser &&
       verifiedGoogleAccount?.email &&
@@ -116,8 +120,8 @@ export const loginCheck = async (idToken?: string) => {
 
     if (!fetchedUser) return;
 
-    const { id, ...userInfo } = fetchedUser;
-    const tokens = await createTokens({ userId: id, refreshToken: true });
+    const { publicId, ...userInfo } = fetchedUser;
+    const tokens = await createTokens({ userId: publicId, refreshToken: true });
     return {
       tokens,
       userInfo,
@@ -184,19 +188,22 @@ export const setAuthCookies = (
   accessToken?: string,
   refreshToken?: string,
 ) => {
-  if (accessToken)
-    res.cookie("pricey_access_token", accessToken, {
+  const accessTokenKey = process.env.ACCESS_TOKEN_KEY;
+  const refreshTokenKey = process.env.REFRESH_TOKEN_KEY;
+
+  if (accessTokenKey && accessToken)
+    res.cookie(accessTokenKey, accessToken, {
       httpOnly: true, // To make it inaccessible to JavaScript
       secure: process.env.NODE_ENV === "production", // Only set true over HTTPS in production
       sameSite: "strict",
-      maxAge: 3600000, // 1 hour expiration time
+      maxAge: 3600000, // 1-hour expiration time
     });
 
-  if (refreshToken)
+  if (refreshTokenKey && refreshToken)
     res.cookie("pricey_refresh_token", refreshToken, {
       httpOnly: true, // To make it inaccessible to JavaScript
       secure: process.env.NODE_ENV === "production", // Only set true over HTTPS in production
       sameSite: "strict",
-      maxAge: 604800000, // 7 day expiration time
+      maxAge: 604800000, // 7-day expiration time
     });
 };

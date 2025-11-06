@@ -4,7 +4,7 @@ import type { InsertRecipe } from "../../db/schemas/recipe-schema.ts";
 import type { InsertIngredient } from "../../db/schemas/ingredient-schema.ts";
 import type { InsertGroceryList } from "../../db/schemas/grocery-list-schema.ts";
 import type { InsertRecipeIngredient } from "../../db/schemas/recipe-ingredient-schema.ts";
-import type { InsertGroceryListIngredient } from "../../db/schemas/grocery-ingredient-schema.ts";
+import type { SeedGroceryListIngredient } from "../../db/schemas/grocery-ingredient-schema.ts";
 
 export const tempUsers: InsertUser[] = [
   {
@@ -109,7 +109,8 @@ export const tempUsers: InsertUser[] = [
   },
   {
     name: "Julian Chu",
-    email: "julianchutor@gmail.com",
+    publicId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    email: process.env.MASTER_TEST_EMAIL || "",
     image: "https://avatars.githubusercontent.com/u/17052350?v=4",
     preferences: {
       units: { mass: Unit.POUND, volume: Unit.QUART },
@@ -127,7 +128,7 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/olive_oil.jpg",
     capacity: 1,
     quantity: 2,
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
   },
   {
     name: "Basil",
@@ -136,7 +137,7 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/basil.jpg",
     capacity: 3,
     quantity: 1,
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     season: Season.SPRING,
   },
   {
@@ -146,7 +147,7 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/chicken.jpg",
     capacity: 2,
     quantity: 1,
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
   },
   {
     name: "Garlic",
@@ -155,7 +156,7 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/garlic.jpg",
     capacity: 2,
     quantity: 1,
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
   },
   {
     name: "Tomato",
@@ -164,7 +165,7 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/tomato.jpg",
     capacity: 5,
     quantity: 2,
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     season: Season.SUMMER,
   },
 ];
@@ -172,66 +173,66 @@ export const tempIngredients: InsertIngredient[] = [
 export const tempGroceryLists: InsertGroceryList[] = [
   {
     name: "Soup",
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     public: true,
   },
   {
     name: "BBQ Party",
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     public: false,
   },
   {
     name: "Vegan Meals",
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     public: true,
   },
   {
     name: "Baking Basics",
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     public: false,
   },
   {
     name: "Holiday Dinner",
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     public: true,
   },
 ];
 
-export const tempGroceryListIngredients: InsertGroceryListIngredient[] = [
+export const tempGroceryListIngredients: SeedGroceryListIngredient[] = [
   {
     name: "Watercress",
-    userId: 3,
-    groceryListId: 1,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    groceryListId: "1",
     capacity: 1,
     unit: Unit.ITEM,
     quantity: 2,
   },
   {
     name: "Pork Spare Rib",
-    userId: 3,
-    groceryListId: 1,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    groceryListId: "1",
     capacity: 2,
     unit: Unit.POUND,
   },
   {
     name: "Gouda",
-    userId: 3,
-    groceryListId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    groceryListId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     capacity: 1,
     unit: Unit.ITEM,
     quantity: 2,
   },
   {
     name: "Ground Beef",
-    userId: 3,
-    groceryListId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    groceryListId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     capacity: 1.3,
     unit: Unit.POUND,
   },
   {
     name: "Eggs",
-    userId: 3,
-    groceryListId: 4,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    groceryListId: "4",
     capacity: 1,
     unit: Unit.ITEM,
     quantity: 30,
@@ -241,27 +242,27 @@ export const tempGroceryListIngredients: InsertGroceryListIngredient[] = [
 export const tempRecipes: InsertRecipe[] = [
   {
     name: "Spaghetti Bolognese",
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     public: true,
   },
   {
     name: "Chicken Curry",
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     public: true,
   },
   {
     name: "Vegetable Stir Fry",
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     public: false,
   },
   {
     name: "Beef Tacos",
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     public: true,
   },
   {
     name: "Quinoa Salad",
-    userId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     public: false,
   },
 ];
@@ -269,37 +270,37 @@ export const tempRecipes: InsertRecipe[] = [
 export const tempRecipeIngredients: InsertRecipeIngredient[] = [
   {
     name: "Gouda",
-    userId: 3,
-    recipeId: 1,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    recipeId: "1",
     capacity: 3,
     quantity: 2,
     unit: Unit.TEASPOON,
   },
   {
     name: "Ground Beef",
-    userId: 3,
-    recipeId: 1,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    recipeId: "1",
     capacity: 1.3,
     unit: Unit.POUND,
   },
   {
     name: "Tomato",
-    userId: 3,
-    recipeId: 5,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    recipeId: "5",
     quantity: 5,
     unit: Unit.ITEM,
   },
   {
     name: "Salad",
-    userId: 3,
-    recipeId: 3,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    recipeId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
     quantity: 1,
     unit: Unit.ITEM,
   },
   {
     name: "Chicken Thighs",
-    userId: 3,
-    recipeId: 2,
+    userId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
+    recipeId: "2",
     capacity: 0.35,
     quantity: 3,
     unit: Unit.KILOGRAM,

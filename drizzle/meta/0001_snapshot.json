@@ -1,6 +1,6 @@
 {
-  "id": "ed00e325-640a-425d-9adc-29cc34c41bcd",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "a3ac4771-3292-47fd-9108-8cf7176913a5",
+  "prevId": "ed00e325-640a-425d-9adc-29cc34c41bcd",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -81,7 +81,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -200,7 +201,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -339,7 +341,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -470,7 +473,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -589,7 +593,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -700,7 +705,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",

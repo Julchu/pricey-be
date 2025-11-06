@@ -27,7 +27,7 @@ recipeRouter.get("/", async (req: AuthRequest, res) => {
 
 recipeRouter.get(
   "/:recipeId",
-  async (req: AuthRequest<{ recipeId: number }>, res) => {
+  async (req: AuthRequest<{ recipeId: string }>, res) => {
     if (!req.userId) {
       res.status(400).json({ success: false, error: "Invalid user ID" });
       return;
