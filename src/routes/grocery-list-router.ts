@@ -37,6 +37,8 @@ groceryListRouter.post(
 
     try {
       const { ingredients, ...newGroceryList } = req.body.groceryList;
+
+      // TODO: omit private fields
       const groceryLists = await insertGroceryList(
         newGroceryList,
         ingredients,

@@ -13,7 +13,7 @@ export const recipeTable = pgTable(
   {
     ...requiredColumns,
     userId: uuid("user_id")
-      .references(() => userTable.publicId, { onDelete: "cascade" })
+      .references(() => userTable.id, { onDelete: "cascade" })
       .notNull(),
     public: boolean().default(false).notNull(),
     ...timestamps,

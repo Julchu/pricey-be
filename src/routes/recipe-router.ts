@@ -30,6 +30,7 @@ recipeRouter.get(
     }
 
     const recipe = await getRecipe(req.params.recipeId, req.userId);
+    // TODO: omit private fields
     res.json({
       success: true,
       data: recipe,

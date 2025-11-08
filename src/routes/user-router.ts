@@ -68,6 +68,7 @@ userRouter.post("/login", async (req, res) => {
     } = loginResponse;
 
     setAuthCookies(res, accessToken, refreshToken);
+    // TODO: omit private fields
     res.status(200).json({ success: true, data: userInfo });
   } catch (error) {
     res.status(500).json({ success: false, error: `Invalid login: ${error}` });

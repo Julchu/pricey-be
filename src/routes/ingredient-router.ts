@@ -43,6 +43,7 @@ ingredientRouter.post(
         req.body.ingredient,
         req.userId,
       );
+      // TODO: omit private fields
       res.json({ success: true, data: ingredient[0] });
     } catch (error) {
       console.error("Failed to save new ingredient", error);

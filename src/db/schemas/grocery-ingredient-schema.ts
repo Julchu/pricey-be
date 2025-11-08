@@ -22,10 +22,10 @@ export const groceryListIngredientTable = pgTable(
   {
     ...requiredColumns,
     userId: uuid("user_id")
-      .references(() => userTable.publicId, { onDelete: "cascade" })
+      .references(() => userTable.id, { onDelete: "cascade" })
       .notNull(),
     groceryListId: uuid("grocery_list_id")
-      .references(() => groceryListTable.publicId, { onDelete: "cascade" })
+      .references(() => groceryListTable.id, { onDelete: "cascade" })
       .notNull(),
     capacity: numeric({ scale: 3, mode: "number" }).default(1),
     quantity: integer().default(1),

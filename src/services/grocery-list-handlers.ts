@@ -73,13 +73,14 @@ export const insertGroceryList = async (
 // Note: how to account for updated ingredient list?
 // Would need to diff groceryList ingredients and remove unused ingredients
 // export const updateGroceryList = async (
-//   groceryList: InsertPublicGroceryList,
-//   groceryIngredients: InsertPublicGroceryListIngredient[],
+//   groceryList: InsertGroceryList,
+//   groceryListIngredients: InsertPublicGroceryListIngredient[],
 // ) => {
 //   try {
 //     return await db.transaction(async (tx) => {
-//         await tx.delete(groceryListIngredients)
-//           .where(eq(groceryListIngredients.groceryListId, listId));
+//       await tx
+//         .delete(groceryListIngredientTable)
+//         .where(eq(groceryListIngredientTable.groceryListId, groceryList.publicId));
 //       const insertedGroceryList = await tx
 //         .insert(groceryListTable)
 //         .values(insertGroceryList)
@@ -94,7 +95,7 @@ export const insertGroceryList = async (
 //         .returning();
 //
 //       await tx.insert(groceryListTable).values(groceryList).returning();
-//       for (const ingredient of groceryIngredients) {
+//       for (const ingredient of groceryListIngredients) {
 //         await tx.update(groceryListIngredientTable).set(ingredient).returning();
 //       }
 //     });

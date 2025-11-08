@@ -25,7 +25,7 @@ export const ingredientTable = pgTable(
   {
     ...requiredColumns,
     userId: uuid("user_id")
-      .references(() => userTable.publicId, { onDelete: "cascade" })
+      .references(() => userTable.id, { onDelete: "cascade" })
       .notNull(),
     price: integer().default(100).notNull(),
     capacity: numeric({ scale: 3, mode: "number" }).default(1).notNull(),
