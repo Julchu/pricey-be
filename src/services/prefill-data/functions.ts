@@ -13,33 +13,34 @@ import {
   tempRecipes,
   tempUsers,
 } from "./data.ts";
-import { groceryListIngredientTable } from "../../db/schemas/grocery-ingredient-schema.ts";
+import { groceryListIngredientTable } from "../../db/schemas/grocery-list-ingredient-schema.ts";
 import { recipeIngredientTable } from "../../db/schemas/recipe-ingredient-schema.ts";
+import { eq } from "drizzle-orm";
 
 export const prefillDb = async () => {
-  try {
-    await insertTempUsers();
-  } catch (error) {
-    console.error("Error prefilling temp users", error);
-  }
-
-  try {
-    await insertTempIngredients();
-  } catch (error) {
-    console.error("Error prefilling temp ingredients", error);
-  }
-
-  try {
-    await insertTempRecipes();
-  } catch (error) {
-    console.error("Error prefilling temp recipes", error);
-  }
-
-  try {
-    await insertTempGroceryLists();
-  } catch (error) {
-    console.error("Error prefilling temp grocery lists", error);
-  }
+  // try {
+  //   await insertTempUsers();
+  // } catch (error) {
+  //   console.error("Error prefilling temp users", error);
+  // }
+  //
+  // try {
+  //   await insertTempIngredients();
+  // } catch (error) {
+  //   console.error("Error prefilling temp ingredients", error);
+  // }
+  //
+  // try {
+  //   await insertTempRecipes();
+  // } catch (error) {
+  //   console.error("Error prefilling temp recipes", error);
+  // }
+  //
+  // try {
+  //   await insertTempGroceryLists();
+  // } catch (error) {
+  //   console.error("Error prefilling temp grocery lists", error);
+  // }
 
   try {
     await insertTempGroceryListIngredients();
@@ -51,6 +52,24 @@ export const prefillDb = async () => {
     await insertTempRecipeIngredients();
   } catch (error) {
     console.error("Error prefilling temp recipe ingredients", error);
+  }
+
+  // try {
+  //   await cloneColumn();
+  // } catch (error) {
+  //   console.error("Error cloning column", error);
+  // }
+};
+
+const cloneColumn = async () => {
+  try {
+    await db
+      .update(recipeTable)
+      .set({ userId: userTable.id })
+      .from(userTable)
+      .where(eq(recipeTable.userId, userTable.publicId));
+  } catch (error) {
+    throw new Error("Error cloning column", { cause: error });
   }
 };
 

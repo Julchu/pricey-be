@@ -1,4 +1,4 @@
-import { boolean, pgTable, unique, uuid } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, unique } from "drizzle-orm/pg-core";
 import {
   type PrivateFields,
   type PrivateFormFields,
@@ -12,8 +12,10 @@ export const recipeTable = pgTable(
   "recipes",
   {
     ...requiredColumns,
-    userId: uuid("user_id")
-      .references(() => userTable.id, { onDelete: "cascade" })
+    userId: integer("user_id")
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+      })
       .notNull(),
     public: boolean().default(false).notNull(),
     ...timestamps,

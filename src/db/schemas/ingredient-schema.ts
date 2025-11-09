@@ -4,7 +4,6 @@ import {
   pgEnum,
   pgTable,
   unique,
-  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import {
@@ -24,8 +23,10 @@ export const ingredientTable = pgTable(
   "ingredients",
   {
     ...requiredColumns,
-    userId: uuid("user_id")
-      .references(() => userTable.id, { onDelete: "cascade" })
+    userId: integer("user_id")
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+      })
       .notNull(),
     price: integer().default(100).notNull(),
     capacity: numeric({ scale: 3, mode: "number" }).default(1).notNull(),

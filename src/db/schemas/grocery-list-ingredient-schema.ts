@@ -3,7 +3,6 @@ import {
   numeric,
   pgTable,
   unique,
-  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import {
@@ -12,7 +11,6 @@ import {
   requiredColumns,
   timestamps,
 } from "../utils/shared-schema.ts";
-import { userTable } from "./user-schema.ts";
 import { type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { groceryListTable } from "./grocery-list-schema.ts";
 import { unitEnum } from "./ingredient-schema.ts";
@@ -21,10 +19,7 @@ export const groceryListIngredientTable = pgTable(
   "grocery_list_ingredients",
   {
     ...requiredColumns,
-    userId: uuid("user_id")
-      .references(() => userTable.id, { onDelete: "cascade" })
-      .notNull(),
-    groceryListId: uuid("grocery_list_id")
+    groceryListId: integer("grocery_list_id")
       .references(() => groceryListTable.id, { onDelete: "cascade" })
       .notNull(),
     capacity: numeric({ scale: 3, mode: "number" }).default(1),
@@ -35,8 +30,7 @@ export const groceryListIngredientTable = pgTable(
   },
   (table) => [
     unique("unique_groceryListIngredients").on(table.publicId),
-    unique("unique_userId_groceryListId_ingredientName").on(
-      table.userId,
+    unique("unique_groceryListId_ingredientName").on(
       table.groceryListId,
       table.name,
     ),

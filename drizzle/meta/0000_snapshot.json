@@ -1,5 +1,5 @@
 {
-  "id": "ed00e325-640a-425d-9adc-29cc34c41bcd",
+  "id": "f5597940-9b75-4c2b-81bf-f075a30b87dd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -38,15 +38,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
         "grocery_list_id": {
           "name": "grocery_list_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -81,7 +75,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -99,28 +94,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "grocery_list_ingredients_user_id_users_public_id_fk": {
-          "name": "grocery_list_ingredients_user_id_users_public_id_fk",
-          "tableFrom": "grocery_list_ingredients",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "public_id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "grocery_list_ingredients_grocery_list_id_grocery_lists_public_id_fk": {
-          "name": "grocery_list_ingredients_grocery_list_id_grocery_lists_public_id_fk",
+        "grocery_list_ingredients_grocery_list_id_grocery_lists_id_fk": {
+          "name": "grocery_list_ingredients_grocery_list_id_grocery_lists_id_fk",
           "tableFrom": "grocery_list_ingredients",
           "tableTo": "grocery_lists",
           "columnsFrom": [
             "grocery_list_id"
           ],
           "columnsTo": [
-            "public_id"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -135,11 +117,10 @@
             "public_id"
           ]
         },
-        "unique_userId_groceryListId_ingredientName": {
-          "name": "unique_userId_groceryListId_ingredientName",
+        "unique_groceryListId_ingredientName": {
+          "name": "unique_groceryListId_ingredientName",
           "nullsNotDistinct": false,
           "columns": [
-            "user_id",
             "grocery_list_id",
             "name"
           ]
@@ -185,7 +166,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -200,7 +181,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -218,15 +200,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "grocery_lists_user_id_users_public_id_fk": {
-          "name": "grocery_lists_user_id_users_public_id_fk",
+        "grocery_lists_user_id_users_id_fk": {
+          "name": "grocery_lists_user_id_users_id_fk",
           "tableFrom": "grocery_lists",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
           "columnsTo": [
-            "public_id"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -290,7 +272,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -339,7 +321,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -357,15 +340,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "ingredients_user_id_users_public_id_fk": {
-          "name": "ingredients_user_id_users_public_id_fk",
+        "ingredients_user_id_users_id_fk": {
+          "name": "ingredients_user_id_users_id_fk",
           "tableFrom": "ingredients",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
           "columnsTo": [
-            "public_id"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -427,15 +410,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
         "recipe_id": {
           "name": "recipe_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -470,7 +447,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -488,28 +466,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "recipe_ingredients_user_id_users_public_id_fk": {
-          "name": "recipe_ingredients_user_id_users_public_id_fk",
-          "tableFrom": "recipe_ingredients",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "public_id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "recipe_ingredients_recipe_id_recipes_public_id_fk": {
-          "name": "recipe_ingredients_recipe_id_recipes_public_id_fk",
+        "recipe_ingredients_recipe_id_recipes_id_fk": {
+          "name": "recipe_ingredients_recipe_id_recipes_id_fk",
           "tableFrom": "recipe_ingredients",
           "tableTo": "recipes",
           "columnsFrom": [
             "recipe_id"
           ],
           "columnsTo": [
-            "public_id"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -524,11 +489,10 @@
             "public_id"
           ]
         },
-        "unique_userId_recipeId_ingredientName": {
-          "name": "unique_userId_recipeId_ingredientName",
+        "unique_recipeId_ingredientName": {
+          "name": "unique_recipeId_ingredientName",
           "nullsNotDistinct": false,
           "columns": [
-            "user_id",
             "recipe_id",
             "name"
           ]
@@ -574,7 +538,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -589,7 +553,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -607,15 +572,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "recipes_user_id_users_public_id_fk": {
-          "name": "recipes_user_id_users_public_id_fk",
+        "recipes_user_id_users_id_fk": {
+          "name": "recipes_user_id_users_id_fk",
           "tableFrom": "recipes",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
           "columnsTo": [
-            "public_id"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -700,7 +665,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",

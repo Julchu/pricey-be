@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import type { SelectGroceryListIngredient } from "../db/schemas/grocery-ingredient-schema.ts";
+import type { SelectGroceryListIngredient } from "../db/schemas/grocery-list-ingredient-schema.ts";
 
 export const Unit = {
   // Mass

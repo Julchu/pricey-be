@@ -9,7 +9,7 @@ import {
   groceryListIngredientTable,
   type InsertGroceryListIngredient,
   type InsertPublicGroceryListIngredient,
-} from "../db/schemas/grocery-ingredient-schema.ts"; // TODO: determine if upsert vs insert/update & removing schema unique conflict
+} from "../db/schemas/grocery-list-ingredient-schema.ts"; // TODO: determine if upsert vs insert/update & removing schema unique conflict
 
 // TODO: determine if upsert vs insert/update & removing schema unique conflict
 // TODO: test if insert accounts for uniqueness (can insert same name/list/userId ingredient, or if blocked)
