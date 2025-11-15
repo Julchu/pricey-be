@@ -7,7 +7,7 @@ import { getUserByEmail, insertUser } from "./user-handlers.ts";
 import { OAuth2Client } from "google-auth-library";
 
 type JwtPayload = {
-  userId: string;
+  userId: number;
 };
 
 export const verifyGoogleToken = async (code: string) => {
@@ -41,7 +41,7 @@ export const verifyPriceyToken = async (token?: string, secret?: string) => {
 
   if (token === process.env.MASTER_KEY) {
     const userInfo = await getUserByEmail(process.env.MASTER_TEST_EMAIL);
-    return { payload: { userId: userInfo?.publicId } };
+    return { payload: { userId: userInfo?.id } };
   }
   const encodedSecret = new TextEncoder().encode(secret);
 
@@ -61,7 +61,7 @@ export const createTokens = async ({
   userId,
   refreshToken = false,
 }: {
-  userId: string;
+  userId: number;
   refreshToken?: boolean;
 }) => {
   if (!userId) return;
@@ -94,7 +94,7 @@ export const createTokens = async ({
 /**
  * Login: checks existence of user before returning accessToken; validates Google token
  * Register: creates new user (if error isn't thrown) and returns accessToken
- * userRequired: checks header auth accessToken in any API call (that isn't login/register)
+ * userSetter: checks header auth accessToken in any API call (that isn't login/register)
  * */
 export const loginCheck = async (idToken?: string) => {
   if (!idToken) return;
@@ -120,8 +120,8 @@ export const loginCheck = async (idToken?: string) => {
 
     if (!fetchedUser) return;
 
-    const { publicId, ...userInfo } = fetchedUser;
-    const tokens = await createTokens({ userId: publicId, refreshToken: true });
+    const { id, ...userInfo } = fetchedUser;
+    const tokens = await createTokens({ userId: id, refreshToken: true });
     return {
       tokens,
       userInfo,
@@ -131,8 +131,8 @@ export const loginCheck = async (idToken?: string) => {
   }
 };
 
-// Need userRequired/refreshRequired and AuthRequest req type to pass req.userId
-export const userRequired = async (
+// Need userSetter/userRefresher and AuthRequest req type to pass req.userId
+export const userSetter = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction,
@@ -151,14 +151,12 @@ export const userRequired = async (
       next();
     } else res.status(401).json({ error: "Unauthorized" });
   } catch (error) {
-    console.error(error);
-    res.status(401).json({ error: "Unauthorized" });
+    res.status(401).json({ error: `Error authenticating user, ${error}` });
     return;
   }
 };
 
-// Separated refreshRequired similar to authRequired for convention, since
-export const refreshRequired = async (
+export const userRefresher = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction,
@@ -177,12 +175,11 @@ export const refreshRequired = async (
       next();
     } else res.status(401).json({ error: "Unauthorized" });
   } catch (error) {
-    console.error("refresh token error", error);
-    // throw new Error("Unable to authenticate user", { cause: error });
-    res.status(401).json({ error: "Invalid or expired refresh token" });
+    res.status(401).json({ error: `Error refreshing token, ${error}` });
     return;
   }
 };
+
 export const setAuthCookies = (
   res: Response,
   accessToken?: string,

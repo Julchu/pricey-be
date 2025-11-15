@@ -5,14 +5,14 @@ import type { InsertPublicUser } from "../db/schemas/user-schema.ts";
 import {
   createTokens,
   loginCheck,
-  refreshRequired,
   setAuthCookies,
-  userRequired,
+  userRefresher,
+  userSetter,
 } from "../services/auth-handlers.ts";
 
 export const userRouter = Router();
 
-userRouter.get("/", userRequired, async (req: AuthRequest, res) => {
+userRouter.get("/", userSetter, async (req: AuthRequest, res) => {
   if (!req.userId) {
     res.status(400).json({ success: false, error: "Invalid user ID" });
     return;
@@ -30,7 +30,7 @@ userRouter.get("/", userRequired, async (req: AuthRequest, res) => {
 // TODO: test if need to filter user form data email (conflict if user exists)
 userRouter.patch(
   "/update",
-  userRequired,
+  userSetter,
   async (
     req: AuthRequest<unknown, unknown, { user: InsertPublicUser }>,
     res: Response,
@@ -99,7 +99,7 @@ userRouter.get(
   },
 );
 
-userRouter.post("/refresh", refreshRequired, async (req: AuthRequest, res) => {
+userRouter.post("/refresh", userRefresher, async (req: AuthRequest, res) => {
   if (!req.userId) {
     res.status(400).json({ success: false, error: "Invalid user ID" });
     return;

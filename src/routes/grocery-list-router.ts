@@ -13,7 +13,6 @@ groceryListRouter.get("/", async (req: AuthRequest, res) => {
     return;
   }
 
-  // TODO: combine grocery list with recipes
   try {
     const groceryLists = await getAllGroceryLists(req.userId);
     res.json({ success: true, data: groceryLists });
@@ -38,7 +37,6 @@ groceryListRouter.post(
     try {
       const { ingredients, ...newGroceryList } = req.body.groceryList;
 
-      // TODO: omit private fields
       const groceryLists = await insertGroceryList(
         newGroceryList,
         ingredients,

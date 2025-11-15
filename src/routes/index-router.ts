@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { prefillDb } from "../services/prefill-data/functions.ts";
-import { userRequired } from "../services/auth-handlers.ts";
+import { userSetter } from "../services/auth-handlers.ts";
 import type { AuthRequest } from "../utils/interfaces.ts";
 
 export const indexRouter = Router();
@@ -19,7 +19,7 @@ indexRouter.post("/test", (req, res) => {
 
 indexRouter.get(
   "/test-user-required",
-  userRequired,
+  userSetter,
   async (req: AuthRequest, res) => {
     if (!req.userId) {
       res.status(400).json({ success: false, error: "Invalid user ID" });

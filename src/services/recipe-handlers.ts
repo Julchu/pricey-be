@@ -9,7 +9,7 @@ import { and, eq } from "drizzle-orm";
 // export const insertRecipe = async (
 //   recipe: InsertPublicRecipe,
 //   recipeIngredients: InsertPublicRecipeIngredient[],
-//   userId: string,
+//   userId: number,
 // ) => {
 //   if (recipeIngredients.some(() => {}))
 //     try {
@@ -25,7 +25,7 @@ import { and, eq } from "drizzle-orm";
 //     }
 // };
 
-export const getAllRecipes = async (userId: string) => {
+export const getAllRecipes = async (userId: number) => {
   try {
     return await db
       .select()
@@ -36,7 +36,7 @@ export const getAllRecipes = async (userId: string) => {
   }
 };
 
-export const getRecipe = async (recipeId: string, userId: string) => {
+export const getRecipe = async (recipeId: string, userId: number) => {
   try {
     return await db
       .select()
@@ -50,6 +50,6 @@ export const getRecipe = async (recipeId: string, userId: string) => {
 };
 
 // TODO: test delete cascading for groceries/recipes, users (does it remove itself from other tables)
-export const deleteRecipe = async (recipeId: string, userId: string) => {
+export const deleteRecipe = async (recipeId: string, userId: number) => {
   return;
 };

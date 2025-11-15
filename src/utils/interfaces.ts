@@ -1,5 +1,6 @@
 import type { Request } from "express";
-import type { SelectGroceryListIngredient } from "../db/schemas/grocery-list-ingredient-schema.ts";
+import type { SelectPublicGroceryListIngredient } from "../db/schemas/grocery-list-ingredient-schema.ts";
+import type { SelectPublicGroceryList } from "../db/schemas/grocery-list-schema.ts";
 
 export const Unit = {
   // Mass
@@ -101,14 +102,9 @@ export interface Ingredient {
   season?: SeasonType;
 }
 
-export interface GroceryList {
-  id: number;
-  publicId: string;
-  name: string;
-  ingredients: SelectGroceryListIngredient[];
-  userId: string;
-  public?: boolean;
-}
+export type GroceryList = SelectPublicGroceryList & {
+  ingredients: SelectPublicGroceryListIngredient[];
+};
 
 export type Recipe = {
   id: number;
@@ -149,5 +145,5 @@ export type AuthRequest<
   TReqBody = unknown,
   TQuery = Record<string, unknown>,
 > = Request<TParams, TResBody, TReqBody, TQuery> & {
-  userId?: string;
+  userId?: number;
 };

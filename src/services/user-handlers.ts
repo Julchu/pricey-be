@@ -3,11 +3,10 @@ import { type InsertPublicUser, userTable } from "../db/schemas/user-schema.ts";
 import { and, eq } from "drizzle-orm";
 
 // Type user to User from interfaces
-export const getUserById = async (userId?: string) => {
-  if (!userId) return;
+export const getUserById = async (userId: number) => {
   try {
     return await db.query.userTable.findFirst({
-      where: (user) => and(eq(user.publicId, userId)),
+      where: (user) => and(eq(user.id, userId)),
     });
   } catch (error) {
     throw new Error("Error getting user", { cause: error });
@@ -39,13 +38,13 @@ export const insertUser = async (user: InsertPublicUser) => {
 };
 
 export const updateUser = async (
-  userId: string,
+  userId: number,
   updatedUser: InsertPublicUser,
 ) => {
   const { email, ...userInfo } = updatedUser;
   try {
     const existingUser = await db.query.userTable.findFirst({
-      where: (user) => and(eq(user.publicId, userId), eq(user.email, email)),
+      where: (user) => and(eq(user.id, userId), eq(user.email, email)),
     });
 
     if (existingUser)

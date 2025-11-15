@@ -67,7 +67,7 @@ const cloneColumn = async () => {
       .update(recipeTable)
       .set({ userId: userTable.id })
       .from(userTable)
-      .where(eq(recipeTable.userId, userTable.publicId));
+      .where(eq(recipeTable.userId, userTable.id));
   } catch (error) {
     throw new Error("Error cloning column", { cause: error });
   }

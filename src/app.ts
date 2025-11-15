@@ -13,7 +13,7 @@ import { userRouter } from "./routes/user-router.ts";
 import { groceryListRouter } from "./routes/grocery-list-router.ts";
 import { recipeRouter } from "./routes/recipe-router.ts";
 import rateLimit from "express-rate-limit";
-import { userRequired } from "./services/auth-handlers.ts";
+import { userSetter } from "./services/auth-handlers.ts";
 
 const app = express();
 
@@ -49,7 +49,7 @@ app.use("/user", userRouter);
 // Protected routes
 const protectedRoutes = express.Router();
 
-protectedRoutes.use(userRequired);
+protectedRoutes.use(userSetter);
 protectedRoutes.use("/ingredient", ingredientRouter);
 protectedRoutes.use("/grocery-list", groceryListRouter);
 protectedRoutes.use("/recipe", recipeRouter);
