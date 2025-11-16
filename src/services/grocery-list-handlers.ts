@@ -9,14 +9,112 @@ import {
   groceryListIngredientTable,
   type InsertGroceryListIngredient,
   type InsertPublicGroceryListIngredient,
-} from "../db/schemas/grocery-list-ingredient-schema.ts"; // TODO: determine if upsert vs insert/update & removing schema unique conflict
+} from "../db/schemas/grocery-list-ingredient-schema.ts";
+import type { GroceryList } from "../utils/interfaces.ts";
 
+export const getAllGroceryLists = async (userId: number) => {
+  try {
+    const rows = await db
+      .select()
+      .from(groceryListTable)
+      .leftJoin(
+        groceryListIngredientTable,
+        eq(groceryListIngredientTable.groceryListId, groceryListTable.id),
+      )
+      .where(eq(groceryListTable.userId, userId));
+
+    // rows.reduce<GroceryList[]>(
+    //   (groceryLists, { grocery_lists, grocery_list_ingredients }) => {
+    //
+    //     groceryLists.push();
+    //     return groceryLists;
+    //   },
+    //   [],
+    // );
+    //
+    // return rows;
+
+    const results = rows.reduce<Record<string, GroceryList>>(
+      (groceryLists, { grocery_lists, grocery_list_ingredients }) => {
+        const {
+          userId: _userId,
+          id: _id,
+          ...publicGroceryList
+        } = grocery_lists;
+
+        const groceryList: GroceryList = {
+          ...publicGroceryList,
+          ingredients: [],
+        };
+
+        const groceryListPublicId = grocery_lists.publicId;
+
+        if (!groceryLists[groceryListPublicId])
+          groceryLists[groceryListPublicId] = groceryList;
+
+        if (grocery_list_ingredients) {
+          const {
+            id: _ingredientId,
+            groceryListId,
+            ...ingredient
+          } = grocery_list_ingredients;
+
+          groceryLists[groceryListPublicId].ingredients.push(ingredient);
+        }
+
+        return groceryLists;
+      },
+      {},
+    );
+    return Object.values(results);
+  } catch (error) {
+    throw new Error("Error getting grocery list", { cause: error });
+  }
+};
+
+export const getGroceryList = async (groceryListId: string, userId: number) => {
+  try {
+    const [fetchedGroceryList] = await db
+      .select()
+      .from(groceryListTable)
+      .where(
+        and(
+          eq(groceryListTable.publicId, groceryListId),
+          eq(groceryListTable.userId, userId),
+        ),
+      );
+
+    if (!fetchedGroceryList) return null;
+
+    const {
+      userId: _userId,
+      id: _groceryListId,
+      ...publicGroceryList
+    } = fetchedGroceryList;
+
+    const ingredients = await db
+      .select()
+      .from(groceryListIngredientTable)
+      .where(eq(groceryListIngredientTable.groceryListId, _groceryListId));
+
+    const groceryList: GroceryList = {
+      ...publicGroceryList,
+      ingredients,
+    };
+
+    return groceryList;
+  } catch (error) {
+    throw new Error("Error getting groceryList:", { cause: error });
+  }
+};
+
+// TODO: omit private fields on return
 // TODO: determine if upsert vs insert/update & removing schema unique conflict
-// TODO: test if insert accounts for uniqueness (can insert same name/list/userId ingredient, or if blocked)
+// TODO: test insert accounts for uniqueness (can insert same name/list/userId ingredient, or if blocked)
 export const insertGroceryList = async (
   groceryList: InsertPublicGroceryList,
   groceryListIngredients: InsertPublicGroceryListIngredient[] = [],
-  userId: string,
+  userId: number,
 ) => {
   const insertGroceryList: InsertGroceryList = {
     ...groceryList,
@@ -26,7 +124,7 @@ export const insertGroceryList = async (
 
   try {
     return await db.transaction(async (tx) => {
-      const insertedGroceryList = await tx
+      const [insertedGroceryList] = await tx
         .insert(groceryListTable)
         .values(insertGroceryList)
         .onConflictDoUpdate({
@@ -35,7 +133,7 @@ export const insertGroceryList = async (
         })
         .returning();
 
-      const groceryListId = insertedGroceryList[0]?.publicId;
+      const groceryListId = insertedGroceryList?.id;
 
       if (groceryListId && groceryListIngredients.length > 0) {
         const insertGroceryListIngredients: InsertGroceryListIngredient[] =
@@ -44,8 +142,7 @@ export const insertGroceryList = async (
               ...ingredient,
               name: ingredient.name.toLowerCase(),
               quantity: ingredient.quantity || 1,
-              userId,
-              groceryListId: groceryListId,
+              groceryListId,
             };
           });
 
@@ -55,7 +152,7 @@ export const insertGroceryList = async (
           .returning();
 
         return {
-          ...insertedGroceryList[0],
+          ...insertedGroceryList,
           ingredients: insertedGroceryListIngredients,
         };
       } else {
@@ -71,64 +168,72 @@ export const insertGroceryList = async (
 };
 
 // Note: how to account for updated ingredient list?
-// Would need to diff groceryList ingredients and remove unused ingredients
-// export const updateGroceryList = async (
-//   groceryList: InsertGroceryList,
-//   groceryListIngredients: InsertPublicGroceryListIngredient[],
-// ) => {
-//   try {
-//     return await db.transaction(async (tx) => {
-//       await tx
-//         .delete(groceryListIngredientTable)
-//         .where(eq(groceryListIngredientTable.groceryListId, groceryList.publicId));
-//       const insertedGroceryList = await tx
-//         .insert(groceryListTable)
-//         .values(insertGroceryList)
-//         .onConflictDoUpdate({
-//           target: [
-//             groceryListTable.userId,
-//             groceryListTable.name,
-//             groceryListTable.publicId,
-//           ],
-//           set: insertGroceryList,
-//         })
-//         .returning();
-//
-//       await tx.insert(groceryListTable).values(groceryList).returning();
-//       for (const ingredient of groceryListIngredients) {
-//         await tx.update(groceryListIngredientTable).set(ingredient).returning();
-//       }
-//     });
-//     //   TODO: update grocery list ingredients
-//   } catch (error) {
-//     throw new Error("Error updating grocery list", { cause: error });
-//   }
-// };
-
-export const getAllGroceryLists = async (userId: string) => {
+// Would need to diff groceryList ingredients and remove unused ingredients?
+// Because of cascading deletion, can just delete original table before inserting new one
+export const updateGroceryList = async (
+  groceryList: InsertGroceryList,
+  groceryListIngredients: InsertPublicGroceryListIngredient[],
+  userId: number,
+) => {
   try {
-    return await db
-      .select()
-      .from(groceryListTable)
-      .where(eq(groceryListTable.userId, userId));
-    //   get grocery ingredients and combine with list
+    // return await db.transaction(async (tx) => {
+    // if (groceryList.publicId) {
+    //   await tx
+    //     .delete(groceryListTable)
+    //     .where(
+    //       and(
+    //         eq(groceryListTable.publicId, groceryList.publicId),
+    //         eq(groceryListTable.userId, userId),
+    //       ),
+    //     );
+    //
+    //   await tx
+    //     .delete(groceryListIngredientTable)
+    //     .where(
+    //       eq(groceryListIngredientTable.groceryListId, groceryList.publicId),
+    //     );
+    // const insertedGroceryList = await tx
+    //   .insert(groceryListTable)
+    //   .values(insertGroceryList)
+    //   .onConflictDoUpdate({
+    //     target: [
+    //       groceryListTable.userId,
+    //       groceryListTable.name,
+    //       groceryListTable.id,
+    //     ],
+    //     set: insertGroceryList,
+    //   })
+    //   .returning();
+    // }
+    // await tx.insert(groceryListTable).values(groceryList).returning();
+    // for (const ingredient of groceryListIngredients) {
+    //   await tx.update(groceryListIngredientTable).set(ingredient).returning();
+    // }
+    // });
+    //   TODO: update grocery list ingredients
   } catch (error) {
-    throw new Error("Error getting grocery list", { cause: error });
+    throw new Error("Error updating grocery list", { cause: error });
   }
 };
 
-export const getGroceryList = async (groceryListId: string, userId: string) => {
+export const deleteGroceryList = async (
+  groceryListId: string,
+  userId: number,
+) => {
   try {
-    return await db
-      .select()
-      .from(groceryListTable)
-      .where(
-        and(
-          eq(groceryListTable.publicId, groceryListId),
-          eq(groceryListTable.userId, userId),
-        ),
-      );
+    const [deletedGroceryListId] = await db.transaction(async (tx) => {
+      return tx
+        .delete(groceryListTable)
+        .where(
+          and(
+            eq(groceryListTable.publicId, groceryListId),
+            eq(groceryListTable.userId, userId),
+          ),
+        )
+        .returning({ publicId: groceryListTable.publicId });
+    });
+    return deletedGroceryListId;
   } catch (error) {
-    throw new Error("Error getting groceryList:", { cause: error });
+    throw new Error("Error deleting grocery list", { cause: error });
   }
 };

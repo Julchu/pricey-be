@@ -1,15 +1,16 @@
 import { db } from "../db";
 import {
   ingredientTable,
+  type InsertIngredient,
   type InsertPublicIngredient,
 } from "../db/schemas/ingredient-schema.ts";
 import { and, eq } from "drizzle-orm";
 
 export const upsertIngredient = async (
   ingredient: Omit<InsertPublicIngredient, "userId">,
-  userId: string,
+  userId: number,
 ) => {
-  const insertIngredient: InsertPublicIngredient = {
+  const insertIngredient: InsertIngredient = {
     ...ingredient,
     name: ingredient.name.toLowerCase(),
     userId,
@@ -32,7 +33,7 @@ export const upsertIngredient = async (
   }
 };
 
-export const getAllIngredients = async (userId: string) => {
+export const getAllIngredients = async (userId: number) => {
   try {
     return await db
       .select()
@@ -43,14 +44,14 @@ export const getAllIngredients = async (userId: string) => {
   }
 };
 
-export const getIngredient = async (ingredientId: string, userId: string) => {
+export const getIngredient = async (ingredientId: number, userId: number) => {
   try {
     return await db
       .select()
       .from(ingredientTable)
       .where(
         and(
-          eq(ingredientTable.publicId, ingredientId),
+          eq(ingredientTable.id, ingredientId),
           eq(ingredientTable.userId, userId),
         ),
       );

@@ -47,12 +47,12 @@ export type InsertGroceryListIngredient = InferInsertModel<
 
 export type SelectPublicGroceryListIngredient = Omit<
   SelectGroceryListIngredient,
-  PrivateFields
+  PrivateFields | "groceryListId"
 >;
 
 export type InsertPublicGroceryListIngredient = Omit<
   InsertGroceryListIngredient,
-  PrivateFormFields
+  PrivateFormFields | "groceryListId"
 >;
 
 export type SeedGroceryListIngredient = Omit<InsertGroceryListIngredient, "">;

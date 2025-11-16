@@ -16,4 +16,4 @@ export const requiredColumns = {
 
 export type PrivateFields = "id" | "userId";
 
-export type PrivateFormFields = "id" | "userId" | "publicId";
+export type PrivateFormFields = "id" | "userId"; //| "publicId";
