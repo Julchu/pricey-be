@@ -43,6 +43,7 @@ export const verifyPriceyToken = async (token?: string, secret?: string) => {
     const userInfo = await getUserByEmail(process.env.MASTER_TEST_EMAIL);
     return { payload: { userId: userInfo?.id } };
   }
+
   const encodedSecret = new TextEncoder().encode(secret);
 
   try {
@@ -192,7 +193,7 @@ export const setAuthCookies = (
     res.cookie(accessTokenKey, accessToken, {
       httpOnly: true, // To make it inaccessible to JavaScript
       secure: process.env.NODE_ENV === "production", // Only set true over HTTPS in production
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 3600000, // 1-hour expiration time
     });
 
@@ -200,7 +201,7 @@ export const setAuthCookies = (
     res.cookie("pricey_refresh_token", refreshToken, {
       httpOnly: true, // To make it inaccessible to JavaScript
       secure: process.env.NODE_ENV === "production", // Only set true over HTTPS in production
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 604800000, // 7-day expiration time
     });
 };
