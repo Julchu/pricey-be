@@ -8,7 +8,7 @@ export const recipeRouter = Router();
 
 recipeRouter.get("/", async (req: AuthRequest, res) => {
   if (!req.userId) {
-    res.status(400).json({ success: false, error: "Invalid user ID" });
+    res.status(401).json({ success: false, error: "Invalid user ID" });
     return;
   }
 
@@ -25,7 +25,7 @@ recipeRouter.get(
   "/:recipeId",
   async (req: AuthRequest<{ recipeId: string }>, res) => {
     if (!req.userId) {
-      res.status(400).json({ success: false, error: "Invalid user ID" });
+      res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
     }
 
@@ -54,7 +54,7 @@ recipeRouter.post(
     res,
   ) => {
     if (!req.userId) {
-      res.status(400).json({ success: false, error: "Invalid user ID" });
+      res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
     }
 

@@ -17,6 +17,7 @@ export const groceryListTable = pgTable(
         onDelete: "cascade",
       })
       .notNull(),
+    // TODO: rename public to isPublic in schema
     public: boolean().default(false).notNull(),
     ...timestamps,
   },

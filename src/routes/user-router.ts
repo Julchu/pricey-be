@@ -2,19 +2,13 @@ import { type Request, type Response, Router } from "express";
 import { getUserById, updateUser } from "../services/user-handlers.ts";
 import type { AuthRequest } from "../utils/interfaces.ts";
 import type { InsertPublicUser } from "../db/schemas/user-schema.ts";
-import {
-  createTokens,
-  loginCheck,
-  setAuthCookies,
-  userRefresher,
-  userSetter,
-} from "../services/auth-handlers.ts";
+import { createTokens, loginCheck, setAuthCookies, userRefresher, userSetter, } from "../services/auth-handlers.ts";
 
 export const userRouter = Router();
 
 userRouter.get("/", userSetter, async (req: AuthRequest, res) => {
   if (!req.userId) {
-    res.status(400).json({ success: false, error: "Invalid user ID" });
+    res.status(401).json({ success: false, error: "Invalid user ID" });
     return;
   }
 
@@ -36,7 +30,7 @@ userRouter.patch(
     res: Response,
   ) => {
     if (!req.userId) {
-      res.status(400).json({ success: false, error: "Invalid user ID" });
+      res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
     }
 
@@ -101,7 +95,7 @@ userRouter.get(
 
 userRouter.post("/refresh", userRefresher, async (req: AuthRequest, res) => {
   if (!req.userId) {
-    res.status(400).json({ success: false, error: "Invalid user ID" });
+    res.status(401).json({ success: false, error: "Invalid user ID" });
     return;
   }
 

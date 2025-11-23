@@ -4,14 +4,17 @@ import {
   getAllGroceryLists,
   getGroceryList,
   insertGroceryList,
+  updateGroceryList,
 } from "../services/grocery-list-handlers.ts";
 import type { AuthRequest, GroceryList } from "../utils/interfaces.ts";
+import type { InsertPublicGroceryList } from "../db/schemas/grocery-list-schema.ts";
+import type { InsertPublicGroceryListIngredient } from "../db/schemas/grocery-list-ingredient-schema.ts";
 
 export const groceryListRouter = Router();
 
 groceryListRouter.get("/", async (req: AuthRequest, res) => {
   if (!req.userId) {
-    res.status(400).json({ success: false, error: "Invalid user ID" });
+    res.status(401).json({ success: false, error: "Invalid user ID" });
     return;
   }
 
@@ -28,7 +31,7 @@ groceryListRouter.get(
   "/:groceryListId",
   async (req: AuthRequest<{ groceryListId: string }>, res) => {
     if (!req.userId) {
-      res.status(400).json({ success: false, error: "Invalid user ID" });
+      res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
     }
 
@@ -65,19 +68,25 @@ groceryListRouter.post(
     res,
   ) => {
     if (!req.userId) {
-      res.status(400).json({ success: false, error: "Invalid user ID" });
+      res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
     }
 
-    try {
-      const { ingredients, ...newGroceryList } = req.body.groceryList;
+    const { ingredients, ...newGroceryList } = req.body.groceryList;
 
-      const groceryLists = await insertGroceryList(
-        newGroceryList,
-        ingredients,
-        req.userId,
-      );
-      res.json({ success: true, data: groceryLists });
+    try {
+      const groceryList = await insertGroceryList({
+        groceryList: newGroceryList,
+        groceryListIngredients: ingredients,
+        userId: req.userId,
+      });
+
+      if (!groceryList) {
+        res.json({ success: false, error: "Grocery list does not exist" });
+        return;
+      }
+
+      res.json({ success: true, data: groceryList });
     } catch (error) {
       console.error("Failed to save new grocery list", error);
       res
@@ -87,27 +96,71 @@ groceryListRouter.post(
   },
 );
 
-// Partial update (like public status, name)
-groceryListRouter.patch("/:groceryListId", async (req: AuthRequest, res) => {
-  if (!req.userId) {
-    res.status(400).json({ success: false, error: "Invalid user ID" });
-    return;
-  }
-});
+groceryListRouter.patch(
+  "/:groceryListId",
+  async (
+    req: AuthRequest<
+      unknown,
+      unknown,
+      {
+        groceryList: InsertPublicGroceryList;
+        deletedIngredientIds: string[];
+        newIngredients: InsertPublicGroceryListIngredient[];
+        updatedIngredients: InsertPublicGroceryListIngredient[];
+      }
+    >,
+    res,
+  ) => {
+    if (!req.userId) {
+      res.status(401).json({ success: false, error: "Invalid user ID" });
+      return;
+    }
+    try {
+      const groceryList = req.body.groceryList;
+      const deletedIngredientIds = req.body.deletedIngredientIds;
+      const newIngredients = req.body.newIngredients;
+      const updatedIngredients = req.body.updatedIngredients;
+      const userId = req.userId;
 
-// Full update (like ingredients)
-groceryListRouter.put("/:groceryListId", async (req: AuthRequest, res) => {
-  if (!req.userId) {
-    res.status(400).json({ success: false, error: "Invalid user ID" });
-    return;
-  }
-});
+      console.log("groceryList", groceryList);
+      console.log("deletedIngredientIds", deletedIngredientIds);
+      console.log("newIngredients", newIngredients);
+      console.log("updatedIngredients", updatedIngredients);
+
+      const updatedGroceryList = await updateGroceryList({
+        groceryList,
+        deletedIngredientIds,
+        newIngredients,
+        updatedIngredients,
+        userId,
+      });
+
+      if (!updatedGroceryList) {
+        res.status(404).json({
+          success: false,
+          error: "Grocery list could not be updated",
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: updatedGroceryList,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: `Failed to update grocery list: ${error}`,
+      });
+    }
+  },
+);
 
 groceryListRouter.delete(
   "/:groceryListId",
   async (req: AuthRequest<{ groceryListId: string }>, res) => {
     if (!req.userId) {
-      res.status(400).json({ success: false, error: "Invalid user ID" });
+      res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
     }
 

@@ -22,7 +22,7 @@ indexRouter.get(
   userSetter,
   async (req: AuthRequest, res) => {
     if (!req.userId) {
-      res.status(400).json({ success: false, error: "Invalid user ID" });
+      res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
     }
 
