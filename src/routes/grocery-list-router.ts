@@ -122,11 +122,6 @@ groceryListRouter.patch(
       const updatedIngredients = req.body.updatedIngredients;
       const userId = req.userId;
 
-      console.log("groceryList", groceryList);
-      console.log("deletedIngredientIds", deletedIngredientIds);
-      console.log("newIngredients", newIngredients);
-      console.log("updatedIngredients", updatedIngredients);
-
       const updatedGroceryList = await updateGroceryList({
         groceryList,
         deletedIngredientIds,
