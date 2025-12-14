@@ -154,6 +154,7 @@ groceryListRouter.patch(
 groceryListRouter.delete(
   "/:groceryListId",
   async (req: AuthRequest<{ groceryListId: string }>, res) => {
+    console.log(req.userId);
     if (!req.userId) {
       res.status(401).json({ success: false, error: "Invalid user ID" });
       return;

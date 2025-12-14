@@ -9,6 +9,7 @@ import {
   groceryListIngredientTable,
   type InsertGroceryListIngredient,
   type InsertPublicGroceryListIngredient,
+  type SelectPublicGroceryListIngredient,
 } from "../db/schemas/grocery-list-ingredient-schema.ts";
 import type { GroceryList } from "../utils/interfaces.ts";
 
@@ -25,14 +26,16 @@ export const getAllGroceryLists = async (userId: number) => {
 
     const results = rows.reduce<Record<string, GroceryList>>(
       (groceryLists, { grocery_lists, grocery_list_ingredients }) => {
-        const {
-          userId: _userId,
-          id: _id,
-          ...publicGroceryList
-        } = grocery_lists;
+        const { updatedAt, createdAt, deletedAt, publicId, name } =
+          grocery_lists;
 
         const groceryList: GroceryList = {
-          ...publicGroceryList,
+          updatedAt,
+          createdAt,
+          deletedAt,
+          publicId,
+          name,
+          public: grocery_lists.public,
           ingredients: [],
         };
 
@@ -43,10 +46,28 @@ export const getAllGroceryLists = async (userId: number) => {
 
         if (grocery_list_ingredients) {
           const {
-            id: _ingredientId,
-            groceryListId,
-            ...ingredient
+            updatedAt,
+            createdAt,
+            deletedAt,
+            capacity,
+            quantity,
+            unit,
+            image,
+            publicId,
+            name,
           } = grocery_list_ingredients;
+
+          const ingredient: SelectPublicGroceryListIngredient = {
+            updatedAt,
+            createdAt,
+            deletedAt,
+            capacity,
+            quantity,
+            unit,
+            image,
+            publicId,
+            name,
+          };
 
           groceryLists[groceryListPublicId].ingredients.push(ingredient);
         }
@@ -75,16 +96,24 @@ export const getGroceryList = async (groceryListId: string, userId: number) => {
 
     if (!fetchedGroceryList) return null;
 
-    const {
-      userId: _userId,
-      id: _groceryListId,
-      ...publicGroceryList
-    } = fetchedGroceryList;
+    const { updatedAt, createdAt, deletedAt, publicId, name } =
+      fetchedGroceryList;
+
+    const publicGroceryList = {
+      updatedAt,
+      createdAt,
+      deletedAt,
+      publicId,
+      name,
+      public: fetchedGroceryList.public,
+    };
 
     const ingredients = await db
       .select()
       .from(groceryListIngredientTable)
-      .where(eq(groceryListIngredientTable.groceryListId, _groceryListId));
+      .where(
+        eq(groceryListIngredientTable.groceryListId, fetchedGroceryList.id),
+      );
 
     const groceryList: GroceryList = {
       ...publicGroceryList,
@@ -187,60 +216,37 @@ export const updateGroceryList = async ({
 
       if (!updatedGroceryList) return tx.rollback();
 
+      const groceryListId = updatedGroceryList.id;
+
       for (const ingredientId of deletedIngredientIds) {
         await tx
           .delete(groceryListIngredientTable)
           .where(
             and(
               eq(groceryListIngredientTable.publicId, ingredientId),
-              eq(
-                groceryListIngredientTable.groceryListId,
-                updatedGroceryList.id,
-              ),
+              eq(groceryListIngredientTable.groceryListId, groceryListId),
             ),
           );
       }
 
-      if (newIngredients.length === 0 && updatedIngredients.length === 0) {
-        return {
-          ...updatedGroceryList,
-          ingredients: [],
-        };
-      }
-
-      const groceryListId = updatedGroceryList.id;
-
-      const returnedIngredients: InsertGroceryListIngredient[] = [];
-
-      if (updatedIngredients) {
-        for (const ingredient of updatedIngredients) {
-          if (ingredient.publicId) {
-            const updatedIngredient = await tx
-              .update(groceryListIngredientTable)
-              .set({
-                name: ingredient.name,
-                capacity: ingredient.capacity,
-                quantity: ingredient.quantity,
-                unit: ingredient.unit,
-              })
-              .where(
-                and(
-                  eq(groceryListIngredientTable.publicId, ingredient.publicId),
-                  eq(groceryListIngredientTable.groceryListId, groceryListId),
-                ),
-              )
-              .returning();
-            console.log("updatedIngredient", updatedIngredient);
-            returnedIngredients.push(...updatedIngredient);
-          }
+      for (const ingredient of updatedIngredients) {
+        if (ingredient.publicId) {
+          await tx
+            .update(groceryListIngredientTable)
+            .set({
+              name: ingredient.name,
+              capacity: ingredient.capacity,
+              quantity: ingredient.quantity,
+              unit: ingredient.unit,
+            })
+            .where(
+              and(
+                eq(groceryListIngredientTable.publicId, ingredient.publicId),
+                eq(groceryListIngredientTable.groceryListId, groceryListId),
+              ),
+            );
         }
       }
-
-      if (newIngredients.length === 0)
-        return {
-          ...updatedGroceryList,
-          ingredients: [...returnedIngredients],
-        };
 
       const insertGroceryListIngredients: InsertGroceryListIngredient[] =
         newIngredients.map((ingredient) => {
@@ -252,18 +258,22 @@ export const updateGroceryList = async ({
           };
         });
 
-      const insertedGroceryListIngredients: InsertGroceryListIngredient[] =
+      if (insertGroceryListIngredients.length > 0) {
         await tx
           .insert(groceryListIngredientTable)
-          .values(insertGroceryListIngredients)
-          .returning();
+          .values(insertGroceryListIngredients);
+      }
+
+      const sourceOfTruthIngredients = await tx
+        .select()
+        .from(groceryListIngredientTable)
+        .where(
+          eq(groceryListIngredientTable.groceryListId, updatedGroceryList.id),
+        );
 
       return {
         ...updatedGroceryList,
-        ingredients: [
-          ...returnedIngredients,
-          ...insertedGroceryListIngredients,
-        ],
+        ingredients: sourceOfTruthIngredients,
       };
     });
   } catch (error) {
