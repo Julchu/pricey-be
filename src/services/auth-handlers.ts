@@ -10,6 +10,17 @@ type JwtPayload = {
   userId: number;
 };
 
+// TODO: log out google session
+export const googleLogout = async () => {
+  //   const client = new OAuth2Client({
+  //     clientId: process.env.GOOGLE_CLIENT_ID,
+  //     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  //     redirectUri: process.env.GOOGLE_REDIRECT_URIS,
+  //   });
+  //
+  //   client.revokeToken()
+};
+
 export const verifyGoogleToken = async (code: string) => {
   const client = new OAuth2Client({
     clientId: process.env.GOOGLE_CLIENT_ID,

@@ -186,29 +186,31 @@ export const insertGroceryList = async ({
 };
 
 export const updateGroceryList = async ({
+  groceryListPublicId,
   groceryList,
   deletedIngredientIds,
   newIngredients,
   updatedIngredients,
   userId,
 }: {
+  groceryListPublicId: string;
   groceryList: InsertPublicGroceryList;
   deletedIngredientIds: string[];
   newIngredients: InsertPublicGroceryListIngredient[];
   updatedIngredients: InsertPublicGroceryListIngredient[];
   userId: number;
 }) => {
+  if (!groceryListPublicId) return;
+
   try {
     return await db.transaction(async (tx) => {
-      if (!groceryList.publicId) return;
-
       // Would fail if grocery list name already exists for user
       const [updatedGroceryList] = await tx
         .update(groceryListTable)
         .set({ name: groceryList.name, public: groceryList.public })
         .where(
           and(
-            eq(groceryListTable.publicId, groceryList.publicId),
+            eq(groceryListTable.publicId, groceryListPublicId),
             eq(groceryListTable.userId, userId),
           ),
         )

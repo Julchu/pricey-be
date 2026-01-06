@@ -97,10 +97,10 @@ groceryListRouter.post(
 );
 
 groceryListRouter.patch(
-  "/:groceryListId",
+  "/:groceryListPublicId",
   async (
     req: AuthRequest<
-      unknown,
+      { groceryListPublicId: string },
       unknown,
       {
         groceryList: InsertPublicGroceryList;
@@ -116,6 +116,7 @@ groceryListRouter.patch(
       return;
     }
     try {
+      const groceryListPublicId = req.params.groceryListPublicId;
       const groceryList = req.body.groceryList;
       const deletedIngredientIds = req.body.deletedIngredientIds;
       const newIngredients = req.body.newIngredients;
@@ -123,6 +124,7 @@ groceryListRouter.patch(
       const userId = req.userId;
 
       const updatedGroceryList = await updateGroceryList({
+        groceryListPublicId,
         groceryList,
         deletedIngredientIds,
         newIngredients,
@@ -152,9 +154,8 @@ groceryListRouter.patch(
 );
 
 groceryListRouter.delete(
-  "/:groceryListId",
-  async (req: AuthRequest<{ groceryListId: string }>, res) => {
-    console.log(req.userId);
+  "/:groceryListPublicId",
+  async (req: AuthRequest<{ groceryListPublicId: string }>, res) => {
     if (!req.userId) {
       res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
@@ -162,7 +163,7 @@ groceryListRouter.delete(
 
     try {
       const deletedGroceryListId = await deleteGroceryList(
-        req.params.groceryListId,
+        req.params.groceryListPublicId,
         req.userId,
       );
 

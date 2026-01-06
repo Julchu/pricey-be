@@ -2,7 +2,14 @@ import { type Request, type Response, Router } from "express";
 import { getUserById, updateUser } from "../services/user-handlers.ts";
 import type { AuthRequest } from "../utils/interfaces.ts";
 import type { InsertPublicUser } from "../db/schemas/user-schema.ts";
-import { createTokens, loginCheck, setAuthCookies, userRefresher, userSetter, } from "../services/auth-handlers.ts";
+import {
+  createTokens,
+  googleLogout,
+  loginCheck,
+  setAuthCookies,
+  userRefresher,
+  userSetter,
+} from "../services/auth-handlers.ts";
 
 export const userRouter = Router();
 
@@ -116,7 +123,8 @@ userRouter.post("/refresh", userRefresher, async (req: AuthRequest, res) => {
   }
 });
 
-userRouter.post("/logout", (req, res) => {
+userRouter.post("/logout", async (req, res) => {
+  await googleLogout();
   res.clearCookie("pricey_access_token");
   res.clearCookie("pricey_refresh_token");
   res.status(200).json({ success: true, data: null });
