@@ -54,6 +54,7 @@ userRouter.patch(
   },
 );
 
+// Unused in favor of /login/google
 userRouter.post("/login", async (req, res) => {
   try {
     const loginResponse = await loginCheck(req.body.idToken);
