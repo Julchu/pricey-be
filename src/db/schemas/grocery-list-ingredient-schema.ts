@@ -22,6 +22,8 @@ export const groceryListIngredientTable = pgTable(
     groceryListId: integer("grocery_list_id")
       .references(() => groceryListTable.id, { onDelete: "cascade" })
       .notNull(),
+    ingredientId: integer("ingredient_id").notNull(),
+    price: integer(),
     capacity: numeric({ scale: 3, mode: "number" }).default(1),
     quantity: integer().default(1),
     unit: unitEnum(),

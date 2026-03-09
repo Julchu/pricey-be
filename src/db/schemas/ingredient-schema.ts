@@ -1,17 +1,5 @@
-import {
-  integer,
-  numeric,
-  pgEnum,
-  pgTable,
-  unique,
-  varchar,
-} from "drizzle-orm/pg-core";
-import {
-  type PrivateFields,
-  type PrivateFormFields,
-  requiredColumns,
-  timestamps,
-} from "../utils/shared-schema.ts";
+import { integer, numeric, pgEnum, pgTable, unique, varchar, } from "drizzle-orm/pg-core";
+import { type PrivateFields, type PrivateFormFields, requiredColumns, timestamps, } from "../utils/shared-schema.ts";
 import { type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { userTable } from "./user-schema.ts";
 import { SeasonValues, UnitValues } from "../../utils/interfaces.ts";
@@ -28,7 +16,7 @@ export const ingredientTable = pgTable(
         onDelete: "cascade",
       })
       .notNull(),
-    price: integer().default(100).notNull(),
+    price: integer(),
     capacity: numeric({ scale: 3, mode: "number" }).default(1).notNull(),
     quantity: integer().default(1),
     unit: unitEnum().notNull(),
