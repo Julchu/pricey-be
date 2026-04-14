@@ -1,4 +1,10 @@
-import { boolean, integer, pgTable, unique } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  pgTable,
+  unique,
+  varchar,
+} from "drizzle-orm/pg-core";
 import {
   type PrivateFields,
   type PrivateFormFields,
@@ -12,12 +18,13 @@ export const recipeTable = pgTable(
   "recipes",
   {
     ...requiredColumns,
+    name: varchar({ length: 255 }).notNull(),
     userId: integer("user_id")
       .references(() => userTable.id, {
         onDelete: "cascade",
       })
       .notNull(),
-    public: boolean().default(false).notNull(),
+    isPublic: boolean().default(false).notNull(),
     ...timestamps,
   },
   (table) => [

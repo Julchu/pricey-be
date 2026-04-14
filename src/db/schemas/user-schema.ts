@@ -12,6 +12,7 @@ export const userTable = pgTable(
   "users",
   {
     ...requiredColumns,
+    name: varchar({ length: 255 }).notNull(),
     email: varchar({ length: 255 }).unique().notNull(),
     image: varchar({ length: 255 }),
     preferences: jsonb()

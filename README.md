@@ -19,6 +19,7 @@ Running Postgres with Docker locally
   docker desktop start
   docker run --name my-postgres -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydb -p 5432:5432 -d postgres
   docker ps -a
+  docker start my-postgres
   docker exec -it my-postgres bash
   psql -U myuser -d mydb
   ```
@@ -43,6 +44,7 @@ psql -U postgres -d postgres
     - `\l`: view all databases
     - `\du`: view all users
     - Note: don't drop `postgres`, `template0`, or `template1` databases
+    - Sometimes might need to enter postgres db to delete other db: `\c postgres`
 
 ```postgresql
 DROP DATABASE your_database_name;

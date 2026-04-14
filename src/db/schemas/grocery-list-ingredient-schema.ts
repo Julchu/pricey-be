@@ -13,7 +13,7 @@ import {
 } from "../utils/shared-schema.ts";
 import { type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import { groceryListTable } from "./grocery-list-schema.ts";
-import { unitEnum } from "./ingredient-schema.ts";
+import { ingredientTable, unitEnum } from "./ingredient-schema.ts";
 
 export const groceryListIngredientTable = pgTable(
   "grocery_list_ingredients",
@@ -22,8 +22,11 @@ export const groceryListIngredientTable = pgTable(
     groceryListId: integer("grocery_list_id")
       .references(() => groceryListTable.id, { onDelete: "cascade" })
       .notNull(),
-    ingredientId: integer("ingredient_id").notNull(),
-    price: integer(),
+    ingredientId: integer("ingredient_id")
+      .references(() => ingredientTable.id, {
+        onDelete: "cascade",
+      })
+      .notNull(),
     capacity: numeric({ scale: 3, mode: "number" }).default(1),
     quantity: integer().default(1),
     unit: unitEnum(),
@@ -32,9 +35,9 @@ export const groceryListIngredientTable = pgTable(
   },
   (table) => [
     unique("unique_groceryListIngredients").on(table.publicId),
-    unique("unique_groceryListId_ingredientName").on(
+    unique("unique_groceryListId_ingredientId").on(
       table.groceryListId,
-      table.name,
+      table.ingredientId,
     ),
   ],
 );

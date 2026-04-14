@@ -14,7 +14,7 @@ export const Unit = {
   TABLESPOON: "tbsp",
   TEASPOON: "tsp",
 
-  ITEM: "item",
+  PIECES: "pcs",
 } as const;
 
 export const UnitValues = [
@@ -25,12 +25,12 @@ export const UnitValues = [
   Unit.CUP,
   Unit.TABLESPOON,
   Unit.TEASPOON,
-  Unit.ITEM,
+  Unit.PIECES,
 ] as const;
 export const MassValues = [Unit.KILOGRAM, Unit.POUND] as const;
 export const VolumeValues = [Unit.LITRE, Unit.QUART] as const;
 
-export type UnitType = (typeof UnitValues)[number]; // "kg" | "lb" | "L" | "qt" | "cup" | "tbsp" | "tsp" | "item";
+export type UnitType = (typeof UnitValues)[number]; // "kg" | "lb" | "L" | "qt" | "cup" | "tbsp" | "tsp" | "pcs";
 export type MassType = (typeof MassValues)[number]; // "kg" | "lb"
 export type VolumeType = (typeof VolumeValues)[number]; // "L" | "qt"
 

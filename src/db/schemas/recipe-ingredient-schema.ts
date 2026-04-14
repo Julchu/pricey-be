@@ -12,7 +12,7 @@ import {
   timestamps,
 } from "../utils/shared-schema.ts";
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { unitEnum } from "./ingredient-schema.ts";
+import { ingredientTable, unitEnum } from "./ingredient-schema.ts";
 import { recipeTable } from "./recipe-schema.ts";
 
 export const recipeIngredientTable = pgTable(
@@ -24,6 +24,11 @@ export const recipeIngredientTable = pgTable(
         onDelete: "cascade",
       })
       .notNull(),
+    ingredientId: integer("ingredient_id")
+      .references(() => ingredientTable.id, {
+        onDelete: "cascade",
+      })
+      .notNull(),
     capacity: numeric({ scale: 3, mode: "number" }).default(1),
     quantity: integer().default(1),
     unit: unitEnum(),
@@ -32,7 +37,10 @@ export const recipeIngredientTable = pgTable(
   },
   (table) => [
     unique("unique_recipeIngredients").on(table.publicId),
-    unique("unique_recipeId_ingredientName").on(table.recipeId, table.name),
+    unique("unique_recipeId_ingredientId").on(
+      table.recipeId,
+      table.ingredientId,
+    ),
   ],
 );
 
