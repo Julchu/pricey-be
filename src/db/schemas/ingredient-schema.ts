@@ -30,9 +30,9 @@ export const ingredientTable = pgTable(
       })
       .notNull(),
     price: integer(),
-    capacity: numeric({ scale: 3, mode: "number" }).default(1).notNull(),
-    quantity: integer().default(1),
-    unit: unitEnum().notNull(),
+    capacity: numeric({ scale: 3, mode: "number" }),
+    quantity: integer(),
+    unit: unitEnum(),
     image: varchar({ length: 255 }),
     season: seasonEnum(),
     ...timestamps,

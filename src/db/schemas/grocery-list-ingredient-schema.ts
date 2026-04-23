@@ -27,8 +27,8 @@ export const groceryListIngredientTable = pgTable(
         onDelete: "cascade",
       })
       .notNull(),
-    capacity: numeric({ scale: 3, mode: "number" }).default(1),
-    quantity: integer().default(1),
+    capacity: numeric({ scale: 3, mode: "number" }),
+    quantity: integer(),
     unit: unitEnum(),
     image: varchar({ length: 255 }),
     ...timestamps,
