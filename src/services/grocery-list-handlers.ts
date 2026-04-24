@@ -11,6 +11,7 @@ import {
   type InsertPublicGroceryListIngredient,
   type SelectPublicGroceryListIngredient,
 } from "../db/schemas/grocery-list-ingredient-schema.ts";
+import { ingredientTable } from "../db/schemas/ingredient-schema.ts";
 import type { GroceryList } from "../utils/interfaces.ts";
 
 export const getAllGroceryLists = async (userId: number) => {
@@ -22,29 +23,39 @@ export const getAllGroceryLists = async (userId: number) => {
         groceryListIngredientTable,
         eq(groceryListIngredientTable.groceryListId, groceryListTable.id),
       )
+      .leftJoin(
+        ingredientTable,
+        eq(ingredientTable.id, groceryListIngredientTable.ingredientId),
+      )
       .where(eq(groceryListTable.userId, userId));
 
     const results = rows.reduce<Record<string, GroceryList>>(
-      (groceryLists, { grocery_lists, grocery_list_ingredients }) => {
-        const { updatedAt, createdAt, deletedAt, publicId, name } =
-          grocery_lists;
+      (
+        groceryListsObject,
+        {
+          grocery_lists: currentList,
+          grocery_list_ingredients: groceryListIngredient,
+          ingredients: currentIngredient,
+        },
+      ) => {
+        const groceryListPublicId = currentList.publicId;
 
-        const groceryList: GroceryList = {
-          updatedAt,
-          createdAt,
-          deletedAt,
-          publicId,
-          name,
-          public: grocery_lists.public,
-          ingredients: [],
-        };
+        if (!groceryListsObject[groceryListPublicId]) {
+          const { updatedAt, createdAt, deletedAt, publicId, name } =
+            currentList;
 
-        const groceryListPublicId = grocery_lists.publicId;
+          groceryListsObject[groceryListPublicId] = {
+            updatedAt,
+            createdAt,
+            deletedAt,
+            publicId,
+            name,
+            isPublic: currentList.isPublic,
+            ingredients: [],
+          };
+        }
 
-        if (!groceryLists[groceryListPublicId])
-          groceryLists[groceryListPublicId] = groceryList;
-
-        if (grocery_list_ingredients) {
+        if (groceryListIngredient) {
           const {
             updatedAt,
             createdAt,
@@ -54,10 +65,11 @@ export const getAllGroceryLists = async (userId: number) => {
             unit,
             image,
             publicId,
-            name,
-          } = grocery_list_ingredients;
+          } = groceryListIngredient;
 
-          const ingredient: SelectPublicGroceryListIngredient = {
+          const ingredient: SelectPublicGroceryListIngredient & {
+            name?: string;
+          } = {
             updatedAt,
             createdAt,
             deletedAt,
@@ -66,13 +78,13 @@ export const getAllGroceryLists = async (userId: number) => {
             unit,
             image,
             publicId,
-            name,
+            name: currentIngredient?.name,
           };
 
-          groceryLists[groceryListPublicId].ingredients.push(ingredient);
+          groceryListsObject[groceryListPublicId].ingredients.push(ingredient);
         }
 
-        return groceryLists;
+        return groceryListsObject;
       },
       {},
     );
@@ -105,7 +117,7 @@ export const getGroceryList = async (groceryListId: string, userId: number) => {
       deletedAt,
       publicId,
       name,
-      public: fetchedGroceryList.public,
+      isPublic: fetchedGroceryList.isPublic,
     };
 
     const ingredients = await db
@@ -129,6 +141,7 @@ export const getGroceryList = async (groceryListId: string, userId: number) => {
 // TODO: omit private fields on return
 // TODO: determine if upsert vs insert/update & removing schema unique conflict
 // TODO: test insert accounts for uniqueness (can insert same name/list/userId ingredient, or if blocked)
+// TODO: insert ingredient might have ingredient public id; get ingredient private id to associate to fk
 export const insertGroceryList = async ({
   groceryList,
   groceryListIngredients = [],
@@ -162,7 +175,6 @@ export const insertGroceryList = async ({
           groceryListIngredients.map((ingredient) => {
             return {
               ...ingredient,
-              name: ingredient.name.toLowerCase(),
               quantity: ingredient.quantity || 1,
               groceryListId,
             };
@@ -207,7 +219,7 @@ export const updateGroceryList = async ({
       // Would fail if grocery list name already exists for user
       const [updatedGroceryList] = await tx
         .update(groceryListTable)
-        .set({ name: groceryList.name, public: groceryList.public })
+        .set({ name: groceryList.name, isPublic: groceryList.isPublic })
         .where(
           and(
             eq(groceryListTable.publicId, groceryListPublicId),
@@ -236,7 +248,6 @@ export const updateGroceryList = async ({
           await tx
             .update(groceryListIngredientTable)
             .set({
-              name: ingredient.name,
               capacity: ingredient.capacity,
               quantity: ingredient.quantity,
               unit: ingredient.unit,
@@ -254,7 +265,6 @@ export const updateGroceryList = async ({
         newIngredients.map((ingredient) => {
           return {
             ...ingredient,
-            name: ingredient.name.toLowerCase(),
             quantity: ingredient.quantity || 1,
             groceryListId,
           };

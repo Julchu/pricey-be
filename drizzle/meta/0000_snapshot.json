@@ -1,5 +1,5 @@
 {
-  "id": "206f35fb-5b49-4a97-ac0d-225231c07b5a",
+  "id": "aeebcbf3-c022-4a6b-9bcd-db2db4337b3f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -42,7 +42,7 @@
           "name": "ingredient_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "capacity": {
           "name": "capacity",
@@ -388,7 +388,7 @@
           "name": "ingredient_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "capacity": {
           "name": "capacity",

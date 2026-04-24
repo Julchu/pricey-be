@@ -25,11 +25,12 @@ export const recipeIngredientTable = pgTable(
         onDelete: "cascade",
       })
       .notNull(),
-    ingredientId: integer("ingredient_id")
-      .references(() => ingredientTable.id, {
+    ingredientId: integer("ingredient_id").references(
+      () => ingredientTable.id,
+      {
         onDelete: "set null",
-      })
-      .notNull(),
+      },
+    ),
     capacity: numeric({ scale: 3, mode: "number" }),
     quantity: integer(),
     unit: unitEnum(),
