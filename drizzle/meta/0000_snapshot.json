@@ -1,5 +1,5 @@
 {
-  "id": "a13a90c4-5142-4daa-ac82-c98bb889739e",
+  "id": "664f8854-a182-4f4a-aabc-75204d42036f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -48,15 +48,13 @@
           "name": "capacity",
           "type": "numeric",
           "primaryKey": false,
-          "notNull": false,
-          "default": 1
+          "notNull": false
         },
         "quantity": {
           "name": "quantity",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
-          "default": 1
+          "notNull": false
         },
         "unit": {
           "name": "unit",
@@ -275,22 +273,20 @@
           "name": "capacity",
           "type": "numeric",
           "primaryKey": false,
-          "notNull": true,
-          "default": 1
+          "notNull": false
         },
         "quantity": {
           "name": "quantity",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
-          "default": 1
+          "notNull": false
         },
         "unit": {
           "name": "unit",
           "type": "unit",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "image": {
           "name": "image",
@@ -398,15 +394,13 @@
           "name": "capacity",
           "type": "numeric",
           "primaryKey": false,
-          "notNull": false,
-          "default": 1
+          "notNull": false
         },
         "quantity": {
           "name": "quantity",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
-          "default": 1
+          "notNull": false
         },
         "unit": {
           "name": "unit",
