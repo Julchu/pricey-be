@@ -6,6 +6,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import {
+  type AutomaticFields,
   type PrivateFields,
   requiredColumns,
   timestamps,
@@ -35,4 +36,7 @@ export const groceryListTable = pgTable(
 export type SelectGroceryList = InferSelectModel<typeof groceryListTable>;
 export type InsertGroceryList = InferInsertModel<typeof groceryListTable>;
 export type SelectPublicGroceryList = Omit<SelectGroceryList, PrivateFields>;
-export type InsertPublicGroceryList = Omit<InsertGroceryList, PrivateFields>;
+export type InsertPublicGroceryList = Omit<
+  InsertGroceryList,
+  PrivateFields | AutomaticFields
+>;

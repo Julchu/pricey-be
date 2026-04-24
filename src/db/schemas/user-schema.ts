@@ -1,5 +1,6 @@
 import { jsonb, pgTable, unique, varchar } from "drizzle-orm/pg-core";
 import {
+  type AutomaticFields,
   type PrivateFields,
   requiredColumns,
   timestamps,
@@ -36,4 +37,7 @@ export const userTable = pgTable(
 export type SelectUser = InferSelectModel<typeof userTable>;
 export type InsertUser = InferInsertModel<typeof userTable>;
 export type SelectPublicUser = Omit<SelectUser, PrivateFields>;
-export type InsertPublicUser = Omit<InsertUser, PrivateFields>;
+export type InsertPublicUser = Omit<
+  InsertUser,
+  PrivateFields & AutomaticFields
+>;

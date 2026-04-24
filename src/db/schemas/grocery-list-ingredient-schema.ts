@@ -6,6 +6,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import {
+  type AutomaticFields,
   type PrivateFields,
   requiredColumns,
   timestamps,
@@ -58,5 +59,5 @@ export type SelectPublicGroceryListIngredient = Omit<
 
 export type InsertPublicGroceryListIngredient = Omit<
   InsertGroceryListIngredient,
-  PrivateFields
+  PrivateFields | AutomaticFields
 >;
