@@ -107,7 +107,7 @@ CREATE TABLE "users"
 ALTER TABLE "grocery_list_ingredients"
     ADD CONSTRAINT "grocery_list_ingredients_grocery_list_id_grocery_lists_id_fk" FOREIGN KEY ("grocery_list_id") REFERENCES "public"."grocery_lists" ("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "grocery_list_ingredients"
-    ADD CONSTRAINT "grocery_list_ingredients_ingredient_id_ingredients_id_fk" FOREIGN KEY ("ingredient_id") REFERENCES "public"."ingredients" ("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+    ADD CONSTRAINT "grocery_list_ingredients_ingredient_id_ingredients_id_fk" FOREIGN KEY ("ingredient_id") REFERENCES "public"."ingredients" ("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "grocery_lists"
     ADD CONSTRAINT "grocery_lists_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ingredients"
@@ -115,6 +115,6 @@ ALTER TABLE "ingredients"
 ALTER TABLE "recipe_ingredients"
     ADD CONSTRAINT "recipe_ingredients_recipe_id_recipes_id_fk" FOREIGN KEY ("recipe_id") REFERENCES "public"."recipes" ("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recipe_ingredients"
-    ADD CONSTRAINT "recipe_ingredients_ingredient_id_ingredients_id_fk" FOREIGN KEY ("ingredient_id") REFERENCES "public"."ingredients" ("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+    ADD CONSTRAINT "recipe_ingredients_ingredient_id_ingredients_id_fk" FOREIGN KEY ("ingredient_id") REFERENCES "public"."ingredients" ("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recipes"
     ADD CONSTRAINT "recipes_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id") ON DELETE cascade ON UPDATE no action;

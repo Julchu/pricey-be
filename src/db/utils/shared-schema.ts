@@ -18,4 +18,4 @@ export type PrivateFields =
   | "recipeId"
   | "ingredientId";
 
-export type PrivateFormFields = "id" | "userId"; //| "publicId";
+export type PrivateFormFields = "id" | "userId";

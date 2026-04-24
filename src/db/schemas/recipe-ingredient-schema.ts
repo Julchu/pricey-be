@@ -15,6 +15,7 @@ import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { ingredientTable, unitEnum } from "./ingredient-schema.ts";
 import { recipeTable } from "./recipe-schema.ts";
 
+// TODO: frontend dropdown to select similar ingredient from master list to get price (and set ingredientId)
 export const recipeIngredientTable = pgTable(
   "recipe_ingredients",
   {
@@ -26,7 +27,7 @@ export const recipeIngredientTable = pgTable(
       .notNull(),
     ingredientId: integer("ingredient_id")
       .references(() => ingredientTable.id, {
-        onDelete: "cascade",
+        onDelete: "set null",
       })
       .notNull(),
     capacity: numeric({ scale: 3, mode: "number" }),

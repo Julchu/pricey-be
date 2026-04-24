@@ -1,5 +1,5 @@
 {
-  "id": "664f8854-a182-4f4a-aabc-75204d42036f",
+  "id": "206f35fb-5b49-4a97-ac0d-225231c07b5a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -106,7 +106,7 @@
           "tableTo": "ingredients",
           "columnsFrom": ["ingredient_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -452,7 +452,7 @@
           "tableTo": "ingredients",
           "columnsFrom": ["ingredient_id"],
           "columnsTo": ["id"],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

@@ -37,7 +37,7 @@ Running Postgres with Docker locally
     - `-d`: database name
 
 ```
-psql -U postgres -d postgres
+psql -U myuser -d postgres
 ```
 
 - Inside psql:

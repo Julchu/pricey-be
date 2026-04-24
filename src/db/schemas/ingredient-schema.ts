@@ -19,6 +19,7 @@ import { SeasonValues, UnitValues } from "../../utils/interfaces.ts";
 export const unitEnum = pgEnum("unit", UnitValues);
 export const seasonEnum = pgEnum("season", ...[SeasonValues]);
 
+// TODO: when deleting ingredients, ensure it's not being used by grocery list/recipes
 export const ingredientTable = pgTable(
   "ingredients",
   {
