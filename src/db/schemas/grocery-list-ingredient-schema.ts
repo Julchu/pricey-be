@@ -60,5 +60,3 @@ export type InsertPublicGroceryListIngredient = Omit<
   InsertGroceryListIngredient,
   PrivateFields
 >;
-
-export type SeedGroceryListIngredient = Omit<InsertGroceryListIngredient, "">;

@@ -7,7 +7,6 @@ import {
 } from "drizzle-orm/pg-core";
 import {
   type PrivateFields,
-  type PrivateFormFields,
   requiredColumns,
   timestamps,
 } from "../utils/shared-schema.ts";
@@ -36,7 +35,4 @@ export const groceryListTable = pgTable(
 export type SelectGroceryList = InferSelectModel<typeof groceryListTable>;
 export type InsertGroceryList = InferInsertModel<typeof groceryListTable>;
 export type SelectPublicGroceryList = Omit<SelectGroceryList, PrivateFields>;
-export type InsertPublicGroceryList = Omit<
-  InsertGroceryList,
-  PrivateFormFields
->;
+export type InsertPublicGroceryList = Omit<InsertGroceryList, PrivateFields>;

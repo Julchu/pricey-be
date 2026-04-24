@@ -8,7 +8,6 @@ import {
 } from "drizzle-orm/pg-core";
 import {
   type PrivateFields,
-  type PrivateFormFields,
   requiredColumns,
   timestamps,
 } from "../utils/shared-schema.ts";
@@ -47,7 +46,7 @@ export const ingredientTable = pgTable(
 export type SelectIngredient = InferSelectModel<typeof ingredientTable>;
 export type InsertIngredient = InferInsertModel<typeof ingredientTable>;
 export type SelectPublicIngredient = Omit<SelectIngredient, PrivateFields>;
-export type InsertPublicIngredient = Omit<InsertIngredient, PrivateFormFields>;
+export type InsertPublicIngredient = Omit<InsertIngredient, PrivateFields>;
 
 // Foreign key (userId) is not created if checks are added (even if foreign key is added as a constraint rather than in-line)
 /*    // check(

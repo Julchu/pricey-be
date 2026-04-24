@@ -16,6 +16,7 @@ export type PrivateFields =
   | "userId"
   | "groceryListId"
   | "recipeId"
-  | "ingredientId";
-
-export type PrivateFormFields = "id" | "userId";
+  | "ingredientId"
+  | "createdAt"
+  | "updatedAt"
+  | "deletedAt";

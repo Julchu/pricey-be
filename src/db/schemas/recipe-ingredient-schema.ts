@@ -7,7 +7,6 @@ import {
 } from "drizzle-orm/pg-core";
 import {
   type PrivateFields,
-  type PrivateFormFields,
   requiredColumns,
   timestamps,
 } from "../utils/shared-schema.ts";
@@ -61,5 +60,5 @@ export type SelectPublicRecipeIngredient = Omit<
 
 export type InsertPublicRecipeIngredient = Omit<
   InsertRecipeIngredient,
-  PrivateFormFields
+  PrivateFields
 >;

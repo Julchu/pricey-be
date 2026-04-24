@@ -1,12 +1,12 @@
-import type { InsertUser } from "../../db/schemas/user-schema.ts";
 import { Color, Season, Unit } from "../../utils/interfaces.ts";
-import type { InsertRecipe } from "../../db/schemas/recipe-schema.ts";
-import type { InsertIngredient } from "../../db/schemas/ingredient-schema.ts";
-import type { InsertGroceryList } from "../../db/schemas/grocery-list-schema.ts";
-import type { InsertRecipeIngredient } from "../../db/schemas/recipe-ingredient-schema.ts";
-import type { InsertGroceryListIngredient } from "../../db/schemas/grocery-list-ingredient-schema.ts";
+import type { InsertPublicUser } from "../../db/schemas/user-schema.ts";
+import type { InsertPublicIngredient } from "../../db/schemas/ingredient-schema.ts";
+import type { InsertPublicRecipe } from "../../db/schemas/recipe-schema.ts";
+import type { InsertPublicGroceryList } from "../../db/schemas/grocery-list-schema.ts";
 
-export const tempUsers: InsertUser[] = [
+// ==================== USER DATA ====================
+
+export const seedUsers: InsertPublicUser[] = [
   {
     name: "Alice Johnson",
     email: "alice@example.com",
@@ -109,8 +109,7 @@ export const tempUsers: InsertUser[] = [
   },
   {
     name: "Julian Chu",
-    publicId: "8d1dd2e1-a2ce-4793-b3bd-99a06d2b135a",
-    email: process.env.MASTER_TEST_EMAIL || "",
+    email: process.env.MASTER_TEST_EMAIL || "julian@example.com",
     image: "https://avatars.githubusercontent.com/u/17052350?v=4",
     preferences: {
       units: { mass: Unit.POUND, volume: Unit.QUART },
@@ -120,7 +119,9 @@ export const tempUsers: InsertUser[] = [
   },
 ];
 
-export const tempIngredients: InsertIngredient[] = [
+// ==================== INGREDIENT DATA (userId added at insertion time) ====================
+
+export const seedIngredients: InsertPublicIngredient[] = [
   {
     name: "Olive Oil",
     price: 1000,
@@ -128,16 +129,14 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/olive_oil.jpg",
     capacity: 1,
     quantity: 2,
-    userId: 22,
   },
   {
     name: "Basil",
     price: 150,
-    unit: Unit.ITEM,
+    unit: Unit.PIECES,
     image: "https://example.com/basil.jpg",
     capacity: 3,
     quantity: 1,
-    userId: 22,
     season: Season.SPRING,
   },
   {
@@ -147,7 +146,6 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/chicken.jpg",
     capacity: 2,
     quantity: 1,
-    userId: 22,
   },
   {
     name: "Garlic",
@@ -156,7 +154,6 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/garlic.jpg",
     capacity: 2,
     quantity: 1,
-    userId: 22,
   },
   {
     name: "Tomato",
@@ -165,134 +162,348 @@ export const tempIngredients: InsertIngredient[] = [
     image: "https://example.com/tomato.jpg",
     capacity: 5,
     quantity: 2,
-    userId: 22,
     season: Season.SUMMER,
   },
-];
-
-export const tempGroceryLists: InsertGroceryList[] = [
   {
-    name: "Soup",
-    userId: 22,
-    public: true,
-  },
-  {
-    name: "BBQ Party",
-    userId: 22,
-    public: false,
-  },
-  {
-    name: "Vegan Meals",
-    userId: 22,
-    public: true,
-  },
-  {
-    name: "Baking Basics",
-    userId: 22,
-    public: false,
-  },
-  {
-    name: "Holiday Dinner",
-    userId: 22,
-    public: true,
-  },
-];
-
-export const tempGroceryListIngredients: InsertGroceryListIngredient[] = [
-  {
-    name: "Watercress",
-    groceryListId: 1,
+    name: "Spaghetti",
+    price: 350,
+    unit: Unit.PIECES,
+    image: "https://example.com/spaghetti.jpg",
     capacity: 1,
-    unit: Unit.ITEM,
-    quantity: 2,
-  },
-  {
-    name: "Pork Spare Rib",
-    groceryListId: 1,
-    capacity: 2,
-    unit: Unit.POUND,
-  },
-  {
-    name: "Gouda",
-    groceryListId: 3,
-    capacity: 1,
-    unit: Unit.ITEM,
-    quantity: 2,
+    quantity: 3,
   },
   {
     name: "Ground Beef",
-    groceryListId: 3,
-    capacity: 1.3,
-    unit: Unit.POUND,
+    price: 1200,
+    unit: Unit.KILOGRAM,
+    image: "https://example.com/beef.jpg",
+    capacity: 1,
+    quantity: 2,
+  },
+  {
+    name: "Onion",
+    price: 150,
+    unit: Unit.KILOGRAM,
+    image: "https://example.com/onion.jpg",
+    capacity: 1,
+    quantity: 5,
+    season: Season.FALL,
+  },
+  {
+    name: "Carrot",
+    price: 200,
+    unit: Unit.KILOGRAM,
+    image: "https://example.com/carrot.jpg",
+    capacity: 1,
+    quantity: 4,
+    season: Season.WINTER,
+  },
+  {
+    name: "Bell Pepper",
+    price: 400,
+    unit: Unit.PIECES,
+    image: "https://example.com/pepper.jpg",
+    capacity: 1,
+    quantity: 6,
+    season: Season.SUMMER,
+  },
+  {
+    name: "Milk",
+    price: 500,
+    unit: Unit.LITRE,
+    image: "https://example.com/milk.jpg",
+    capacity: 2,
+    quantity: 1,
   },
   {
     name: "Eggs",
-    groceryListId: 5,
-    capacity: 1,
-    unit: Unit.ITEM,
-    quantity: 30,
-  },
-];
-
-export const tempRecipes: InsertRecipe[] = [
-  {
-    name: "Spaghetti Bolognese",
-    userId: 22,
-    public: true,
-  },
-  {
-    name: "Chicken Curry",
-    userId: 22,
-    public: true,
-  },
-  {
-    name: "Vegetable Stir Fry",
-    userId: 22,
-    public: false,
-  },
-  {
-    name: "Beef Tacos",
-    userId: 22,
-    public: true,
-  },
-  {
-    name: "Quinoa Salad",
-    userId: 22,
-    public: false,
-  },
-];
-
-export const tempRecipeIngredients: InsertRecipeIngredient[] = [
-  {
-    name: "Gouda",
-    recipeId: 5,
-    capacity: 3,
-    quantity: 2,
-    unit: Unit.TEASPOON,
-  },
-  {
-    name: "Ground Beef",
-    recipeId: 5,
-    capacity: 1.3,
-    unit: Unit.POUND,
-  },
-  {
-    name: "Tomato",
-    recipeId: 3,
-    quantity: 5,
-    unit: Unit.ITEM,
-  },
-  {
-    name: "Salad",
-    recipeId: 3,
+    price: 600,
+    unit: Unit.PIECES,
+    image: "https://example.com/eggs.jpg",
+    capacity: 12,
     quantity: 1,
-    unit: Unit.ITEM,
   },
   {
-    name: "Chicken Thighs",
-    recipeId: 1,
-    capacity: 0.35,
-    quantity: 3,
+    name: "Flour",
+    price: 300,
     unit: Unit.KILOGRAM,
+    image: "https://example.com/flour.jpg",
+    capacity: 5,
+    quantity: 1,
+  },
+  {
+    name: "Sugar",
+    price: 250,
+    unit: Unit.KILOGRAM,
+    image: "https://example.com/sugar.jpg",
+    capacity: 2,
+    quantity: 1,
+  },
+  {
+    name: "Butter",
+    price: 800,
+    unit: Unit.PIECES,
+    image: "https://example.com/butter.jpg",
+    capacity: 1,
+    quantity: 2,
   },
 ];
+
+// ==================== RECIPE DATA (userId added at insertion time) ====================
+
+export const seedRecipes: InsertPublicRecipe[] = [
+  { name: "Spaghetti Bolognese", isPublic: true },
+  { name: "Chicken Curry", isPublic: true },
+  { name: "Vegetable Stir Fry", isPublic: false },
+  { name: "Beef Tacos", isPublic: true },
+  { name: "Quinoa Salad", isPublic: false },
+  { name: "Tomato Basil Soup", isPublic: true },
+  { name: "Garlic Butter Chicken", isPublic: false },
+  { name: "Beef Stew", isPublic: true },
+];
+
+// ==================== GROCERY LIST DATA (userId added at insertion time) ====================
+
+export const seedGroceryLists: InsertPublicGroceryList[] = [
+  { name: "Soup", isPublic: true },
+  { name: "BBQ Party", isPublic: false },
+  { name: "Vegan Meals", isPublic: true },
+  { name: "Baking Basics", isPublic: false },
+  { name: "Holiday Dinner", isPublic: true },
+  { name: "Weekly Shop", isPublic: false },
+];
+
+// ==================== RECIPE INGREDIENT DATA ====================
+// Maps recipe index (from seedRecipes array) to ingredient data
+// ingredientName is used to look up the ingredientId after ingredients are inserted
+
+export interface RecipeIngredientSeed {
+  ingredientName: string;
+  capacity?: number;
+  quantity?: number;
+  unit: (typeof Unit)[keyof typeof Unit];
+  image?: string;
+}
+
+export const seedRecipeIngredients: Record<number, RecipeIngredientSeed[]> = {
+  // Spaghetti Bolognese
+  0: [
+    {
+      ingredientName: "Ground Beef",
+      capacity: 0.5,
+      quantity: 1,
+      unit: Unit.KILOGRAM,
+    },
+    {
+      ingredientName: "Spaghetti",
+      capacity: 1,
+      quantity: 1,
+      unit: Unit.PIECES,
+    },
+    { ingredientName: "Tomato", capacity: 0.5, quantity: 3, unit: Unit.PIECES },
+    { ingredientName: "Garlic", capacity: 2, quantity: 1, unit: Unit.PIECES },
+    {
+      ingredientName: "Olive Oil",
+      capacity: 2,
+      quantity: 1,
+      unit: Unit.TABLESPOON,
+    },
+  ],
+  // Chicken Curry
+  1: [
+    {
+      ingredientName: "Chicken Breast",
+      capacity: 0.5,
+      quantity: 2,
+      unit: Unit.KILOGRAM,
+    },
+    { ingredientName: "Onion", capacity: 0.5, quantity: 2, unit: Unit.PIECES },
+    { ingredientName: "Garlic", capacity: 3, quantity: 1, unit: Unit.PIECES },
+    { ingredientName: "Tomato", capacity: 0.3, quantity: 2, unit: Unit.PIECES },
+  ],
+  // Vegetable Stir Fry
+  2: [
+    {
+      ingredientName: "Bell Pepper",
+      capacity: 2,
+      quantity: 1,
+      unit: Unit.PIECES,
+    },
+    { ingredientName: "Carrot", capacity: 0.5, quantity: 3, unit: Unit.PIECES },
+    { ingredientName: "Onion", capacity: 1, quantity: 1, unit: Unit.PIECES },
+    { ingredientName: "Garlic", capacity: 2, quantity: 1, unit: Unit.PIECES },
+    {
+      ingredientName: "Olive Oil",
+      capacity: 1,
+      quantity: 1,
+      unit: Unit.TABLESPOON,
+    },
+  ],
+  // Beef Tacos
+  3: [
+    {
+      ingredientName: "Ground Beef",
+      capacity: 0.5,
+      quantity: 1,
+      unit: Unit.KILOGRAM,
+    },
+    { ingredientName: "Onion", capacity: 1, quantity: 1, unit: Unit.PIECES },
+    { ingredientName: "Tomato", capacity: 0.5, quantity: 2, unit: Unit.PIECES },
+  ],
+  // Quinoa Salad
+  4: [
+    {
+      ingredientName: "Bell Pepper",
+      capacity: 1,
+      quantity: 2,
+      unit: Unit.PIECES,
+    },
+    { ingredientName: "Tomato", capacity: 0.5, quantity: 3, unit: Unit.PIECES },
+    {
+      ingredientName: "Olive Oil",
+      capacity: 2,
+      quantity: 1,
+      unit: Unit.TABLESPOON,
+    },
+    { ingredientName: "Basil", capacity: 5, quantity: 1, unit: Unit.PIECES },
+  ],
+  // Tomato Basil Soup
+  5: [
+    { ingredientName: "Tomato", capacity: 1, quantity: 6, unit: Unit.PIECES },
+    { ingredientName: "Basil", capacity: 10, quantity: 1, unit: Unit.PIECES },
+    { ingredientName: "Garlic", capacity: 3, quantity: 1, unit: Unit.PIECES },
+    {
+      ingredientName: "Olive Oil",
+      capacity: 2,
+      quantity: 1,
+      unit: Unit.TABLESPOON,
+    },
+    { ingredientName: "Onion", capacity: 1, quantity: 1, unit: Unit.PIECES },
+  ],
+  // Garlic Butter Chicken
+  6: [
+    {
+      ingredientName: "Chicken Breast",
+      capacity: 0.5,
+      quantity: 2,
+      unit: Unit.KILOGRAM,
+    },
+    { ingredientName: "Garlic", capacity: 4, quantity: 1, unit: Unit.PIECES },
+    { ingredientName: "Butter", capacity: 50, quantity: 1, unit: Unit.PIECES },
+    {
+      ingredientName: "Olive Oil",
+      capacity: 1,
+      quantity: 1,
+      unit: Unit.TABLESPOON,
+    },
+  ],
+  // Beef Stew
+  7: [
+    {
+      ingredientName: "Ground Beef",
+      capacity: 0.5,
+      quantity: 1,
+      unit: Unit.KILOGRAM,
+    },
+    { ingredientName: "Carrot", capacity: 0.5, quantity: 4, unit: Unit.PIECES },
+    { ingredientName: "Onion", capacity: 1, quantity: 2, unit: Unit.PIECES },
+    { ingredientName: "Garlic", capacity: 2, quantity: 1, unit: Unit.PIECES },
+    { ingredientName: "Tomato", capacity: 0.3, quantity: 2, unit: Unit.PIECES },
+  ],
+};
+
+// ==================== GROCERY LIST INGREDIENT DATA ====================
+// Maps grocery list index (from seedGroceryLists array) to ingredient data
+
+export interface GroceryListIngredientSeed {
+  ingredientName: string;
+  capacity?: number;
+  quantity?: number;
+  unit: (typeof Unit)[keyof typeof Unit];
+  image?: string;
+}
+
+export const seedGroceryListIngredients: Record<
+  number,
+  GroceryListIngredientSeed[]
+> = {
+  // Soup
+  0: [
+    { ingredientName: "Carrot", capacity: 1, quantity: 5, unit: Unit.PIECES },
+    { ingredientName: "Onion", capacity: 1, quantity: 3, unit: Unit.PIECES },
+    { ingredientName: "Garlic", capacity: 1, quantity: 1, unit: Unit.PIECES },
+    { ingredientName: "Tomato", capacity: 1, quantity: 4, unit: Unit.PIECES },
+  ],
+  // BBQ Party
+  1: [
+    {
+      ingredientName: "Chicken Breast",
+      capacity: 2,
+      quantity: 1,
+      unit: Unit.KILOGRAM,
+    },
+    {
+      ingredientName: "Ground Beef",
+      capacity: 1.5,
+      quantity: 1,
+      unit: Unit.KILOGRAM,
+    },
+    {
+      ingredientName: "Bell Pepper",
+      capacity: 1,
+      quantity: 6,
+      unit: Unit.PIECES,
+    },
+    { ingredientName: "Onion", capacity: 1, quantity: 4, unit: Unit.PIECES },
+  ],
+  // Vegan Meals
+  2: [
+    { ingredientName: "Tomato", capacity: 1, quantity: 6, unit: Unit.PIECES },
+    {
+      ingredientName: "Bell Pepper",
+      capacity: 1,
+      quantity: 4,
+      unit: Unit.PIECES,
+    },
+    { ingredientName: "Carrot", capacity: 1, quantity: 5, unit: Unit.PIECES },
+    { ingredientName: "Olive Oil", capacity: 1, quantity: 1, unit: Unit.LITRE },
+  ],
+  // Baking Basics
+  3: [
+    { ingredientName: "Flour", capacity: 5, quantity: 1, unit: Unit.KILOGRAM },
+    { ingredientName: "Sugar", capacity: 2, quantity: 1, unit: Unit.KILOGRAM },
+    { ingredientName: "Butter", capacity: 1, quantity: 2, unit: Unit.PIECES },
+    { ingredientName: "Eggs", capacity: 12, quantity: 2, unit: Unit.PIECES },
+    { ingredientName: "Milk", capacity: 2, quantity: 1, unit: Unit.LITRE },
+  ],
+  // Holiday Dinner
+  4: [
+    {
+      ingredientName: "Chicken Breast",
+      capacity: 2,
+      quantity: 2,
+      unit: Unit.KILOGRAM,
+    },
+    { ingredientName: "Carrot", capacity: 1, quantity: 10, unit: Unit.PIECES },
+    { ingredientName: "Onion", capacity: 1, quantity: 5, unit: Unit.PIECES },
+    { ingredientName: "Garlic", capacity: 1, quantity: 2, unit: Unit.PIECES },
+    { ingredientName: "Butter", capacity: 1, quantity: 3, unit: Unit.PIECES },
+    { ingredientName: "Basil", capacity: 1, quantity: 2, unit: Unit.PIECES },
+  ],
+  // Weekly Shop
+  5: [
+    { ingredientName: "Milk", capacity: 2, quantity: 2, unit: Unit.LITRE },
+    { ingredientName: "Eggs", capacity: 12, quantity: 1, unit: Unit.PIECES },
+    { ingredientName: "Bread", capacity: 1, quantity: 2, unit: Unit.PIECES },
+    {
+      ingredientName: "Chicken Breast",
+      capacity: 1,
+      quantity: 1,
+      unit: Unit.KILOGRAM,
+    },
+    { ingredientName: "Tomato", capacity: 0.5, quantity: 6, unit: Unit.PIECES },
+    { ingredientName: "Carrot", capacity: 1, quantity: 4, unit: Unit.PIECES },
+    { ingredientName: "Onion", capacity: 0.5, quantity: 4, unit: Unit.PIECES },
+    { ingredientName: "Garlic", capacity: 0.5, quantity: 1, unit: Unit.PIECES },
+  ],
+};
