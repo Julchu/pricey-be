@@ -7,13 +7,13 @@ import express, {
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import { indexRouter } from "./routes/index-router.ts";
-import { ingredientRouter } from "./routes/ingredient-router.ts";
-import { userRouter } from "./routes/user-router.ts";
-import { groceryListRouter } from "./routes/grocery-list-router.ts";
-import { recipeRouter } from "./routes/recipe-router.ts";
+import { seedingRouter } from "./modules/testing/seeding.routes.ts";
+import { ingredientRouter } from "./modules/ingredient/ingredient.routes";
+import { userRouter } from "./modules/user/user.routes";
+import { groceryListRouter } from "./modules/grocery-list/grocery-list.routes";
+import { recipeRouter } from "./modules/recipe/recipe.routes";
 import rateLimit from "express-rate-limit";
-import { userSetter } from "./services/auth-handlers.ts";
+import { userSetter } from "./lib/auth/auth-handlers";
 
 const app = express();
 
@@ -43,7 +43,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Public routes
-app.use("/", indexRouter);
+app.use("/", seedingRouter);
 app.use("/user", userRouter);
 
 // Protected routes

@@ -5,7 +5,7 @@
  */
 
 import { createServer } from "http";
-import app from "./app.ts";
+import app from "./app";
 import debug from "debug";
 
 const debugServer = debug("pricey-be:server");

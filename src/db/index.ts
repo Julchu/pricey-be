@@ -1,10 +1,10 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { ingredientTable } from "./schemas/ingredient-schema.ts";
-import { userTable } from "./schemas/user-schema.ts";
-import { groceryListTable } from "./schemas/grocery-list-schema.ts";
-import { groceryListIngredientTable } from "./schemas/grocery-list-ingredient-schema.ts";
-import { recipeTable } from "./schemas/recipe-schema.ts";
-import { recipeIngredientTable } from "./schemas/recipe-ingredient-schema.ts";
+import { ingredientTable } from "./schemas/ingredient.schema";
+import { userTable } from "./schemas/user.schema";
+import { groceryListTable } from "./schemas/grocery-list.schema";
+import { groceryListIngredientTable } from "./schemas/grocery-list-ingredient.schema";
+import { recipeTable } from "./schemas/recipe.schema";
+import { recipeIngredientTable } from "./schemas/recipe-ingredient.schema";
 
 // You can specify any property from the postgres-js connection options
 export const db = drizzle({
