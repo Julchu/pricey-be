@@ -1,0 +1,43 @@
+import { jsonb, pgTable, unique, varchar } from "drizzle-orm/pg-core";
+import {
+  type AutomaticFields,
+  type PrivateFields,
+  requiredColumns,
+  timestamps,
+} from "../utils/shared-schema";
+import { Color, Unit, type UserPreferences } from "../../types";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
+
+export const userTable = pgTable(
+  "users",
+  {
+    ...requiredColumns,
+    name: varchar({ length: 255 }).notNull(),
+    email: varchar({ length: 255 }).unique().notNull(),
+    image: varchar({ length: 255 }),
+    preferences: jsonb()
+      .$type<UserPreferences>()
+      .default({
+        units: {
+          mass: Unit.KILOGRAM,
+          volume: Unit.LITRE,
+        },
+        colorMode: Color.DARK,
+        displayName: "",
+      })
+      .notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    unique("unique_user").on(table.publicId),
+    unique("unique_userEmail").on(table.email),
+  ],
+);
+
+export type SelectUser = InferSelectModel<typeof userTable>;
+export type InsertUser = InferInsertModel<typeof userTable>;
+export type SelectPublicUser = Omit<SelectUser, PrivateFields>;
+export type InsertPublicUser = Omit<
+  InsertUser,
+  PrivateFields & AutomaticFields
+>;
