@@ -31,6 +31,7 @@ export const recipeIngredientTable = pgTable(
         onDelete: "set null",
       },
     ),
+    name: varchar({ length: 255 }).notNull(),
     capacity: numeric({ scale: 3, mode: "number" }),
     quantity: integer(),
     unit: unitEnum(),
@@ -62,4 +63,4 @@ export type SelectPublicRecipeIngredient = Omit<
 export type InsertPublicRecipeIngredient = Omit<
   InsertRecipeIngredient,
   PrivateFields | AutomaticFields
->;
+> & { ingredientPublicId?: string | null };

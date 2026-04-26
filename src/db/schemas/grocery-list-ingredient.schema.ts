@@ -29,6 +29,7 @@ export const groceryListIngredientTable = pgTable(
         onDelete: "set null",
       },
     ),
+    name: varchar({ length: 255 }).notNull(),
     capacity: numeric({ scale: 3, mode: "number" }),
     quantity: integer(),
     unit: unitEnum(),
@@ -60,4 +61,4 @@ export type SelectPublicGroceryListIngredient = Omit<
 export type InsertPublicGroceryListIngredient = Omit<
   InsertGroceryListIngredient,
   PrivateFields | AutomaticFields
->;
+> & { ingredientPublicId?: string | null };

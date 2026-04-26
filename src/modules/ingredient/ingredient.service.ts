@@ -59,3 +59,23 @@ export const getIngredient = async (ingredientId: number, userId: number) => {
     throw new Error("Error getting specific ingredient:", { cause: error });
   }
 };
+
+export const getIngredientIdByPublicId = async (
+  publicId: string,
+  userId: number,
+) => {
+  try {
+    const [ingredient] = await db
+      .select({ id: ingredientTable.id })
+      .from(ingredientTable)
+      .where(
+        and(
+          eq(ingredientTable.publicId, publicId),
+          eq(ingredientTable.userId, userId),
+        ),
+      );
+    return ingredient?.id ?? null;
+  } catch (error) {
+    throw new Error("Error getting ingredient by public ID:", { cause: error });
+  }
+};

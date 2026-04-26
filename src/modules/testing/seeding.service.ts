@@ -82,20 +82,23 @@ export const insertRecipeIngredients = async (
     return [];
   }
 
-  const values = ingredientsToInsert.map((ri) => {
-    const ingredientId = ingredientMap[ri.ingredientName];
-    if (!ingredientId) {
-      console.warn(`Ingredient "${ri.ingredientName}" not found in map`);
-    }
-    return {
-      recipeId,
-      ingredientId: ingredientId || null,
-      capacity: ri.capacity,
-      quantity: ri.quantity,
-      unit: ri.unit,
-      image: ri.image,
-    };
-  });
+  const values = ingredientsToInsert.map(
+    ({ name, capacity, quantity, unit, image }) => {
+      const ingredientId = ingredientMap[name];
+      if (!ingredientId) {
+        console.warn(`Ingredient "${name}" not found in map`);
+      }
+      return {
+        recipeId,
+        ingredientId: ingredientId || null,
+        name,
+        capacity,
+        quantity,
+        unit,
+        image,
+      };
+    },
+  );
 
   const inserted = await db
     .insert(recipeIngredientTable)
@@ -128,6 +131,7 @@ export const insertGroceryListIngredients = async (
     return {
       groceryListId,
       ingredientId: ingredientId || null,
+      name: li.ingredientName,
       capacity: li.capacity,
       quantity: li.quantity,
       unit: li.unit,
