@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import type { SelectPublicGroceryListIngredient } from "../db/schemas/grocery-list-ingredient.schema";
+import type { InsertPublicGroceryListIngredient } from "../db/schemas/grocery-list-ingredient.schema";
 import type { SelectPublicGroceryList } from "../db/schemas/grocery-list.schema";
 
 export const Unit = {
@@ -103,7 +103,7 @@ export interface Ingredient {
 }
 
 export type GroceryList = SelectPublicGroceryList & {
-  ingredients: SelectPublicGroceryListIngredient[];
+  ingredients: InsertPublicGroceryListIngredient[];
 };
 
 export type Recipe = {

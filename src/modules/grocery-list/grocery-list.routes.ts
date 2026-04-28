@@ -6,7 +6,7 @@ import {
   insertGroceryList,
   updateGroceryList,
 } from "./grocery-list.service";
-import type { AuthRequest, GroceryList } from "../../types";
+import type { AuthRequest } from "../../types";
 import type { InsertPublicGroceryList } from "../../db/schemas/grocery-list.schema";
 import type { InsertPublicGroceryListIngredient } from "../../db/schemas/grocery-list-ingredient.schema";
 
@@ -64,7 +64,15 @@ groceryListRouter.get(
 groceryListRouter.post(
   "/",
   async (
-    req: AuthRequest<unknown, unknown, { groceryList: GroceryList }>,
+    req: AuthRequest<
+      unknown,
+      unknown,
+      {
+        groceryList: InsertPublicGroceryList & {
+          ingredients: InsertPublicGroceryListIngredient[];
+        };
+      }
+    >,
     res,
   ) => {
     if (!req.userId) {

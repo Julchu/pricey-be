@@ -56,7 +56,7 @@ export type InsertGroceryListIngredient = InferInsertModel<
 export type SelectPublicGroceryListIngredient = Omit<
   SelectGroceryListIngredient,
   PrivateFields
->;
+> & { ingredientPublicId?: string | null };
 
 export type InsertPublicGroceryListIngredient = Omit<
   InsertGroceryListIngredient,

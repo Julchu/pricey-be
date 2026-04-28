@@ -1,5 +1,5 @@
 import { db } from "../../db";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import {
   groceryListTable,
   type InsertGroceryList,
@@ -9,7 +9,6 @@ import {
   groceryListIngredientTable,
   type InsertGroceryListIngredient,
   type InsertPublicGroceryListIngredient,
-  type SelectPublicGroceryListIngredient,
 } from "../../db/schemas/grocery-list-ingredient.schema";
 import { ingredientTable } from "../../db/schemas/ingredient.schema";
 import type { GroceryList } from "../../types";
@@ -60,6 +59,7 @@ export const getAllGroceryLists = async (userId: number) => {
             updatedAt,
             createdAt,
             deletedAt,
+            name,
             capacity,
             quantity,
             unit,
@@ -67,18 +67,17 @@ export const getAllGroceryLists = async (userId: number) => {
             publicId,
           } = groceryListIngredient;
 
-          const ingredient: SelectPublicGroceryListIngredient & {
-            name?: string;
-          } = {
+          const ingredient = {
             updatedAt,
             createdAt,
             deletedAt,
+            name,
+            ingredientPublicId: currentIngredient?.publicId,
             capacity,
             quantity,
             unit,
             image,
             publicId,
-            name: currentIngredient?.name,
           };
 
           groceryListsObject[groceryListPublicId].ingredients.push(ingredient);
@@ -120,12 +119,32 @@ export const getGroceryList = async (groceryListId: string, userId: number) => {
       isPublic: fetchedGroceryList.isPublic,
     };
 
-    const ingredients = await db
+    const ingredientRows = await db
       .select()
       .from(groceryListIngredientTable)
+      .leftJoin(
+        ingredientTable,
+        eq(ingredientTable.id, groceryListIngredientTable.ingredientId),
+      )
       .where(
         eq(groceryListIngredientTable.groceryListId, fetchedGroceryList.id),
       );
+
+    const ingredients = ingredientRows.map(
+      ({ grocery_list_ingredients: groceryListIngredients, ingredients }) => {
+        const { publicId, name, capacity, quantity, unit, image } =
+          groceryListIngredients;
+        return {
+          publicId,
+          name,
+          capacity,
+          quantity,
+          unit,
+          image,
+          ingredientPublicId: ingredients?.publicId ?? null,
+        };
+      },
+    );
 
     const groceryList: GroceryList = {
       ...publicGroceryList,
@@ -157,8 +176,35 @@ export const insertGroceryList = async ({
     userId,
   };
 
+  const ingredientPublicIds = groceryListIngredients
+    .map(({ ingredientPublicId }) => ingredientPublicId)
+    .filter((id): id is string => !!id);
+
   try {
     return await db.transaction(async (tx) => {
+      const ingredientsFoundByPublicId =
+        ingredientPublicIds.length > 0
+          ? await tx
+              .select({
+                publicId: ingredientTable.publicId,
+                id: ingredientTable.id,
+              })
+              .from(ingredientTable)
+              .where(
+                and(
+                  eq(ingredientTable.userId, userId),
+                  inArray(ingredientTable.publicId, ingredientPublicIds),
+                ),
+              )
+          : [];
+
+      const ingredientIdMap = ingredientsFoundByPublicId.reduce<
+        Record<string, number>
+      >((ingredientMap, { publicId, id }) => {
+        ingredientMap[publicId] = id;
+        return ingredientMap;
+      }, {});
+
       const [insertedGroceryList] = await tx
         .insert(groceryListTable)
         .values(insertGroceryList)
@@ -175,8 +221,12 @@ export const insertGroceryList = async ({
           groceryListIngredients.map((ingredient) => {
             return {
               ...ingredient,
+              name: ingredient.name,
               quantity: ingredient.quantity || 1,
               groceryListId,
+              ingredientId: ingredient.ingredientPublicId
+                ? (ingredientIdMap[ingredient.ingredientPublicId] ?? null)
+                : null,
             };
           });
 
@@ -214,9 +264,13 @@ export const updateGroceryList = async ({
 }) => {
   if (!groceryListPublicId) return;
 
+  const ingredientPublicIds = [
+    ...newIngredients.map(({ ingredientPublicId }) => ingredientPublicId),
+    ...updatedIngredients.map(({ ingredientPublicId }) => ingredientPublicId),
+  ].filter((id): id is string => !!id);
+
   try {
     return await db.transaction(async (tx) => {
-      // Would fail if grocery list name already exists for user
       const [updatedGroceryList] = await tx
         .update(groceryListTable)
         .set({ name: groceryList.name, isPublic: groceryList.isPublic })
@@ -228,26 +282,43 @@ export const updateGroceryList = async ({
         )
         .returning();
 
-      if (!updatedGroceryList) return tx.rollback();
-
+      if (!updatedGroceryList) {
+        throw new Error("Grocery list not found");
+      }
       const groceryListId = updatedGroceryList.id;
 
-      for (const ingredientId of deletedIngredientIds) {
-        await tx
-          .delete(groceryListIngredientTable)
-          .where(
-            and(
-              eq(groceryListIngredientTable.publicId, ingredientId),
-              eq(groceryListIngredientTable.groceryListId, groceryListId),
-            ),
-          );
-      }
+      const ingredientsFoundByPublicId =
+        ingredientPublicIds.length > 0
+          ? await tx
+              .select({
+                publicId: ingredientTable.publicId,
+                id: ingredientTable.id,
+              })
+              .from(ingredientTable)
+              .where(
+                and(
+                  eq(ingredientTable.userId, userId),
+                  inArray(ingredientTable.publicId, ingredientPublicIds),
+                ),
+              )
+          : [];
+
+      const ingredientIdMap = ingredientsFoundByPublicId.reduce<
+        Record<string, number>
+      >((ingredientMap, { publicId, id }) => {
+        ingredientMap[publicId] = id;
+        return ingredientMap;
+      }, {});
 
       for (const ingredient of updatedIngredients) {
         if (ingredient.publicId) {
           await tx
             .update(groceryListIngredientTable)
             .set({
+              name: ingredient.name,
+              ingredientId: ingredient.ingredientPublicId
+                ? (ingredientIdMap[ingredient.ingredientPublicId] ?? null)
+                : null,
               capacity: ingredient.capacity,
               quantity: ingredient.quantity,
               unit: ingredient.unit,
@@ -265,8 +336,12 @@ export const updateGroceryList = async ({
         newIngredients.map((ingredient) => {
           return {
             ...ingredient,
+            name: ingredient.name,
             quantity: ingredient.quantity || 1,
             groceryListId,
+            ingredientId: ingredient.ingredientPublicId
+              ? (ingredientIdMap[ingredient.ingredientPublicId] ?? null)
+              : null,
           };
         });
 
@@ -274,6 +349,20 @@ export const updateGroceryList = async ({
         await tx
           .insert(groceryListIngredientTable)
           .values(insertGroceryListIngredients);
+      }
+
+      if (deletedIngredientIds.length > 0) {
+        await tx
+          .delete(groceryListIngredientTable)
+          .where(
+            and(
+              eq(groceryListIngredientTable.groceryListId, groceryListId),
+              inArray(
+                groceryListIngredientTable.publicId,
+                deletedIngredientIds,
+              ),
+            ),
+          );
       }
 
       const sourceOfTruthIngredients = await tx
@@ -298,18 +387,16 @@ export const deleteGroceryList = async (
   userId: number,
 ) => {
   try {
-    const [deletedGroceryListId] = await db.transaction(async (tx) => {
-      return tx
-        .delete(groceryListTable)
-        .where(
-          and(
-            eq(groceryListTable.publicId, groceryListId),
-            eq(groceryListTable.userId, userId),
-          ),
-        )
-        .returning({ publicId: groceryListTable.publicId });
-    });
-    return deletedGroceryListId;
+    const [deleted] = await db
+      .delete(groceryListTable)
+      .where(
+        and(
+          eq(groceryListTable.publicId, groceryListId),
+          eq(groceryListTable.userId, userId),
+        ),
+      )
+      .returning({ publicId: groceryListTable.publicId });
+    return deleted ?? null;
   } catch (error) {
     throw new Error("Error deleting grocery list", { cause: error });
   }
