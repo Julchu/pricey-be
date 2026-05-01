@@ -57,16 +57,7 @@ export const verifyPriceyToken = async (token?: string, secret?: string) => {
 
   const encodedSecret = new TextEncoder().encode(secret);
 
-  try {
-    return await jwtVerify<JwtPayload>(token, encodedSecret);
-  } catch (error) {
-    throw new Error(
-      "Error authenticating user, invalid or expired accessToken",
-      {
-        cause: error,
-      },
-    );
-  }
+  return await jwtVerify<JwtPayload>(token, encodedSecret);
 };
 
 export const createTokens = async ({
@@ -161,9 +152,11 @@ export const userSetter = async (
     if (auth) {
       req.userId = auth.payload.userId;
       next();
-    } else res.status(401).json({ error: "Unauthorized" });
+    } else {
+      res.status(401).json({ error: "Unauthorized" });
+    }
   } catch (error) {
-    res.status(401).json({ error: `Error authenticating user, ${error}` });
+    res.status(500).json({ error: `Internal server error, ${error}` });
     return;
   }
 };
@@ -185,9 +178,11 @@ export const userRefresher = async (
     if (auth) {
       req.userId = auth.payload.userId;
       next();
-    } else res.status(401).json({ error: "Unauthorized" });
+    } else {
+      res.status(401).json({ error: "Unauthorized" });
+    }
   } catch (error) {
-    res.status(401).json({ error: `Error refreshing token, ${error}` });
+    res.status(500).json({ error: `Internal server error, ${error}` });
     return;
   }
 };
