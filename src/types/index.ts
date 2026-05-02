@@ -7,10 +7,13 @@ import type { SelectPublicRecipe } from "../db/schemas/recipe.schema";
 export const Unit = {
   // Mass
   KILOGRAM: "kg",
+  GRAM: "g",
   POUND: "lb",
+  OUNCE: "oz",
 
   // Volume
   LITRE: "L",
+  MILLILITER: "ml",
   QUART: "qt",
   CUP: "cup",
   TABLESPOON: "tbsp",
@@ -21,16 +24,24 @@ export const Unit = {
 
 export const UnitValues = [
   Unit.KILOGRAM,
+  Unit.GRAM,
   Unit.POUND,
+  Unit.OUNCE,
   Unit.LITRE,
+  Unit.MILLILITER,
   Unit.QUART,
   Unit.CUP,
   Unit.TABLESPOON,
   Unit.TEASPOON,
   Unit.PIECES,
 ] as const;
-export const MassValues = [Unit.KILOGRAM, Unit.POUND] as const;
-export const VolumeValues = [Unit.LITRE, Unit.QUART] as const;
+export const MassValues = [
+  Unit.KILOGRAM,
+  Unit.GRAM,
+  Unit.POUND,
+  Unit.OUNCE,
+] as const;
+export const VolumeValues = [Unit.LITRE, Unit.MILLILITER, Unit.QUART] as const;
 
 export type UnitType = (typeof UnitValues)[number]; // "kg" | "lb" | "L" | "qt" | "cup" | "tbsp" | "tsp" | "pcs";
 export type MassType = (typeof MassValues)[number]; // "kg" | "lb"
