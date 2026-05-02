@@ -10,6 +10,7 @@ export const upsertIngredient = async (
   ingredient: Omit<InsertPublicIngredient, "userId">,
   userId: number,
 ) => {
+  console.log("upsert", ingredient);
   const insertIngredient: InsertIngredient = {
     ...ingredient,
     name: ingredient.name.toLowerCase(),

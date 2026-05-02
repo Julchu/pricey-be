@@ -2,7 +2,7 @@ import { Router } from "express";
 import { getAllIngredients, upsertIngredient } from "./ingredient.service";
 import type { AuthRequest } from "../../types";
 import type { InsertPublicIngredient } from "../../db/schemas/ingredient.schema";
-import { z } from "zod";
+import { insertIngredientSchema } from "./ingredient.validation";
 
 export const ingredientRouter = Router();
 
@@ -19,10 +19,6 @@ ingredientRouter.get("/", async (req: AuthRequest, res) => {
     console.error("Failed to get ingredients", error);
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
-});
-
-const insertIngredientSchema = z.object({
-  ingredient: z.string(),
 });
 
 ingredientRouter.post(
@@ -43,11 +39,7 @@ ingredientRouter.post(
     }
 
     try {
-      const ingredient = await upsertIngredient(
-        req.body.ingredient,
-        req.userId,
-      );
-      // TODO: omit private fields
+      const ingredient = await upsertIngredient(data.ingredient, req.userId);
       res.json({ success: true, data: ingredient[0] });
     } catch (error) {
       console.error("Failed to save new ingredient", error);

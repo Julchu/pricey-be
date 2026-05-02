@@ -8,12 +8,12 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import { seedingRouter } from "./modules/testing/seeding.routes.ts";
-import { ingredientRouter } from "./modules/ingredient/ingredient.routes";
-import { userRouter } from "./modules/user/user.routes";
-import { groceryListRouter } from "./modules/grocery-list/grocery-list.routes";
-import { recipeRouter } from "./modules/recipe/recipe.routes";
+import { ingredientRouter } from "./modules/ingredient/ingredient.routes.ts";
+import { userRouter } from "./modules/user/user.routes.ts";
+import { groceryListRouter } from "./modules/grocery-list/grocery-list.routes.ts";
+import { recipeRouter } from "./modules/recipe/recipe.routes.ts";
 import rateLimit from "express-rate-limit";
-import { userSetter } from "./lib/auth/auth-handlers";
+import { userSetter } from "./lib/auth/auth-handlers.ts";
 
 const app = express();
 

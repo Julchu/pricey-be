@@ -1,6 +1,8 @@
 import type { Request } from "express";
 import type { InsertPublicGroceryListIngredient } from "../db/schemas/grocery-list-ingredient.schema";
+import type { InsertPublicRecipeIngredient } from "../db/schemas/recipe-ingredient.schema";
 import type { SelectPublicGroceryList } from "../db/schemas/grocery-list.schema";
+import type { SelectPublicRecipe } from "../db/schemas/recipe.schema";
 
 export const Unit = {
   // Mass
@@ -106,12 +108,10 @@ export type GroceryList = SelectPublicGroceryList & {
   ingredients: InsertPublicGroceryListIngredient[];
 };
 
-export type Recipe = {
-  id: number;
-  name: string;
-  ingredients: Ingredient[];
-  userId: string;
-  public?: boolean;
+export type Recipe = SelectPublicRecipe & {
+  ingredients: (InsertPublicRecipeIngredient & {
+    ingredientPublicId?: string | null;
+  })[];
 };
 
 export type OmitType = Omit<GroceryList, "name">;
