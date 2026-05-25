@@ -12,6 +12,7 @@ import { ingredientRouter } from "./modules/ingredient/ingredient.routes.ts";
 import { userRouter } from "./modules/user/user.routes.ts";
 import { groceryListRouter } from "./modules/grocery-list/grocery-list.routes.ts";
 import { recipeRouter } from "./modules/recipe/recipe.routes.ts";
+import { pantryRouter } from "./modules/pantry/pantry.routes.ts";
 import rateLimit from "express-rate-limit";
 import { userSetter } from "./lib/auth/auth-handlers.ts";
 
@@ -53,6 +54,7 @@ protectedRoutes.use(userSetter);
 protectedRoutes.use("/ingredient", ingredientRouter);
 protectedRoutes.use("/grocery-list", groceryListRouter);
 protectedRoutes.use("/recipe", recipeRouter);
+protectedRoutes.use("/pantry", pantryRouter);
 
 app.use("/", protectedRoutes);
 

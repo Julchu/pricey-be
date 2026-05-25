@@ -1,5 +1,5 @@
 CREATE TYPE "public"."season" AS ENUM('spring', 'winter', 'summer', 'fall');--> statement-breakpoint
-CREATE TYPE "public"."unit" AS ENUM('kg', 'lb', 'L', 'qt', 'cup', 'tbsp', 'tsp', 'pcs');--> statement-breakpoint
+CREATE TYPE "public"."unit" AS ENUM('kg', 'g', 'lb', 'oz', 'L', 'ml', 'qt', 'cup', 'tbsp', 'tsp', 'pcs');--> statement-breakpoint
 CREATE TABLE "grocery_list_ingredients" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "grocery_list_ingredients_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"public_id" uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -46,6 +46,22 @@ CREATE TABLE "ingredients" (
 	"deleted_at" timestamp,
 	CONSTRAINT "unique_ingredients" UNIQUE("id"),
 	CONSTRAINT "unique_userId_ingredientName" UNIQUE("user_id","name")
+);
+--> statement-breakpoint
+CREATE TABLE "pantry_ingredients" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "pantry_ingredients_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"public_id" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" integer NOT NULL,
+	"ingredient_id" integer,
+	"capacity" numeric,
+	"quantity" integer,
+	"unit" "unit",
+	"image" varchar(255),
+	"updated_at" timestamp,
+	"created_at" timestamp DEFAULT now(),
+	"deleted_at" timestamp,
+	CONSTRAINT "unique_pantryIngredients" UNIQUE("public_id"),
+	CONSTRAINT "unique_userId_ingredientId" UNIQUE("user_id","ingredient_id")
 );
 --> statement-breakpoint
 CREATE TABLE "recipe_ingredients" (
@@ -97,6 +113,8 @@ ALTER TABLE "grocery_list_ingredients" ADD CONSTRAINT "grocery_list_ingredients_
 ALTER TABLE "grocery_list_ingredients" ADD CONSTRAINT "grocery_list_ingredients_ingredient_id_ingredients_id_fk" FOREIGN KEY ("ingredient_id") REFERENCES "public"."ingredients"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "grocery_lists" ADD CONSTRAINT "grocery_lists_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ingredients" ADD CONSTRAINT "ingredients_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "pantry_ingredients" ADD CONSTRAINT "pantry_ingredients_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "pantry_ingredients" ADD CONSTRAINT "pantry_ingredients_ingredient_id_ingredients_id_fk" FOREIGN KEY ("ingredient_id") REFERENCES "public"."ingredients"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recipe_ingredients" ADD CONSTRAINT "recipe_ingredients_recipe_id_recipes_id_fk" FOREIGN KEY ("recipe_id") REFERENCES "public"."recipes"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recipe_ingredients" ADD CONSTRAINT "recipe_ingredients_ingredient_id_ingredients_id_fk" FOREIGN KEY ("ingredient_id") REFERENCES "public"."ingredients"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "recipes" ADD CONSTRAINT "recipes_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;

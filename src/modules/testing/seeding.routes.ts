@@ -66,6 +66,7 @@ seedingRouter.post("/seed", async (req, res) => {
             (sum, arr) => sum + arr.length,
             0,
           ),
+          pantryIngredientsCreated: result.pantryIngredients.length,
         },
       });
       return;

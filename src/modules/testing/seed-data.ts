@@ -507,3 +507,25 @@ export const seedGroceryListIngredients: Record<
     { ingredientName: "Garlic", capacity: 0.5, quantity: 1, unit: Unit.PIECES },
   ],
 };
+
+// ==================== PANTRY INGREDIENT DATA ====================
+// Ingredients the main user currently has at home.
+// ingredientName is used to look up ingredientId after ingredients are inserted.
+
+export interface PantryIngredientSeed {
+  ingredientName: string;
+  capacity?: number;
+  quantity?: number;
+  unit: (typeof Unit)[keyof typeof Unit];
+}
+
+export const seedPantryIngredients: PantryIngredientSeed[] = [
+  { ingredientName: "Olive Oil", capacity: 0.5, quantity: 1, unit: Unit.LITRE },
+  { ingredientName: "Garlic", capacity: 1, quantity: 2, unit: Unit.PIECES },
+  { ingredientName: "Onion", capacity: 1, quantity: 3, unit: Unit.PIECES },
+  { ingredientName: "Eggs", capacity: 12, quantity: 1, unit: Unit.PIECES },
+  { ingredientName: "Butter", capacity: 1, quantity: 1, unit: Unit.PIECES },
+  { ingredientName: "Flour", capacity: 2, quantity: 1, unit: Unit.KILOGRAM },
+  { ingredientName: "Milk", capacity: 1, quantity: 1, unit: Unit.LITRE },
+  { ingredientName: "Sugar", capacity: 1, quantity: 1, unit: Unit.KILOGRAM },
+];

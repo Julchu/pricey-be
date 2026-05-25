@@ -5,10 +5,12 @@ import { recipeTable } from "../../db/schemas/recipe.schema";
 import { groceryListTable } from "../../db/schemas/grocery-list.schema";
 import { recipeIngredientTable } from "../../db/schemas/recipe-ingredient.schema";
 import { groceryListIngredientTable } from "../../db/schemas/grocery-list-ingredient.schema";
+import { pantryIngredientTable } from "../../db/schemas/pantry-ingredient.schema.ts";
 import {
   seedGroceryListIngredients,
   seedGroceryLists,
   seedIngredients,
+  seedPantryIngredients,
   seedRecipeIngredients,
   seedRecipes,
   seedUsers,
@@ -149,6 +151,42 @@ export const insertGroceryListIngredients = async (
   return inserted;
 };
 
+/**
+ * Inserts pantry ingredients for a specific user using ingredient ID map
+ */
+export const insertPantryIngredients = async (
+  userId: number,
+  ingredientMap: Record<string, number>,
+) => {
+  const values = seedPantryIngredients
+    .map(({ ingredientName, capacity, quantity, unit }) => {
+      const ingredientId = ingredientMap[ingredientName];
+      if (!ingredientId) {
+        console.warn(
+          `Ingredient "${ingredientName}" not found in map, skipping`,
+        );
+        return null;
+      }
+      return {
+        userId,
+        ingredientId,
+        capacity,
+        quantity,
+        unit,
+      };
+    })
+    .filter((v): v is NonNullable<typeof v> => v !== null);
+
+  const inserted = await db
+    .insert(pantryIngredientTable)
+    .values(values)
+    .returning();
+  console.log(
+    `Inserted ${inserted.length} pantry ingredients for user ${userId}`,
+  );
+  return inserted;
+};
+
 // ==================== MASTER SEED FUNCTION ====================
 
 export type SeedResult = {
@@ -160,6 +198,7 @@ export type SeedResult = {
   groceryListIngredients: Awaited<
     ReturnType<typeof insertGroceryListIngredients>
   >[];
+  pantryIngredients: Awaited<ReturnType<typeof insertPantryIngredients>>;
 };
 
 export const prefillDb = async (): Promise<SeedResult> => {
@@ -216,6 +255,12 @@ export const prefillDb = async (): Promise<SeedResult> => {
 
     console.log("Database seeding completed successfully!");
 
+    // Step 7: Insert pantry ingredients (depends on user and ingredients)
+    const pantryIngredients = await insertPantryIngredients(
+      mainUserId,
+      ingredientMap,
+    );
+
     return {
       users,
       ingredients,
@@ -223,6 +268,7 @@ export const prefillDb = async (): Promise<SeedResult> => {
       groceryLists,
       recipeIngredients: recipeIngredientsResults,
       groceryListIngredients: groceryListIngredientsResults,
+      pantryIngredients,
     };
   } catch (error) {
     console.error("Error seeding database:", error);

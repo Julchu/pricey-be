@@ -17,17 +17,17 @@ Running Postgres with Docker locally
 
 - ```
   docker desktop start
-  docker run --name my-postgres -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydb -p 5432:5432 -d postgres
+  docker run --name pricey_container -e POSTGRES_USER=pricey_admin -e POSTGRES_PASSWORD=pricey_password -e POSTGRES_DB=pricey_db -p 5432:5432 -d postgres
   docker ps -a
-  docker start my-postgres
-  docker exec -it my-postgres bash
-  psql -U myuser -d mydb
+  docker start pricey_container
+  docker exec -it pricey_container bash
+  psql -U pricey_admin -d pricey_db
   ```
     - URL to connect to: `postgres://myuser:mypassword@localhost:5432/mydb`
-    - `--name my-postgres`: Names the container
-    - `-e POSTGRES_USER=myuser`: Sets the database username
-    - `-e POSTGRES_PASSWORD=mypassword`: Sets the password
-    - `-e POSTGRES_DB=mydb`: Creates a database
+    - `--name pricey_container`: Names the container
+    - `-e POSTGRES_USER=pricey_admin`: Sets the database username
+    - `-e POSTGRES_PASSWORD=pricey_password`: Sets the password
+    - `-e POSTGRES_DB=pricey_db`: Creates a database
     - `-p 5432:5432`: Exposes PostgreSQL on port 5432
     - `-d postgres`: Runs the official PostgreSQL image in the background
 
@@ -37,7 +37,7 @@ Running Postgres with Docker locally
     - `-d`: database name
 
 ```
-psql -U myuser -d postgres
+psql -U pricey_admin -d postgres
 ```
 
 - Inside psql:

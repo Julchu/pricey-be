@@ -5,6 +5,7 @@ import { groceryListTable } from "./schemas/grocery-list.schema";
 import { groceryListIngredientTable } from "./schemas/grocery-list-ingredient.schema";
 import { recipeTable } from "./schemas/recipe.schema";
 import { recipeIngredientTable } from "./schemas/recipe-ingredient.schema";
+import { pantryIngredientTable } from "./schemas/pantry-ingredient.schema.ts";
 
 // You can specify any property from the postgres-js connection options
 export const db = drizzle({
@@ -21,5 +22,6 @@ export const db = drizzle({
     groceryListIngredientTable,
     recipeTable,
     recipeIngredientTable,
+    pantryIngredientTable,
   },
 });
