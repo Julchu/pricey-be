@@ -12,8 +12,8 @@ pantryRouter.get("/", async (req: AuthRequest, res) => {
   }
 
   try {
-    const ingredients = await getPantry(req.userId);
-    res.json({ success: true, data: ingredients });
+    const pantryIngredients = await getPantry(req.userId);
+    res.json({ success: true, data: pantryIngredients });
   } catch (error) {
     console.error("Failed to get pantry", error);
     res.status(500).json({ success: false, error: "Internal Server Error" });

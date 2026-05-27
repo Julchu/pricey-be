@@ -10,6 +10,8 @@ export const insertIngredientSchema = z.object({
     unit: z.enum([...UnitValues]).optional(),
     image: z.string().optional(),
     season: z.enum([...SeasonValues]).optional(),
+    // TODO: test publicId filtering (what happens if not included in form submission data, or if included but removing publicId validator)
+    publicId: z.string().optional(),
   }),
 });
 
