@@ -80,6 +80,7 @@ groceryListRouter.post(
       return;
     }
 
+    // TODO: Add zod schema validation
     const { ingredients, ...newGroceryList } = req.body.groceryList;
 
     try {

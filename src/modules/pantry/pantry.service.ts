@@ -82,7 +82,6 @@ export const batchUpdatePantry = async ({
       }, {});
 
       // Insert new ingredients
-      let inserted: (typeof pantryIngredientTable.$inferSelect)[] = [];
       if (newIngredients.length > 0) {
         const insertValues: InsertPantryIngredient[] = newIngredients.map(
           (ingredient) => {
@@ -102,7 +101,7 @@ export const batchUpdatePantry = async ({
           },
         );
 
-        inserted = await tx
+        await tx
           .insert(pantryIngredientTable)
           .values(insertValues)
           .onConflictDoNothing()
@@ -155,8 +154,8 @@ export const batchUpdatePantry = async ({
         )
         .where(eq(pantryIngredientTable.userId, userId));
 
-      const pantryIngredients: SelectPublicPantryIngredient[] =
-        sourceOfTruth.map(({ pantry_ingredients: pi, ingredients: ing }) => ({
+      const ingredients: SelectPublicPantryIngredient[] = sourceOfTruth.map(
+        ({ pantry_ingredients: pi, ingredients: ing }) => ({
           updatedAt: pi.updatedAt,
           createdAt: pi.createdAt,
           deletedAt: pi.deletedAt,
@@ -166,14 +165,10 @@ export const batchUpdatePantry = async ({
           unit: pi.unit,
           name: ing?.name ?? "",
           ingredientPublicId: ing?.publicId ?? "",
-        }));
+        }),
+      );
 
-      return {
-        pantryIngredients,
-        insertedCount: inserted.length,
-        updatedCount: updatedIngredients.length,
-        deletedCount: deletedIngredientIds.length,
-      };
+      return ingredients;
     });
   } catch (error) {
     throw new Error("Error updating pantry", { cause: error });

@@ -4,9 +4,9 @@ import { SeasonValues, UnitValues } from "../../types";
 export const insertIngredientSchema = z.object({
   ingredient: z.object({
     name: z.string().min(1),
-    price: z.number().optional(),
-    capacity: z.number().optional(),
-    quantity: z.number().optional(),
+    price: z.number().optional().nullable(),
+    capacity: z.number().positive().optional().nullable(),
+    quantity: z.number().int().positive().optional().nullable(),
     unit: z.enum([...UnitValues]).optional(),
     image: z.string().optional(),
     season: z.enum([...SeasonValues]).optional(),

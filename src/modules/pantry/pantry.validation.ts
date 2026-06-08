@@ -3,16 +3,15 @@ import { UnitValues } from "../../types";
 
 const pantryIngredientSchema = z.object({
   ingredientPublicId: z.string().uuid(),
-  capacity: z.number().positive().optional(),
-  quantity: z.number().int().positive().optional(),
+  capacity: z.number().positive().optional().nullable(),
+  quantity: z.number().int().positive().optional().nullable(),
   unit: z.enum([...UnitValues]).optional(),
+  publicId: z.string().uuid().optional(),
 });
 
 const pantryIngredientWithPublicIdSchema = pantryIngredientSchema.extend({
   publicId: z.string().uuid(),
 });
-
-export const getPantrySchema = z.object({});
 
 export const batchUpdatePantrySchema = z.object({
   newIngredients: z.array(pantryIngredientSchema).default([]),

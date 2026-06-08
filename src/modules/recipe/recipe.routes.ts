@@ -73,6 +73,7 @@ recipeRouter.post(
       return;
     }
 
+    // TODO: Add zod schema validation
     const { ingredients, ...newRecipe } = req.body.recipe;
 
     try {

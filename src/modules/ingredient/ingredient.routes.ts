@@ -34,7 +34,7 @@ ingredientRouter.post(
 
     const { data, error } = insertIngredientSchema.safeParse(req.body);
     if (error) {
-      res.json({ success: false, error: error.message });
+      res.status(400).json({ success: false, error: error.message });
       return;
     }
 

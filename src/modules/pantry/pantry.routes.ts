@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { batchUpdatePantry, getPantry } from "./pantry.service.ts";
-import { batchUpdatePantrySchema } from "./pantry.validation.ts";
+import {
+  type BatchUpdatePantryInput,
+  batchUpdatePantrySchema,
+} from "./pantry.validation.ts";
 import type { AuthRequest } from "../../types";
 
 export const pantryRouter = Router();
@@ -22,18 +25,7 @@ pantryRouter.get("/", async (req: AuthRequest, res) => {
 
 pantryRouter.patch(
   "/",
-  async (
-    req: AuthRequest<
-      unknown,
-      unknown,
-      {
-        newIngredients?: unknown;
-        updatedIngredients?: unknown;
-        deletedIngredientIds?: unknown;
-      }
-    >,
-    res,
-  ) => {
+  async (req: AuthRequest<unknown, unknown, BatchUpdatePantryInput>, res) => {
     if (!req.userId) {
       res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
@@ -46,14 +38,14 @@ pantryRouter.patch(
     }
 
     try {
-      const result = await batchUpdatePantry({
+      const pantryIngredients = await batchUpdatePantry({
         userId: req.userId,
         newIngredients: data.newIngredients,
         updatedIngredients: data.updatedIngredients,
         deletedIngredientIds: data.deletedIngredientIds,
       });
 
-      res.json({ success: true, data: result });
+      res.json({ success: true, data: pantryIngredients });
     } catch (error) {
       console.error("Failed to update pantry", error);
       res.status(500).json({ success: false, error: "Internal Server Error" });
