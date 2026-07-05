@@ -1,5 +1,5 @@
 {
-  "id": "da7d9fc6-0a5c-446f-bb45-fbb5ca78e679",
+  "id": "7a19aa23-43a7-4a17-ab18-c9470bc09383",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -425,7 +425,7 @@
           "name": "ingredient_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "capacity": {
           "name": "capacity",
@@ -443,12 +443,6 @@
           "name": "unit",
           "type": "unit",
           "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "image": {
-          "name": "image",
-          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
@@ -711,6 +705,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
         },
         "updated_at": {
           "name": "updated_at",
