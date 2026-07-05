@@ -5,6 +5,8 @@ import {
   type InsertPublicIngredient,
 } from "../../db/schemas/ingredient.schema";
 import { and, eq, getTableColumns } from "drizzle-orm";
+import { deleteObject, getObjectKeyFromUrl } from "../../lib/s3/s3.service.ts";
+import { BucketNames } from "../../lib/s3/s3-client.ts";
 
 export const upsertIngredient = async (
   ingredient: Omit<InsertPublicIngredient, "userId">,
@@ -84,5 +86,50 @@ export const getIngredientIdByPublicId = async (
     return ingredient?.id ?? null;
   } catch (error) {
     throw new Error("Error getting ingredient by public ID:", { cause: error });
+  }
+};
+
+export const updateIngredientImage = async ({
+  ingredientPublicId,
+  userId,
+  image,
+}: {
+  ingredientPublicId: string;
+  userId: number;
+  image: string;
+}) => {
+  try {
+    const [existing] = await db
+      .select({ image: ingredientTable.image })
+      .from(ingredientTable)
+      .where(
+        and(
+          eq(ingredientTable.publicId, ingredientPublicId),
+          eq(ingredientTable.userId, userId),
+        ),
+      );
+
+    const [updatedIngredient] = await db
+      .update(ingredientTable)
+      .set({ image })
+      .where(
+        and(
+          eq(ingredientTable.publicId, ingredientPublicId),
+          eq(ingredientTable.userId, userId),
+        ),
+      )
+      .returning();
+
+    if (updatedIngredient && existing?.image) {
+      const oldKey = getObjectKeyFromUrl(
+        BucketNames.INGREDIENTS,
+        existing.image,
+      );
+      if (oldKey) await deleteObject(BucketNames.INGREDIENTS, oldKey);
+    }
+
+    return updatedIngredient ?? null;
+  } catch (error) {
+    throw new Error("Error updating ingredient image:", { cause: error });
   }
 };

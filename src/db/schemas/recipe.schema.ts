@@ -25,6 +25,7 @@ export const recipeTable = pgTable(
       })
       .notNull(),
     isPublic: boolean().default(false).notNull(),
+    image: varchar({ length: 255 }),
     ...timestamps,
   },
   (table) => [

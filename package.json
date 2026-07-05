@@ -23,6 +23,9 @@
     "build": "pkgroll"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1078.0",
+    "@aws-sdk/s3-presigned-post": "^3.1078.0",
+    "@aws-sdk/s3-request-presigner": "^3.1078.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "drizzle-orm": "^0.41.0",

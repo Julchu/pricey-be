@@ -12,6 +12,8 @@ import {
 } from "../../db/schemas/recipe-ingredient.schema";
 import { ingredientTable } from "../../db/schemas/ingredient.schema";
 import type { Recipe } from "../../types";
+import { deleteObject, getObjectKeyFromUrl } from "../../lib/s3/s3.service.ts";
+import { BucketNames } from "../../lib/s3/s3-client.ts";
 
 export const getAllRecipes = async (userId: number) => {
   try {
@@ -40,7 +42,7 @@ export const getAllRecipes = async (userId: number) => {
         const recipePublicId = currentRecipe.publicId;
 
         if (!recipesObject[recipePublicId]) {
-          const { updatedAt, createdAt, deletedAt, publicId, name } =
+          const { updatedAt, createdAt, deletedAt, publicId, name, image } =
             currentRecipe;
 
           recipesObject[recipePublicId] = {
@@ -49,6 +51,7 @@ export const getAllRecipes = async (userId: number) => {
             deletedAt,
             publicId,
             name,
+            image,
             isPublic: currentRecipe.isPublic,
             ingredients: [],
           };
@@ -104,7 +107,8 @@ export const getRecipe = async (recipeId: string, userId: number) => {
 
     if (!fetchedRecipe) return null;
 
-    const { updatedAt, createdAt, deletedAt, publicId, name } = fetchedRecipe;
+    const { updatedAt, createdAt, deletedAt, publicId, name, image } =
+      fetchedRecipe;
 
     const publicRecipe = {
       updatedAt,
@@ -112,6 +116,7 @@ export const getRecipe = async (recipeId: string, userId: number) => {
       deletedAt,
       publicId,
       name,
+      image,
       isPublic: fetchedRecipe.isPublic,
     };
 
@@ -260,7 +265,11 @@ export const updateRecipe = async ({
     return await db.transaction(async (tx) => {
       const [updatedRecipe] = await tx
         .update(recipeTable)
-        .set({ name: recipe.name, isPublic: recipe.isPublic })
+        .set({
+          name: recipe.name,
+          isPublic: recipe.isPublic,
+          image: recipe.image,
+        })
         .where(
           and(
             eq(recipeTable.publicId, recipePublicId),
@@ -373,5 +382,49 @@ export const deleteRecipe = async (recipeId: string, userId: number) => {
     return deleted ?? null;
   } catch (error) {
     throw new Error("Error deleting recipe", { cause: error });
+  }
+};
+
+// Not full updateRecipe -- used to confirm a presigned image upload without
+// requiring the client to resend the entire recipe payload.
+export const updateRecipeImage = async ({
+  recipePublicId,
+  userId,
+  image,
+}: {
+  recipePublicId: string;
+  userId: number;
+  image: string;
+}) => {
+  try {
+    const [existing] = await db
+      .select({ image: recipeTable.image })
+      .from(recipeTable)
+      .where(
+        and(
+          eq(recipeTable.publicId, recipePublicId),
+          eq(recipeTable.userId, userId),
+        ),
+      );
+
+    const [updatedRecipe] = await db
+      .update(recipeTable)
+      .set({ image })
+      .where(
+        and(
+          eq(recipeTable.publicId, recipePublicId),
+          eq(recipeTable.userId, userId),
+        ),
+      )
+      .returning();
+
+    if (updatedRecipe && existing?.image) {
+      const oldKey = getObjectKeyFromUrl(BucketNames.RECIPES, existing.image);
+      if (oldKey) await deleteObject(BucketNames.RECIPES, oldKey);
+    }
+
+    return updatedRecipe ?? null;
+  } catch (error) {
+    throw new Error("Error updating recipe image", { cause: error });
   }
 };

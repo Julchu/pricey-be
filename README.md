@@ -51,6 +51,19 @@ DROP DATABASE your_database_name;
 CREATE DATABASE your_database_name;
 ```
 
+Running MinIO (S3-like image storage) with Docker locally
+
+```docker
+docker run -d \
+  --name pricey_images \
+  -p 8003:9000 \
+  -p 8004:9001 \
+  -e MINIO_ROOT_USER=pricey_admin \
+  -e MINIO_ROOT_PASSWORD=pricey_password \
+  -v minio-data:/data \
+  minio/minio server /data --console-address ":9001"
+```
+
 Running Redis with Docker locally
 
 - ```aiignore
