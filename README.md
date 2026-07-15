@@ -17,27 +17,29 @@ Running Postgres with Docker locally
 
 - ```
   docker desktop start
-  docker run --name pricey_container -e POSTGRES_USER=pricey_admin -e POSTGRES_PASSWORD=pricey_password -e POSTGRES_DB=pricey_db -p 5432:5432 -d postgres
+  docker run --name pricey-db -e POSTGRES_USER=priceyadmin -e POSTGRES_PASSWORD=priceypassword -e POSTGRES_DB=pricey_db -p 5432:5432 -d postgres
   docker ps -a
-  docker start pricey_container
-  docker exec -it pricey_container bash
-  psql -U pricey_admin -d pricey_db
+  docker start pricey-db
+  docker exec -it pricey-db bash
+  psql -U priceyadmin -d pricey_db
   ```
-    - URL to connect to: `postgres://myuser:mypassword@localhost:5432/mydb`
-    - `--name pricey_container`: Names the container
-    - `-e POSTGRES_USER=pricey_admin`: Sets the database username
-    - `-e POSTGRES_PASSWORD=pricey_password`: Sets the password
-    - `-e POSTGRES_DB=pricey_db`: Creates a database
+    - URL to connect to: `postgres://priceyadmin:priceypassword@localhost:5432/pricey_db`
+    - `--name pricey-db`: Container name (kebab-case, env-scoped — mirrors AWS RDS identifier convention)
+    - `-e POSTGRES_USER=priceyadmin`: Db master username (no hyphens/underscores — mirrors AWS RDS master username
+      rules)
+    - `-e POSTGRES_PASSWORD=priceypassword`: Replace with a strong password (avoid `@`, `/`, `?` — safe for connection
+      strings)
+    - `-e POSTGRES_DB=pricey_db`: Database name (snake_case, env-scoped — PostgreSQL identifiers cannot contain hyphens)
     - `-p 5432:5432`: Exposes PostgreSQL on port 5432
     - `-d postgres`: Runs the official PostgreSQL image in the background
 
 
-- Drop and recreate DB: log into separate database (`postgres`) to modify/delete main database (`mydb`)
+- Drop and recreate DB: log into separate database (`postgres`) to modify/delete main database (`pricey_db`)
     - `-U`: user
     - `-d`: database name
 
 ```
-psql -U pricey_admin -d postgres
+psql -U priceyadmin -d postgres
 ```
 
 - Inside psql:
@@ -66,7 +68,7 @@ docker run -d \
 
 Running Redis with Docker locally
 
-- ```aiignore
+- ```
   docker run -d --name redis-dev -p 6379:6379 redis
   docker ps -a
   ```
@@ -74,11 +76,11 @@ Running Redis with Docker locally
 - Restart container/local database like local Postgres and Redis
   ```
   docker container ls -a
-  docker container start my-postgres
+  docker container start pricey-db
   docker container start redis-dev
   ```
 
 - Close container
-  ```aiignore
+  ```
   docker stop <container_id_or_name>
   ```
