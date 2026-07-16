@@ -129,8 +129,7 @@ ingredientRouter.post(
   },
 );
 
-// Step 2 (after the client uploads directly to S3/MinIO): persist the
-// resulting public URL onto the ingredient.
+// Step 2 (after the client uploads directly to S3/MinIO): persist the resulting public URL onto the ingredient.
 ingredientRouter.patch(
   "/:ingredientPublicId/image",
   async (
