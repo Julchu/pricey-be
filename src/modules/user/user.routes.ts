@@ -1,13 +1,14 @@
-import { type Request, type Response, Router } from "express";
+import { type Response, Router } from "express";
 import { getUserById, updateUser } from "./user.service";
 import type { AuthRequest } from "../../types";
 import type { InsertPublicUser } from "../../db/schemas/user.schema";
 import {
-  createTokens,
-  googleLogout,
-  loginCheck,
+  bearerToken,
+  clearAuthCookies,
+  loginWithGoogleCode,
+  logoutSession,
+  refreshSession,
   setAuthCookies,
-  userRefresher,
   userSetter,
 } from "../../lib/auth/auth-handlers";
 
@@ -28,14 +29,10 @@ userRouter.get("/", userSetter, async (req: AuthRequest, res) => {
   }
 });
 
-// TODO: test if need to filter user form data email (conflict if user exists)
 userRouter.patch(
   "/update",
   userSetter,
-  async (
-    req: AuthRequest<unknown, unknown, { user: InsertPublicUser }>,
-    res: Response,
-  ) => {
+  async (req: AuthRequest<unknown, unknown, { user: InsertPublicUser }>, res: Response) => {
     if (!req.userId) {
       res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
@@ -48,85 +45,62 @@ userRouter.patch(
         data: updatedUser,
       });
     } catch (error) {
-      console.error("Failed to get user", error);
+      console.error("Failed to update user", error);
       res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   },
 );
 
-// Unused in favor of /login/google
-userRouter.post("/login", async (req, res) => {
-  try {
-    const loginResponse = await loginCheck(req.body.idToken);
+userRouter.post("/login/google", async (req, res) => {
+  const code = req.body?.code;
+  const codeVerifier = req.body?.codeVerifier;
 
-    if (!loginResponse || !loginResponse.tokens) {
-      res.status(401).json({ success: false, error: "Unauthorized" });
-      return;
-    }
-
-    const {
-      tokens: { accessToken, refreshToken },
-      userInfo,
-    } = loginResponse;
-
-    setAuthCookies(res, accessToken, refreshToken);
-    // TODO: omit private fields
-    res.status(200).json({ success: true, data: userInfo });
-  } catch (error) {
-    res.status(500).json({ success: false, error: `Invalid login: ${error}` });
-  }
-});
-
-userRouter.get(
-  "/login/google",
-  async (req: Request<unknown, unknown, unknown, { code: string }>, res) => {
-    try {
-      const loginResponse = await loginCheck(req.query.code);
-
-      if (!loginResponse || !loginResponse.tokens) {
-        res.status(401).json({ success: false, error: "Unauthorized" });
-        return;
-      }
-
-      const {
-        tokens: { accessToken, refreshToken },
-      } = loginResponse;
-
-      setAuthCookies(res, accessToken, refreshToken);
-
-      res.redirect(`${process.env.PRICEY_URL}`);
-    } catch (error) {
-      console.error(error);
-    }
-  },
-);
-
-userRouter.post("/refresh", userRefresher, async (req: AuthRequest, res) => {
-  if (!req.userId) {
-    res.status(401).json({ success: false, error: "Invalid user ID" });
+  if (typeof code !== "string" || typeof codeVerifier !== "string") {
+    res.status(400).json({ success: false, error: "Missing authorization code" });
     return;
   }
 
   try {
-    const tokens = await createTokens({ userId: req.userId });
+    const tokens = await loginWithGoogleCode(code, codeVerifier);
 
-    if (!tokens) {
+    if (!tokens?.refreshToken) {
       res.status(401).json({ success: false, error: "Unauthorized" });
       return;
     }
 
-    const { accessToken } = tokens;
-
-    setAuthCookies(res, accessToken);
-    res.status(200).json({ success: true, data: accessToken });
+    setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
+    res.status(200).json({ success: true });
   } catch (error) {
-    res.status(500).json({ success: false, error: `Invalid login: ${error}` });
+    console.error("Failed to login", error instanceof Error ? error.name : "unknown");
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+});
+
+userRouter.post("/refresh", async (req, res) => {
+  const token = bearerToken(req.header("Authorization"));
+
+  try {
+    const refreshed = await refreshSession(token);
+
+    if (!refreshed) {
+      clearAuthCookies(res);
+      res.status(401).json({ success: false, error: "Unauthorized" });
+      return;
+    }
+
+    setAuthCookies(res, refreshed.accessToken);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Failed to refresh session", error instanceof Error ? error.name : "unknown");
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 
 userRouter.post("/logout", async (req, res) => {
-  await googleLogout();
-  res.clearCookie("pricey_access_token");
-  res.clearCookie("pricey_refresh_token");
+  const accessToken = bearerToken(req.header("Authorization"));
+  const refreshToken = req.header("x-refresh-token")?.trim();
+
+  await logoutSession(accessToken, refreshToken);
+  clearAuthCookies(res);
   res.status(200).json({ success: true, data: null });
 });

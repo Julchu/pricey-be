@@ -37,11 +37,7 @@ export const upsertIngredient = async (
 };
 
 export const getAllIngredients = async (userId: number) => {
-  const {
-    userId: _userId,
-    id: _id,
-    ...ingredientTableColumns
-  } = getTableColumns(ingredientTable);
+  const { userId: _userId, id: _id, ...ingredientTableColumns } = getTableColumns(ingredientTable);
   try {
     return await db
       .select(ingredientTableColumns)
@@ -57,32 +53,19 @@ export const getIngredient = async (ingredientId: number, userId: number) => {
     return await db
       .select()
       .from(ingredientTable)
-      .where(
-        and(
-          eq(ingredientTable.id, ingredientId),
-          eq(ingredientTable.userId, userId),
-        ),
-      );
+      .where(and(eq(ingredientTable.id, ingredientId), eq(ingredientTable.userId, userId)));
   } catch (error) {
     throw new Error("Error getting specific ingredient:", { cause: error });
   }
 };
 
 // Not get ingredient, but rather get private ingredient id
-export const getIngredientIdByPublicId = async (
-  publicId: string,
-  userId: number,
-) => {
+export const getIngredientIdByPublicId = async (publicId: string, userId: number) => {
   try {
     const [ingredient] = await db
       .select({ id: ingredientTable.id })
       .from(ingredientTable)
-      .where(
-        and(
-          eq(ingredientTable.publicId, publicId),
-          eq(ingredientTable.userId, userId),
-        ),
-      );
+      .where(and(eq(ingredientTable.publicId, publicId), eq(ingredientTable.userId, userId)));
     return ingredient?.id ?? null;
   } catch (error) {
     throw new Error("Error getting ingredient by public ID:", { cause: error });
@@ -103,28 +86,19 @@ export const updateIngredientImage = async ({
       .select({ image: ingredientTable.image })
       .from(ingredientTable)
       .where(
-        and(
-          eq(ingredientTable.publicId, ingredientPublicId),
-          eq(ingredientTable.userId, userId),
-        ),
+        and(eq(ingredientTable.publicId, ingredientPublicId), eq(ingredientTable.userId, userId)),
       );
 
     const [updatedIngredient] = await db
       .update(ingredientTable)
       .set({ image })
       .where(
-        and(
-          eq(ingredientTable.publicId, ingredientPublicId),
-          eq(ingredientTable.userId, userId),
-        ),
+        and(eq(ingredientTable.publicId, ingredientPublicId), eq(ingredientTable.userId, userId)),
       )
       .returning();
 
     if (updatedIngredient && existing?.image) {
-      const oldKey = getObjectKeyFromUrl(
-        BucketNames.INGREDIENTS,
-        existing.image,
-      );
+      const oldKey = getObjectKeyFromUrl(BucketNames.INGREDIENTS, existing.image);
       if (oldKey) await deleteObject(BucketNames.INGREDIENTS, oldKey);
     }
 

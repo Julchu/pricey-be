@@ -37,10 +37,7 @@ ingredientRouter.get("/", async (req: AuthRequest, res) => {
 
 ingredientRouter.post(
   "/",
-  async (
-    req: AuthRequest<unknown, unknown, { ingredient: InsertPublicIngredient }>,
-    res,
-  ) => {
+  async (req: AuthRequest<unknown, unknown, { ingredient: InsertPublicIngredient }>, res) => {
     if (!req.userId) {
       res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
@@ -57,9 +54,7 @@ ingredientRouter.post(
       res.json({ success: true, data: ingredient[0] });
     } catch (error) {
       console.error("Failed to save new ingredient", error);
-      res
-        .status(500)
-        .json({ success: false, error: "Failed to save new ingredient" });
+      res.status(500).json({ success: false, error: "Failed to save new ingredient" });
     }
   },
 );
@@ -70,11 +65,7 @@ ingredientRouter.post(
   "/:ingredientPublicId/image/presign",
   presignRateLimiter,
   async (
-    req: AuthRequest<
-      { ingredientPublicId: string },
-      unknown,
-      { contentType: string }
-    >,
+    req: AuthRequest<{ ingredientPublicId: string }, unknown, { contentType: string }>,
     res,
   ) => {
     if (!req.userId) {
@@ -84,9 +75,7 @@ ingredientRouter.post(
 
     const { contentType } = req.body;
     if (!isAllowedImageContentType(contentType)) {
-      res
-        .status(400)
-        .json({ success: false, error: "Unsupported image content type" });
+      res.status(400).json({ success: false, error: "Unsupported image content type" });
       return;
     }
 
@@ -117,10 +106,7 @@ ingredientRouter.post(
         },
       });
     } catch (error) {
-      console.error(
-        "Failed to generate presigned ingredient image upload",
-        error,
-      );
+      console.error("Failed to generate presigned ingredient image upload", error);
       res.status(500).json({
         success: false,
         error: "Failed to generate presigned upload",
@@ -132,14 +118,7 @@ ingredientRouter.post(
 // Step 2 (after the client uploads directly to S3/MinIO): persist the resulting public URL onto the ingredient.
 ingredientRouter.patch(
   "/:ingredientPublicId/image",
-  async (
-    req: AuthRequest<
-      { ingredientPublicId: string },
-      unknown,
-      { image: string }
-    >,
-    res,
-  ) => {
+  async (req: AuthRequest<{ ingredientPublicId: string }, unknown, { image: string }>, res) => {
     if (!req.userId) {
       res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
@@ -166,9 +145,7 @@ ingredientRouter.patch(
       res.json({ success: true, data: updatedIngredient });
     } catch (error) {
       console.error("Failed to update ingredient image", error);
-      res
-        .status(500)
-        .json({ success: false, error: "Failed to update ingredient image" });
+      res.status(500).json({ success: false, error: "Failed to update ingredient image" });
     }
   },
 );

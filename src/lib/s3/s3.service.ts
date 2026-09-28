@@ -11,14 +11,9 @@ const DEFAULT_PRESIGNED_URL_EXPIRY_SECONDS = 900; // 15 minutes
 export const MAX_IMAGE_UPLOAD_BYTES = 5 * 1024 * 1024; // 10 MB
 export const MIN_IMAGE_UPLOAD_BYTES = 1;
 
-export const ALLOWED_IMAGE_CONTENT_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-] as const;
+export const ALLOWED_IMAGE_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 
-export type AllowedImageContentType =
-  (typeof ALLOWED_IMAGE_CONTENT_TYPES)[number];
+export type AllowedImageContentType = (typeof ALLOWED_IMAGE_CONTENT_TYPES)[number];
 
 export const isAllowedImageContentType = (
   contentType: unknown,
@@ -132,10 +127,7 @@ export const getPublicObjectUrl = (bucketName: BucketName, key: string) => {
  * name (e.g. a legacy value or an external URL), so callers can skip the
  * delete gracefully.
  */
-export const getObjectKeyFromUrl = (
-  bucketName: BucketName,
-  url: string,
-): string | null => {
+export const getObjectKeyFromUrl = (bucketName: BucketName, url: string): string | null => {
   const marker = `/${bucketName}/`;
   const idx = url.indexOf(marker);
   if (idx === -1) return null;

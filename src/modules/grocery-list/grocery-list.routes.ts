@@ -36,10 +36,7 @@ groceryListRouter.get(
     }
 
     try {
-      const groceryList = await getGroceryList(
-        req.params.groceryListId,
-        req.userId,
-      );
+      const groceryList = await getGroceryList(req.params.groceryListId, req.userId);
 
       if (!groceryList) {
         res.status(404).json({
@@ -54,9 +51,7 @@ groceryListRouter.get(
       });
     } catch (error) {
       console.error("Failed to get specific grocery list", error);
-      res
-        .status(500)
-        .json({ success: false, error: "Failed to get specific grocery list" });
+      res.status(500).json({ success: false, error: "Failed to get specific grocery list" });
     }
   },
 );
@@ -98,9 +93,7 @@ groceryListRouter.post(
       res.json({ success: true, data: groceryList });
     } catch (error) {
       console.error("Failed to save new grocery list", error);
-      res
-        .status(500)
-        .json({ success: false, error: "Failed to save new grocery list" });
+      res.status(500).json({ success: false, error: "Failed to save new grocery list" });
     }
   },
 );

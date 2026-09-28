@@ -11,11 +11,6 @@ export const requiredColumns = {
   publicId: uuid("public_id").defaultRandom().notNull(),
 };
 
-export type PrivateFields =
-  | "id"
-  | "userId"
-  | "groceryListId"
-  | "recipeId"
-  | "ingredientId";
+export type PrivateFields = "id" | "userId" | "groceryListId" | "recipeId" | "ingredientId";
 
 export type AutomaticFields = "createdAt" | "updatedAt" | "deletedAt";

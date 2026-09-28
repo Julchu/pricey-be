@@ -6,14 +6,13 @@ import { groceryListIngredientTable } from "./schemas/grocery-list-ingredient.sc
 import { recipeTable } from "./schemas/recipe.schema";
 import { recipeIngredientTable } from "./schemas/recipe-ingredient.schema";
 import { pantryIngredientTable } from "./schemas/pantry-ingredient.schema.ts";
+import { refreshTokenTable } from "./schemas/refresh-token.schema";
 
 // You can specify any property from the postgres-js connection options
 export const db = drizzle({
   connection: {
     url: process.env.DATABASE_URL,
-    ssl:
-      process.env.NODE_ENV === "production" ||
-      process.env.NODE_ENV === "staging",
+    ssl: process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging",
   },
   schema: {
     userTable,
@@ -23,5 +22,6 @@ export const db = drizzle({
     recipeTable,
     recipeIngredientTable,
     pantryIngredientTable,
+    refreshTokenTable,
   },
 });

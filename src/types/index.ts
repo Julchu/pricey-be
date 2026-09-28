@@ -35,12 +35,7 @@ export const UnitValues = [
   Unit.TEASPOON,
   Unit.PIECES,
 ] as const;
-export const MassValues = [
-  Unit.KILOGRAM,
-  Unit.GRAM,
-  Unit.POUND,
-  Unit.OUNCE,
-] as const;
+export const MassValues = [Unit.KILOGRAM, Unit.GRAM, Unit.POUND, Unit.OUNCE] as const;
 export const VolumeValues = [Unit.LITRE, Unit.MILLILITER, Unit.QUART] as const;
 
 export type UnitType = (typeof UnitValues)[number]; // "kg" | "lb" | "L" | "qt" | "cup" | "tbsp" | "tsp" | "pcs";
@@ -66,12 +61,7 @@ export const Season = {
   FALL: "fall",
 } as const;
 
-export const SeasonValues = [
-  Season.SPRING,
-  Season.WINTER,
-  Season.SUMMER,
-  Season.FALL,
-] as const;
+export const SeasonValues = [Season.SPRING, Season.WINTER, Season.SUMMER, Season.FALL] as const;
 export type SeasonType = (typeof SeasonValues)[number];
 
 export const Role = {

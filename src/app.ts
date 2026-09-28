@@ -1,9 +1,5 @@
 import createError, { HttpError } from "http-errors";
-import express, {
-  type NextFunction,
-  type Request,
-  type Response,
-} from "express";
+import express, { type NextFunction, type Request, type Response } from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
@@ -28,19 +24,23 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// TODO: test/optimize rate limiter
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 1000, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-  standardHeaders: "draft-7", // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
-  keyGenerator: (req) => {
-    if (!req.headers.authorization) return "1";
-    return req.ip || "";
-  },
+  windowMs: 15 * 60 * 1000,
+  limit: 1000,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
 });
 
-// Apply the rate limiting middleware to all requests.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+});
+
+app.use("/user/login", authLimiter);
+app.use("/user/refresh", authLimiter);
+app.use("/user/logout", authLimiter);
 app.use(limiter);
 
 // Public routes

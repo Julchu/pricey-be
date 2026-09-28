@@ -22,10 +22,7 @@ export const getAllGroceryLists = async (userId: number) => {
         groceryListIngredientTable,
         eq(groceryListIngredientTable.groceryListId, groceryListTable.id),
       )
-      .leftJoin(
-        ingredientTable,
-        eq(ingredientTable.id, groceryListIngredientTable.ingredientId),
-      )
+      .leftJoin(ingredientTable, eq(ingredientTable.id, groceryListIngredientTable.ingredientId))
       .where(eq(groceryListTable.userId, userId));
 
     const results = rows.reduce<Record<string, GroceryList>>(
@@ -40,8 +37,7 @@ export const getAllGroceryLists = async (userId: number) => {
         const groceryListPublicId = currentList.publicId;
 
         if (!groceryListsObject[groceryListPublicId]) {
-          const { updatedAt, createdAt, deletedAt, publicId, name } =
-            currentList;
+          const { updatedAt, createdAt, deletedAt, publicId, name } = currentList;
 
           groceryListsObject[groceryListPublicId] = {
             updatedAt,
@@ -99,16 +95,12 @@ export const getGroceryList = async (groceryListId: string, userId: number) => {
       .select()
       .from(groceryListTable)
       .where(
-        and(
-          eq(groceryListTable.publicId, groceryListId),
-          eq(groceryListTable.userId, userId),
-        ),
+        and(eq(groceryListTable.publicId, groceryListId), eq(groceryListTable.userId, userId)),
       );
 
     if (!fetchedGroceryList) return null;
 
-    const { updatedAt, createdAt, deletedAt, publicId, name } =
-      fetchedGroceryList;
+    const { updatedAt, createdAt, deletedAt, publicId, name } = fetchedGroceryList;
 
     const publicGroceryList = {
       updatedAt,
@@ -122,18 +114,12 @@ export const getGroceryList = async (groceryListId: string, userId: number) => {
     const ingredientRows = await db
       .select()
       .from(groceryListIngredientTable)
-      .leftJoin(
-        ingredientTable,
-        eq(ingredientTable.id, groceryListIngredientTable.ingredientId),
-      )
-      .where(
-        eq(groceryListIngredientTable.groceryListId, fetchedGroceryList.id),
-      );
+      .leftJoin(ingredientTable, eq(ingredientTable.id, groceryListIngredientTable.ingredientId))
+      .where(eq(groceryListIngredientTable.groceryListId, fetchedGroceryList.id));
 
     const ingredients = ingredientRows.map(
       ({ grocery_list_ingredients: groceryListIngredients, ingredients }) => {
-        const { publicId, name, capacity, quantity, unit, image } =
-          groceryListIngredients;
+        const { publicId, name, capacity, quantity, unit, image } = groceryListIngredients;
         return {
           publicId,
           name,
@@ -198,12 +184,13 @@ export const insertGroceryList = async ({
               )
           : [];
 
-      const ingredientIdMap = ingredientsFoundByPublicId.reduce<
-        Record<string, number>
-      >((ingredientMap, { publicId, id }) => {
-        ingredientMap[publicId] = id;
-        return ingredientMap;
-      }, {});
+      const ingredientIdMap = ingredientsFoundByPublicId.reduce<Record<string, number>>(
+        (ingredientMap, { publicId, id }) => {
+          ingredientMap[publicId] = id;
+          return ingredientMap;
+        },
+        {},
+      );
 
       const [insertedGroceryList] = await tx
         .insert(groceryListTable)
@@ -303,12 +290,13 @@ export const updateGroceryList = async ({
               )
           : [];
 
-      const ingredientIdMap = ingredientsFoundByPublicId.reduce<
-        Record<string, number>
-      >((ingredientMap, { publicId, id }) => {
-        ingredientMap[publicId] = id;
-        return ingredientMap;
-      }, {});
+      const ingredientIdMap = ingredientsFoundByPublicId.reduce<Record<string, number>>(
+        (ingredientMap, { publicId, id }) => {
+          ingredientMap[publicId] = id;
+          return ingredientMap;
+        },
+        {},
+      );
 
       for (const ingredient of updatedIngredients) {
         if (ingredient.publicId) {
@@ -332,8 +320,8 @@ export const updateGroceryList = async ({
         }
       }
 
-      const insertGroceryListIngredients: InsertGroceryListIngredient[] =
-        newIngredients.map((ingredient) => {
+      const insertGroceryListIngredients: InsertGroceryListIngredient[] = newIngredients.map(
+        (ingredient) => {
           return {
             ...ingredient,
             name: ingredient.name,
@@ -343,12 +331,11 @@ export const updateGroceryList = async ({
               ? (ingredientIdMap[ingredient.ingredientPublicId] ?? null)
               : null,
           };
-        });
+        },
+      );
 
       if (insertGroceryListIngredients.length > 0) {
-        await tx
-          .insert(groceryListIngredientTable)
-          .values(insertGroceryListIngredients);
+        await tx.insert(groceryListIngredientTable).values(insertGroceryListIngredients);
       }
 
       if (deletedIngredientIds.length > 0) {
@@ -357,10 +344,7 @@ export const updateGroceryList = async ({
           .where(
             and(
               eq(groceryListIngredientTable.groceryListId, groceryListId),
-              inArray(
-                groceryListIngredientTable.publicId,
-                deletedIngredientIds,
-              ),
+              inArray(groceryListIngredientTable.publicId, deletedIngredientIds),
             ),
           );
       }
@@ -368,9 +352,7 @@ export const updateGroceryList = async ({
       const sourceOfTruthIngredients = await tx
         .select()
         .from(groceryListIngredientTable)
-        .where(
-          eq(groceryListIngredientTable.groceryListId, updatedGroceryList.id),
-        );
+        .where(eq(groceryListIngredientTable.groceryListId, updatedGroceryList.id));
 
       return {
         ...updatedGroceryList,
@@ -382,19 +364,11 @@ export const updateGroceryList = async ({
   }
 };
 
-export const deleteGroceryList = async (
-  groceryListId: string,
-  userId: number,
-) => {
+export const deleteGroceryList = async (groceryListId: string, userId: number) => {
   try {
     const [deleted] = await db
       .delete(groceryListTable)
-      .where(
-        and(
-          eq(groceryListTable.publicId, groceryListId),
-          eq(groceryListTable.userId, userId),
-        ),
-      )
+      .where(and(eq(groceryListTable.publicId, groceryListId), eq(groceryListTable.userId, userId)))
       .returning({ publicId: groceryListTable.publicId });
     return deleted ?? null;
   } catch (error) {

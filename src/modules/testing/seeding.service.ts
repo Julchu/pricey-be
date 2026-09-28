@@ -84,28 +84,23 @@ export const insertRecipeIngredients = async (
     return [];
   }
 
-  const values = ingredientsToInsert.map(
-    ({ name, capacity, quantity, unit, image }) => {
-      const ingredientId = ingredientMap[name];
-      if (!ingredientId) {
-        console.warn(`Ingredient "${name}" not found in map`);
-      }
-      return {
-        recipeId,
-        ingredientId: ingredientId || null,
-        name,
-        capacity,
-        quantity,
-        unit,
-        image,
-      };
-    },
-  );
+  const values = ingredientsToInsert.map(({ name, capacity, quantity, unit, image }) => {
+    const ingredientId = ingredientMap[name];
+    if (!ingredientId) {
+      console.warn(`Ingredient "${name}" not found in map`);
+    }
+    return {
+      recipeId,
+      ingredientId: ingredientId || null,
+      name,
+      capacity,
+      quantity,
+      unit,
+      image,
+    };
+  });
 
-  const inserted = await db
-    .insert(recipeIngredientTable)
-    .values(values)
-    .returning();
+  const inserted = await db.insert(recipeIngredientTable).values(values).returning();
   console.log(`Inserted ${inserted.length} ingredients for recipe ${recipeId}`);
   return inserted;
 };
@@ -141,13 +136,8 @@ export const insertGroceryListIngredients = async (
     };
   });
 
-  const inserted = await db
-    .insert(groceryListIngredientTable)
-    .values(values)
-    .returning();
-  console.log(
-    `Inserted ${inserted.length} ingredients for grocery list ${groceryListId}`,
-  );
+  const inserted = await db.insert(groceryListIngredientTable).values(values).returning();
+  console.log(`Inserted ${inserted.length} ingredients for grocery list ${groceryListId}`);
   return inserted;
 };
 
@@ -162,9 +152,7 @@ export const insertPantryIngredients = async (
     .map(({ ingredientName, capacity, quantity, unit }) => {
       const ingredientId = ingredientMap[ingredientName];
       if (!ingredientId) {
-        console.warn(
-          `Ingredient "${ingredientName}" not found in map, skipping`,
-        );
+        console.warn(`Ingredient "${ingredientName}" not found in map, skipping`);
         return null;
       }
       return {
@@ -177,13 +165,8 @@ export const insertPantryIngredients = async (
     })
     .filter((v): v is NonNullable<typeof v> => v !== null);
 
-  const inserted = await db
-    .insert(pantryIngredientTable)
-    .values(values)
-    .returning();
-  console.log(
-    `Inserted ${inserted.length} pantry ingredients for user ${userId}`,
-  );
+  const inserted = await db.insert(pantryIngredientTable).values(values).returning();
+  console.log(`Inserted ${inserted.length} pantry ingredients for user ${userId}`);
   return inserted;
 };
 
@@ -195,9 +178,7 @@ export type SeedResult = {
   recipes: Awaited<ReturnType<typeof insertRecipes>>;
   groceryLists: Awaited<ReturnType<typeof insertGroceryLists>>;
   recipeIngredients: Awaited<ReturnType<typeof insertRecipeIngredients>>[];
-  groceryListIngredients: Awaited<
-    ReturnType<typeof insertGroceryListIngredients>
-  >[];
+  groceryListIngredients: Awaited<ReturnType<typeof insertGroceryListIngredients>>[];
   pantryIngredients: Awaited<ReturnType<typeof insertPantryIngredients>>;
 };
 
@@ -208,8 +189,7 @@ export const prefillDb = async (): Promise<SeedResult> => {
     const users = await insertUsers();
 
     const mainUser =
-      users.find((u) => u.email === process.env.MASTER_TEST_EMAIL) ||
-      users[users.length - 1];
+      users.find((u) => u.email === process.env.MASTER_TEST_EMAIL) || users[users.length - 1];
 
     if (!mainUser) {
       throw new Error("No users were inserted");
@@ -219,10 +199,8 @@ export const prefillDb = async (): Promise<SeedResult> => {
 
     const ingredients = await insertIngredients(mainUserId);
 
-    const ingredientMap = Object.fromEntries(
-      ingredients.map(({ name, id }) => [name, id]),
-    );
-    console.log(`Created ingredient map with ${ingredientMap.size} entries`);
+    const ingredientMap = Object.fromEntries(ingredients.map(({ name, id }) => [name, id]));
+    console.log(`Created ingredient map with ${Object.keys(ingredientMap).length} entries`);
 
     // Step 3: Insert recipes (depends on user)
     const recipes = await insertRecipes(mainUserId);
@@ -240,26 +218,18 @@ export const prefillDb = async (): Promise<SeedResult> => {
     }
 
     // Step 6: Insert grocery list ingredients (depends on grocery lists and ingredients)
-    const groceryListIngredientsResults: SeedResult["groceryListIngredients"] =
-      [];
+    const groceryListIngredientsResults: SeedResult["groceryListIngredients"] = [];
     for (let i = 0; i < groceryLists.length; i++) {
       const list = groceryLists[i];
       if (!list) continue;
-      const result = await insertGroceryListIngredients(
-        list.id,
-        i,
-        ingredientMap,
-      );
+      const result = await insertGroceryListIngredients(list.id, i, ingredientMap);
       groceryListIngredientsResults.push(result);
     }
 
     console.log("Database seeding completed successfully!");
 
     // Step 7: Insert pantry ingredients (depends on user and ingredients)
-    const pantryIngredients = await insertPantryIngredients(
-      mainUserId,
-      ingredientMap,
-    );
+    const pantryIngredients = await insertPantryIngredients(mainUserId, ingredientMap);
 
     return {
       users,

@@ -13,10 +13,7 @@ export const getPantry = async (userId: number) => {
     const rows = await db
       .select()
       .from(pantryIngredientTable)
-      .leftJoin(
-        ingredientTable,
-        eq(ingredientTable.id, pantryIngredientTable.ingredientId),
-      )
+      .leftJoin(ingredientTable, eq(ingredientTable.id, pantryIngredientTable.ingredientId))
       .where(eq(pantryIngredientTable.userId, userId));
 
     const ingredients: SelectPublicPantryIngredient[] = rows.map(
@@ -74,32 +71,31 @@ export const batchUpdatePantry = async ({
               )
           : [];
 
-      const ingredientIdMap = ingredientsFoundByPublicId.reduce<
-        Record<string, number>
-      >((map, { publicId, id }) => {
-        map[publicId] = id;
-        return map;
-      }, {});
+      const ingredientIdMap = ingredientsFoundByPublicId.reduce<Record<string, number>>(
+        (map, { publicId, id }) => {
+          map[publicId] = id;
+          return map;
+        },
+        {},
+      );
 
       // Insert new ingredients
       if (newIngredients.length > 0) {
-        const insertValues: InsertPantryIngredient[] = newIngredients.map(
-          (ingredient) => {
-            const ingredientId = ingredientIdMap[ingredient.ingredientPublicId];
-            if (!ingredientId) {
-              throw new Error(
-                `Master ingredient not found for publicId: ${ingredient.ingredientPublicId}`,
-              );
-            }
-            return {
-              quantity: ingredient.quantity ?? 1,
-              userId,
-              ingredientId,
-              capacity: ingredient.capacity,
-              unit: ingredient.unit,
-            };
-          },
-        );
+        const insertValues: InsertPantryIngredient[] = newIngredients.map((ingredient) => {
+          const ingredientId = ingredientIdMap[ingredient.ingredientPublicId];
+          if (!ingredientId) {
+            throw new Error(
+              `Master ingredient not found for publicId: ${ingredient.ingredientPublicId}`,
+            );
+          }
+          return {
+            quantity: ingredient.quantity ?? 1,
+            userId,
+            ingredientId,
+            capacity: ingredient.capacity,
+            unit: ingredient.unit,
+          };
+        });
 
         await tx
           .insert(pantryIngredientTable)
@@ -148,10 +144,7 @@ export const batchUpdatePantry = async ({
       const sourceOfTruth = await tx
         .select()
         .from(pantryIngredientTable)
-        .leftJoin(
-          ingredientTable,
-          eq(ingredientTable.id, pantryIngredientTable.ingredientId),
-        )
+        .leftJoin(ingredientTable, eq(ingredientTable.id, pantryIngredientTable.ingredientId))
         .where(eq(pantryIngredientTable.userId, userId));
 
       const ingredients: SelectPublicPantryIngredient[] = sourceOfTruth.map(

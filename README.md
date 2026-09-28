@@ -23,30 +23,30 @@ Running Postgres with Docker locally
   docker exec -it pricey-db bash
   psql -U priceyadmin -d pricey_db
   ```
-    - URL to connect to: `postgres://priceyadmin:priceypassword@localhost:5432/pricey_db`
-    - `--name pricey-db`: Container name (kebab-case, env-scoped — mirrors AWS RDS identifier convention)
-    - `-e POSTGRES_USER=priceyadmin`: Db master username (no hyphens/underscores — mirrors AWS RDS master username
-      rules)
-    - `-e POSTGRES_PASSWORD=priceypassword`: Replace with a strong password (avoid `@`, `/`, `?` — safe for connection
-      strings)
-    - `-e POSTGRES_DB=pricey_db`: Database name (snake_case, env-scoped — PostgreSQL identifiers cannot contain hyphens)
-    - `-p 5432:5432`: Exposes PostgreSQL on port 5432
-    - `-d postgres`: Runs the official PostgreSQL image in the background
 
+  - URL to connect to: `postgres://priceyadmin:priceypassword@localhost:5432/pricey_db`
+  - `--name pricey-db`: Container name (kebab-case, env-scoped — mirrors AWS RDS identifier convention)
+  - `-e POSTGRES_USER=priceyadmin`: Db master username (no hyphens/underscores — mirrors AWS RDS master username
+    rules)
+  - `-e POSTGRES_PASSWORD=priceypassword`: Replace with a strong password (avoid `@`, `/`, `?` — safe for connection
+    strings)
+  - `-e POSTGRES_DB=pricey_db`: Database name (snake_case, env-scoped — PostgreSQL identifiers cannot contain hyphens)
+  - `-p 5432:5432`: Exposes PostgreSQL on port 5432
+  - `-d postgres`: Runs the official PostgreSQL image in the background
 
 - Drop and recreate DB: log into separate database (`postgres`) to modify/delete main database (`pricey_db`)
-    - `-U`: user
-    - `-d`: database name
+  - `-U`: user
+  - `-d`: database name
 
 ```
 psql -U priceyadmin -d postgres
 ```
 
 - Inside psql:
-    - `\l`: view all databases
-    - `\du`: view all users
-    - Note: don't drop `postgres`, `template0`, or `template1` databases
-    - Sometimes might need to enter postgres db to delete other db: `\c postgres`
+  - `\l`: view all databases
+  - `\du`: view all users
+  - Note: don't drop `postgres`, `template0`, or `template1` databases
+  - Sometimes might need to enter postgres db to delete other db: `\c postgres`
 
 ```postgresql
 DROP DATABASE your_database_name;
@@ -74,6 +74,7 @@ Running Redis with Docker locally
   ```
 
 - Restart container/local database like local Postgres and Redis
+
   ```
   docker container ls -a
   docker container start pricey-db

@@ -69,8 +69,7 @@ const onError = (error: NodeSystemError) => {
 const onListening = () => {
   const addr = server.address();
   if (addr) {
-    const bind =
-      typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+    const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
     debugServer("Listening on " + bind);
   }
 };

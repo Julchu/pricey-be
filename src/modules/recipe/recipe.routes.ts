@@ -37,32 +37,29 @@ recipeRouter.get("/", async (req: AuthRequest, res) => {
   }
 });
 
-recipeRouter.get(
-  "/:recipeId",
-  async (req: AuthRequest<{ recipeId: string }>, res) => {
-    if (!req.userId) {
-      res.status(401).json({ success: false, error: "Invalid user ID" });
+recipeRouter.get("/:recipeId", async (req: AuthRequest<{ recipeId: string }>, res) => {
+  if (!req.userId) {
+    res.status(401).json({ success: false, error: "Invalid user ID" });
+    return;
+  }
+
+  try {
+    const recipe = await getRecipe(req.params.recipeId, req.userId);
+
+    if (!recipe) {
+      res.status(404).json({ success: false });
       return;
     }
 
-    try {
-      const recipe = await getRecipe(req.params.recipeId, req.userId);
-
-      if (!recipe) {
-        res.status(404).json({ success: false });
-        return;
-      }
-
-      res.json({
-        success: true,
-        data: recipe,
-      });
-    } catch (error) {
-      console.error("Failed to get recipe", error);
-      res.status(500).json({ success: false, error: "Failed to get recipe" });
-    }
-  },
-);
+    res.json({
+      success: true,
+      data: recipe,
+    });
+  } catch (error) {
+    console.error("Failed to get recipe", error);
+    res.status(500).json({ success: false, error: "Failed to get recipe" });
+  }
+});
 
 recipeRouter.post(
   "/",
@@ -175,10 +172,7 @@ recipeRouter.delete(
     }
 
     try {
-      const deletedRecipeId = await deleteRecipe(
-        req.params.recipePublicId,
-        req.userId,
-      );
+      const deletedRecipeId = await deleteRecipe(req.params.recipePublicId, req.userId);
 
       if (!deletedRecipeId) {
         res.status(404).json({
@@ -206,14 +200,7 @@ recipeRouter.delete(
 recipeRouter.post(
   "/:recipePublicId/image/presign",
   presignRateLimiter,
-  async (
-    req: AuthRequest<
-      { recipePublicId: string },
-      unknown,
-      { contentType: string }
-    >,
-    res,
-  ) => {
+  async (req: AuthRequest<{ recipePublicId: string }, unknown, { contentType: string }>, res) => {
     if (!req.userId) {
       res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
@@ -221,9 +208,7 @@ recipeRouter.post(
 
     const { contentType } = req.body;
     if (!isAllowedImageContentType(contentType)) {
-      res
-        .status(400)
-        .json({ success: false, error: "Unsupported image content type" });
+      res.status(400).json({ success: false, error: "Unsupported image content type" });
       return;
     }
 
@@ -264,10 +249,7 @@ recipeRouter.post(
 // resulting public URL onto the recipe.
 recipeRouter.patch(
   "/:recipePublicId/image",
-  async (
-    req: AuthRequest<{ recipePublicId: string }, unknown, { image: string }>,
-    res,
-  ) => {
+  async (req: AuthRequest<{ recipePublicId: string }, unknown, { image: string }>, res) => {
     if (!req.userId) {
       res.status(401).json({ success: false, error: "Invalid user ID" });
       return;
@@ -294,9 +276,7 @@ recipeRouter.patch(
       res.json({ success: true, data: updatedRecipe });
     } catch (error) {
       console.error("Failed to update recipe image", error);
-      res
-        .status(500)
-        .json({ success: false, error: "Failed to update recipe image" });
+      res.status(500).json({ success: false, error: "Failed to update recipe image" });
     }
   },
 );

@@ -34,18 +34,14 @@ export const pantryIngredientTable = pgTable(
   ],
 );
 
-export type SelectPantryIngredient = InferSelectModel<
-  typeof pantryIngredientTable
->;
+export type SelectPantryIngredient = InferSelectModel<typeof pantryIngredientTable>;
 
-export type InsertPantryIngredient = InferInsertModel<
-  typeof pantryIngredientTable
->;
+export type InsertPantryIngredient = InferInsertModel<typeof pantryIngredientTable>;
 
-export type SelectPublicPantryIngredient = Omit<
-  SelectPantryIngredient,
-  PrivateFields
-> & { ingredientPublicId: string; name: string };
+export type SelectPublicPantryIngredient = Omit<SelectPantryIngredient, PrivateFields> & {
+  ingredientPublicId: string;
+  name: string;
+};
 
 export type InsertPublicPantryIngredient = Omit<
   InsertPantryIngredient,

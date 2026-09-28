@@ -1,16 +1,12 @@
-import {
-  integer,
-  numeric,
-  pgTable,
-  unique,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { integer, numeric, pgTable, unique, varchar } from "drizzle-orm/pg-core";
+
 import {
   type AutomaticFields,
   type PrivateFields,
   requiredColumns,
   timestamps,
 } from "../utils/shared-schema";
+
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { ingredientTable, unitEnum } from "./ingredient.schema";
 import { recipeTable } from "./recipe.schema";
@@ -25,12 +21,9 @@ export const recipeIngredientTable = pgTable(
         onDelete: "cascade",
       })
       .notNull(),
-    ingredientId: integer("ingredient_id").references(
-      () => ingredientTable.id,
-      {
-        onDelete: "set null",
-      },
-    ),
+    ingredientId: integer("ingredient_id").references(() => ingredientTable.id, {
+      onDelete: "set null",
+    }),
     name: varchar({ length: 255 }).notNull(),
     capacity: numeric({ scale: 3, mode: "number" }),
     quantity: integer(),
@@ -40,25 +33,15 @@ export const recipeIngredientTable = pgTable(
   },
   (table) => [
     unique("unique_recipeIngredients").on(table.publicId),
-    unique("unique_recipeId_ingredientId").on(
-      table.recipeId,
-      table.ingredientId,
-    ),
+    unique("unique_recipeId_ingredientId").on(table.recipeId, table.ingredientId),
   ],
 );
 
-export type SelectRecipeIngredient = InferSelectModel<
-  typeof recipeIngredientTable
->;
+export type SelectRecipeIngredient = InferSelectModel<typeof recipeIngredientTable>;
 
-export type InsertRecipeIngredient = InferInsertModel<
-  typeof recipeIngredientTable
->;
+export type InsertRecipeIngredient = InferInsertModel<typeof recipeIngredientTable>;
 
-export type SelectPublicRecipeIngredient = Omit<
-  SelectRecipeIngredient,
-  PrivateFields
->;
+export type SelectPublicRecipeIngredient = Omit<SelectRecipeIngredient, PrivateFields>;
 
 export type InsertPublicRecipeIngredient = Omit<
   InsertRecipeIngredient,

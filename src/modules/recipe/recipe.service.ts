@@ -1,6 +1,10 @@
 import { db } from "../../db";
 import { and, eq, inArray } from "drizzle-orm";
-import { type InsertPublicRecipe, type InsertRecipe, recipeTable, } from "../../db/schemas/recipe.schema";
+import {
+  type InsertPublicRecipe,
+  type InsertRecipe,
+  recipeTable,
+} from "../../db/schemas/recipe.schema";
 import {
   type InsertPublicRecipeIngredient,
   type InsertRecipeIngredient,
@@ -16,14 +20,8 @@ export const getAllRecipes = async (userId: number) => {
     const rows = await db
       .select()
       .from(recipeTable)
-      .leftJoin(
-        recipeIngredientTable,
-        eq(recipeIngredientTable.recipeId, recipeTable.id),
-      )
-      .leftJoin(
-        ingredientTable,
-        eq(ingredientTable.id, recipeIngredientTable.ingredientId),
-      )
+      .leftJoin(recipeIngredientTable, eq(recipeIngredientTable.recipeId, recipeTable.id))
+      .leftJoin(ingredientTable, eq(ingredientTable.id, recipeIngredientTable.ingredientId))
       .where(eq(recipeTable.userId, userId));
 
     const results = rows.reduce<Record<string, Recipe>>(
@@ -38,8 +36,7 @@ export const getAllRecipes = async (userId: number) => {
         const recipePublicId = currentRecipe.publicId;
 
         if (!recipesObject[recipePublicId]) {
-          const { updatedAt, createdAt, deletedAt, publicId, name, image } =
-            currentRecipe;
+          const { updatedAt, createdAt, deletedAt, publicId, name, image } = currentRecipe;
 
           recipesObject[recipePublicId] = {
             updatedAt,
@@ -97,14 +94,11 @@ export const getRecipe = async (recipeId: string, userId: number) => {
     const [fetchedRecipe] = await db
       .select()
       .from(recipeTable)
-      .where(
-        and(eq(recipeTable.publicId, recipeId), eq(recipeTable.userId, userId)),
-      );
+      .where(and(eq(recipeTable.publicId, recipeId), eq(recipeTable.userId, userId)));
 
     if (!fetchedRecipe) return null;
 
-    const { updatedAt, createdAt, deletedAt, publicId, name, image } =
-      fetchedRecipe;
+    const { updatedAt, createdAt, deletedAt, publicId, name, image } = fetchedRecipe;
 
     const publicRecipe = {
       updatedAt,
@@ -119,10 +113,7 @@ export const getRecipe = async (recipeId: string, userId: number) => {
     const ingredientRows = await db
       .select()
       .from(recipeIngredientTable)
-      .leftJoin(
-        ingredientTable,
-        eq(ingredientTable.id, recipeIngredientTable.ingredientId),
-      )
+      .leftJoin(ingredientTable, eq(ingredientTable.id, recipeIngredientTable.ingredientId))
       .where(eq(recipeIngredientTable.recipeId, fetchedRecipe.id));
 
     const ingredients = ingredientRows.map((row) => {
@@ -186,12 +177,13 @@ export const insertRecipe = async ({
               )
           : [];
 
-      const ingredientIdMap = ingredientsFoundByPublicId.reduce<
-        Record<string, number>
-      >((ingredientMap, { publicId, id }) => {
-        ingredientMap[publicId] = id;
-        return ingredientMap;
-      }, {});
+      const ingredientIdMap = ingredientsFoundByPublicId.reduce<Record<string, number>>(
+        (ingredientMap, { publicId, id }) => {
+          ingredientMap[publicId] = id;
+          return ingredientMap;
+        },
+        {},
+      );
 
       const [insertedRecipe] = await tx
         .insert(recipeTable)
@@ -205,8 +197,8 @@ export const insertRecipe = async ({
       const recipeId = insertedRecipe?.id;
 
       if (recipeId && recipeIngredients.length > 0) {
-        const insertRecipeIngredients: InsertRecipeIngredient[] =
-          recipeIngredients.map((ingredient) => {
+        const insertRecipeIngredients: InsertRecipeIngredient[] = recipeIngredients.map(
+          (ingredient) => {
             return {
               ...ingredient,
               name: ingredient.name,
@@ -216,7 +208,8 @@ export const insertRecipe = async ({
                 ? (ingredientIdMap[ingredient.ingredientPublicId] ?? null)
                 : null,
             };
-          });
+          },
+        );
 
         const insertedRecipeIngredients = await tx
           .insert(recipeIngredientTable)
@@ -266,12 +259,7 @@ export const updateRecipe = async ({
           isPublic: recipe.isPublic,
           image: recipe.image,
         })
-        .where(
-          and(
-            eq(recipeTable.publicId, recipePublicId),
-            eq(recipeTable.userId, userId),
-          ),
-        )
+        .where(and(eq(recipeTable.publicId, recipePublicId), eq(recipeTable.userId, userId)))
         .returning();
 
       if (!updatedRecipe) {
@@ -295,12 +283,13 @@ export const updateRecipe = async ({
               )
           : [];
 
-      const ingredientIdMap = ingredientsFoundByPublicId.reduce<
-        Record<string, number>
-      >((ingredientMap, { publicId, id }) => {
-        ingredientMap[publicId] = id;
-        return ingredientMap;
-      }, {});
+      const ingredientIdMap = ingredientsFoundByPublicId.reduce<Record<string, number>>(
+        (ingredientMap, { publicId, id }) => {
+          ingredientMap[publicId] = id;
+          return ingredientMap;
+        },
+        {},
+      );
 
       for (const ingredient of updatedIngredients) {
         if (ingredient.publicId) {
@@ -324,18 +313,17 @@ export const updateRecipe = async ({
         }
       }
 
-      const insertRecipeIngredients: InsertRecipeIngredient[] =
-        newIngredients.map((ingredient) => {
-          return {
-            ...ingredient,
-            name: ingredient.name,
-            quantity: ingredient.quantity || 1,
-            recipeId,
-            ingredientId: ingredient.ingredientPublicId
-              ? (ingredientIdMap[ingredient.ingredientPublicId] ?? null)
-              : null,
-          };
-        });
+      const insertRecipeIngredients: InsertRecipeIngredient[] = newIngredients.map((ingredient) => {
+        return {
+          ...ingredient,
+          name: ingredient.name,
+          quantity: ingredient.quantity || 1,
+          recipeId,
+          ingredientId: ingredient.ingredientPublicId
+            ? (ingredientIdMap[ingredient.ingredientPublicId] ?? null)
+            : null,
+        };
+      });
 
       if (insertRecipeIngredients.length > 0) {
         await tx.insert(recipeIngredientTable).values(insertRecipeIngredients);
@@ -371,9 +359,7 @@ export const deleteRecipe = async (recipeId: string, userId: number) => {
   try {
     const [deleted] = await db
       .delete(recipeTable)
-      .where(
-        and(eq(recipeTable.publicId, recipeId), eq(recipeTable.userId, userId)),
-      )
+      .where(and(eq(recipeTable.publicId, recipeId), eq(recipeTable.userId, userId)))
       .returning({ publicId: recipeTable.publicId });
     return deleted ?? null;
   } catch (error) {
@@ -396,22 +382,12 @@ export const updateRecipeImage = async ({
     const [existing] = await db
       .select({ image: recipeTable.image })
       .from(recipeTable)
-      .where(
-        and(
-          eq(recipeTable.publicId, recipePublicId),
-          eq(recipeTable.userId, userId),
-        ),
-      );
+      .where(and(eq(recipeTable.publicId, recipePublicId), eq(recipeTable.userId, userId)));
 
     const [updatedRecipe] = await db
       .update(recipeTable)
       .set({ image })
-      .where(
-        and(
-          eq(recipeTable.publicId, recipePublicId),
-          eq(recipeTable.userId, userId),
-        ),
-      )
+      .where(and(eq(recipeTable.publicId, recipePublicId), eq(recipeTable.userId, userId)))
       .returning();
 
     if (updatedRecipe && existing?.image) {

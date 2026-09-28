@@ -28,19 +28,13 @@ export const getUserByEmail = async (email?: string) => {
 export const insertUser = async (user: InsertPublicUser) => {
   const { name, email, image } = user;
   try {
-    return await db
-      .insert(userTable)
-      .values({ name, email, image })
-      .returning();
+    return await db.insert(userTable).values({ name, email, image }).returning();
   } catch (error) {
     throw new Error("Error inserting user", { cause: error });
   }
 };
 
-export const updateUser = async (
-  userId: number,
-  updatedUser: InsertPublicUser,
-) => {
+export const updateUser = async (userId: number, updatedUser: InsertPublicUser) => {
   const { email, ...userInfo } = updatedUser;
   try {
     const existingUser = await db.query.userTable.findFirst({
@@ -48,7 +42,7 @@ export const updateUser = async (
     });
 
     if (existingUser)
-      return await db.update(userTable).set(userInfo).returning();
+      return await db.update(userTable).set(userInfo).where(eq(userTable.id, userId)).returning();
   } catch (error) {
     throw new Error("Error updating user", { cause: error });
   }

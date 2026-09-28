@@ -1,63 +1,141 @@
-// Can pass values to req; ex: req.userId = "userId"; console.log(req['userId])
 import type { AuthRequest } from "../../types";
 import type { NextFunction, Response } from "express";
-import { jwtVerify, SignJWT } from "jose";
+import { errors as joseErrors, jwtVerify, SignJWT } from "jose";
 import { getUserByEmail, insertUser } from "../../modules/user/user.service";
-
 import { OAuth2Client } from "google-auth-library";
+import {
+  refreshTokenIsCurrent,
+  revokeUserRefreshTokens,
+  storeRefreshToken,
+} from "./refresh-tokens";
 
-type JwtPayload = {
+const JWT_ISSUER = "pricey";
+const JWT_AUDIENCE = "pricey-api";
+const ACCESS_MAX_AGE_MS = 60 * 60 * 1000;
+const REFRESH_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+type TokenType = "access" | "refresh";
+
+type TokenClaims = {
   userId: number;
+  typ: TokenType;
 };
 
-// TODO: log out google session
-export const googleLogout = async () => {
-  //   const client = new OAuth2Client({
-  //     clientId: process.env.GOOGLE_CLIENT_ID,
-  //     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  //     redirectUri: process.env.GOOGLE_REDIRECT_URIS,
-  //   });
-  //
-  //   client.revokeToken()
+export const allowsDevMasterKey = (token?: string) => {
+  if (process.env.NODE_ENV !== "development" || !token) return false;
+  const masterKey = process.env.MASTER_KEY;
+  if (!masterKey) return false;
+  return token === masterKey;
 };
 
-export const verifyGoogleToken = async (code: string) => {
+const hmacKey = (secret: string | undefined, name: string) => {
+  if (!secret || secret.length < 32) {
+    console.error(`${name} must be at least 32 characters`);
+    return;
+  }
+  return new TextEncoder().encode(secret);
+};
+
+export const bearerToken = (header?: string) => {
+  if (!header?.startsWith("Bearer ")) return;
+  const token = header.slice("Bearer ".length).trim();
+  return token || undefined;
+};
+
+const verifySignedToken = async (
+  token: string,
+  secret: string | undefined,
+  secretName: string,
+  expectedType: TokenType,
+): Promise<{ userId: number; jti?: string } | undefined> => {
+  const key = hmacKey(secret, secretName);
+  if (!key) return;
+
+  try {
+    const { payload } = await jwtVerify(token, key, {
+      algorithms: ["HS256"],
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE,
+    });
+
+    if (payload.typ !== expectedType) return;
+    if (typeof payload.userId !== "number") return;
+
+    return { userId: payload.userId, jti: payload.jti };
+  } catch (error) {
+    if (error instanceof joseErrors.JOSEError) return;
+    throw error;
+  }
+};
+
+export const verifyGoogleCode = async (code: string, codeVerifier: string) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const redirectUri = process.env.GOOGLE_REDIRECT_URIS;
+  if (!clientId || !clientSecret || !redirectUri) return;
+
   const client = new OAuth2Client({
-    clientId: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    redirectUri: process.env.GOOGLE_REDIRECT_URIS,
+    clientId,
+    clientSecret,
+    redirectUri,
   });
 
-  const { tokens } = await client.getToken(code); // exchanges code for tokens
+  let idToken: string | undefined;
+  try {
+    const { tokens } = await client.getToken({ code, codeVerifier });
+    idToken = tokens.id_token ?? undefined;
+  } catch (error) {
+    console.error("Google token exchange failed", error instanceof Error ? error.name : "unknown");
+    return;
+  }
 
-  if (!tokens.id_token) return;
+  if (!idToken) return;
 
   const ticket = await client.verifyIdToken({
-    idToken: tokens.id_token!,
-    audience: process.env.GOOGLE_CLIENT_ID!,
+    idToken,
+    audience: clientId,
   });
 
   const payload = ticket.getPayload();
-  if (payload && payload.email_verified) {
-    return {
-      email: payload.email,
-      name: payload.name,
-      picture: payload.picture,
-    };
-  }
+  if (!payload?.email_verified || !payload.email) return;
+
+  return {
+    email: payload.email,
+    name: payload.name,
+    picture: payload.picture,
+  };
 };
 
-export const verifyPriceyToken = async (token?: string, secret?: string) => {
-  if (!token || !secret) return;
+export const verifyAccessToken = async (token?: string) => {
+  if (!token) return;
 
-  if (token === process.env.MASTER_KEY) {
-    const userInfo = await getUserByEmail(process.env.MASTER_TEST_EMAIL);
-    return { payload: { userId: userInfo?.id } };
+  if (allowsDevMasterKey(token)) {
+    const user = await getUserByEmail(process.env.MASTER_TEST_EMAIL);
+    if (!user?.id) return;
+    return { userId: user.id };
   }
 
-  const encodedSecret = new TextEncoder().encode(secret);
+  const payload = await verifySignedToken(
+    token,
+    process.env.JWT_ACCESS_SECRET,
+    "JWT_ACCESS_SECRET",
+    "access",
+  );
+  if (!payload) return;
+  return { userId: payload.userId };
+};
 
-  return await jwtVerify<JwtPayload>(token, encodedSecret);
+export const verifyRefreshToken = async (token?: string) => {
+  if (!token) return;
+
+  const payload = await verifySignedToken(
+    token,
+    process.env.JWT_REFRESH_SECRET,
+    "JWT_REFRESH_SECRET",
+    "refresh",
+  );
+  if (!payload?.jti) return;
+  return { userId: payload.userId, jti: payload.jti };
 };
 
 export const createTokens = async ({
@@ -69,145 +147,149 @@ export const createTokens = async ({
 }) => {
   if (!userId) return;
 
-  const payload: JwtPayload = {
+  const accessKey = hmacKey(process.env.JWT_ACCESS_SECRET, "JWT_ACCESS_SECRET");
+  if (!accessKey) return;
+
+  const accessExpiresAt = new Date(Date.now() + ACCESS_MAX_AGE_MS);
+  const accessToken = await new SignJWT({
     userId,
-  };
+    typ: "access",
+  } satisfies TokenClaims)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(JWT_ISSUER)
+    .setAudience(JWT_AUDIENCE)
+    .setIssuedAt()
+    .setExpirationTime(Math.floor(accessExpiresAt.getTime() / 1000))
+    .sign(accessKey);
 
-  const accessSecret = new TextEncoder().encode(process.env.JWT_ACCESS_SECRET);
-  const refreshSecret = new TextEncoder().encode(
-    process.env.JWT_REFRESH_SECRET,
-  );
+  if (!refreshToken) return { accessToken };
 
-  return {
-    accessToken: await new SignJWT(payload)
-      .setProtectedHeader({ alg: "HS256" })
-      .setIssuedAt()
-      .setExpirationTime("1h")
-      .sign(accessSecret),
-    ...(refreshToken && {
-      refreshToken: await new SignJWT(payload)
-        .setProtectedHeader({ alg: "HS256" })
-        .setIssuedAt()
-        .setExpirationTime("7d")
-        .sign(refreshSecret),
-    }),
-  };
+  const refreshKey = hmacKey(process.env.JWT_REFRESH_SECRET, "JWT_REFRESH_SECRET");
+  if (!refreshKey) return;
+
+  const jti = crypto.randomUUID();
+  const refreshExpiresAt = new Date(Date.now() + REFRESH_MAX_AGE_MS);
+  await storeRefreshToken({
+    userId,
+    jti,
+    expiresAt: refreshExpiresAt,
+  });
+
+  const signedRefreshToken = await new SignJWT({
+    userId,
+    typ: "refresh",
+  } satisfies TokenClaims)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(JWT_ISSUER)
+    .setAudience(JWT_AUDIENCE)
+    .setJti(jti)
+    .setIssuedAt()
+    .setExpirationTime(Math.floor(refreshExpiresAt.getTime() / 1000))
+    .sign(refreshKey);
+
+  return { accessToken, refreshToken: signedRefreshToken };
 };
 
-/**
- * Login: checks existence of user before returning accessToken; validates Google token
- * Register: creates new user (if error isn't thrown) and returns accessToken
- * userSetter: checks header auth accessToken in any API call (that isn't login/register)
- * */
-export const loginCheck = async (idToken?: string) => {
-  if (!idToken) return;
+export const loginWithGoogleCode = async (code?: string, codeVerifier?: string) => {
+  if (!code || !codeVerifier) return;
 
+  const account = await verifyGoogleCode(code, codeVerifier);
+  if (!account?.email || !account.name) return;
+
+  let fetchedUser = await getUserByEmail(account.email);
+
+  if (!fetchedUser) {
+    const [newUser] = await insertUser({
+      email: account.email,
+      name: account.name,
+      image: account.picture,
+    });
+    fetchedUser = newUser;
+  }
+
+  if (!fetchedUser) return;
+
+  const tokens = await createTokens({
+    userId: fetchedUser.id,
+    refreshToken: true,
+  });
+  if (!tokens?.refreshToken) return;
+  return tokens;
+};
+
+export const refreshSession = async (token?: string) => {
+  const current = await verifyRefreshToken(token);
+  if (!current) return;
+
+  const stillCurrent = await refreshTokenIsCurrent(current);
+  if (!stillCurrent) return;
+
+  return createTokens({ userId: current.userId });
+};
+
+export const logoutSession = async (accessToken?: string, refreshToken?: string) => {
   try {
-    const verifiedGoogleAccount = await verifyGoogleToken(idToken);
+    // The refresh token identifies the session to revoke; fall back to the
+    // access token so logout still works if the refresh cookie is gone.
+    const session =
+      (await verifyRefreshToken(refreshToken)) ??
+      (allowsDevMasterKey(accessToken) ? undefined : await verifyAccessToken(accessToken));
 
-    let fetchedUser = await getUserByEmail(verifiedGoogleAccount?.email);
-
-    // Register a new account
-    if (
-      !fetchedUser &&
-      verifiedGoogleAccount?.email &&
-      verifiedGoogleAccount?.name
-    ) {
-      const [newUser] = await insertUser({
-        email: verifiedGoogleAccount?.email || "",
-        name: verifiedGoogleAccount?.name || "",
-        image: verifiedGoogleAccount?.picture,
-      });
-      fetchedUser = newUser;
-    }
-
-    if (!fetchedUser) return;
-
-    const { id, ...userInfo } = fetchedUser;
-    const tokens = await createTokens({ userId: id, refreshToken: true });
-    return {
-      tokens,
-      userInfo,
-    };
+    if (session) await revokeUserRefreshTokens(session.userId);
   } catch (error) {
-    throw new Error("Failed to login", { cause: error });
+    console.error("Failed to revoke session", error instanceof Error ? error.name : "unknown");
   }
 };
 
-// Need userSetter/userRefresher and AuthRequest req type to pass req.userId
-export const userSetter = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction,
-) => {
+export const userSetter = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const token = req.header("Authorization")?.split("Bearer ")[1];
+    const token = bearerToken(req.header("Authorization"));
 
     if (!token) {
-      res.status(401).json({ error: "Missing access token" });
+      res.status(401).json({ success: false, error: "Missing access token" });
       return;
     }
 
-    const auth = await verifyPriceyToken(token, process.env.JWT_ACCESS_SECRET);
-    if (auth) {
-      req.userId = auth.payload.userId;
-      next();
-    } else {
-      res.status(401).json({ error: "Unauthorized" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: `Internal server error, ${error}` });
-    return;
-  }
-};
-
-export const userRefresher = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const token = req.header("Authorization")?.split("Bearer ")[1];
-
-    if (!token) {
-      res.status(401).json({ error: "Missing refresh token" });
+    const auth = await verifyAccessToken(token);
+    if (!auth) {
+      res.status(401).json({ success: false, error: "Unauthorized" });
       return;
     }
 
-    const auth = await verifyPriceyToken(token, process.env.JWT_REFRESH_SECRET);
-    if (auth) {
-      req.userId = auth.payload.userId;
-      next();
-    } else {
-      res.status(401).json({ error: "Unauthorized" });
-    }
+    req.userId = auth.userId;
+    next();
   } catch (error) {
-    res.status(500).json({ error: `Internal server error, ${error}` });
-    return;
+    console.error("Auth failed", error instanceof Error ? error.name : "unknown");
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
 
-export const setAuthCookies = (
-  res: Response,
-  accessToken?: string,
-  refreshToken?: string,
-) => {
+const cookieOptions = (maxAge?: number) => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  ...(maxAge !== undefined && { maxAge }),
+});
+
+export const setAuthCookies = (res: Response, accessToken?: string, refreshToken?: string) => {
   const accessTokenKey = process.env.ACCESS_TOKEN_KEY;
   const refreshTokenKey = process.env.REFRESH_TOKEN_KEY;
 
-  if (accessTokenKey && accessToken)
-    res.cookie(accessTokenKey, accessToken, {
-      httpOnly: true, // To make it inaccessible to JavaScript
-      secure: process.env.NODE_ENV === "production", // Only set true over HTTPS in production
-      sameSite: "lax",
-      maxAge: 3600000, // 1-hour expiration time
-    });
+  if (accessTokenKey && accessToken) {
+    res.cookie(accessTokenKey, accessToken, cookieOptions(ACCESS_MAX_AGE_MS));
+  }
 
-  if (refreshTokenKey && refreshToken)
-    res.cookie("pricey_refresh_token", refreshToken, {
-      httpOnly: true, // To make it inaccessible to JavaScript
-      secure: process.env.NODE_ENV === "production", // Only set true over HTTPS in production
-      sameSite: "lax",
-      maxAge: 604800000, // 7-day expiration time
-    });
+  if (refreshTokenKey && refreshToken) {
+    res.cookie(refreshTokenKey, refreshToken, cookieOptions(REFRESH_MAX_AGE_MS));
+  }
+};
+
+export const clearAuthCookies = (res: Response) => {
+  const accessTokenKey = process.env.ACCESS_TOKEN_KEY;
+  const refreshTokenKey = process.env.REFRESH_TOKEN_KEY;
+  const options = cookieOptions();
+
+  if (accessTokenKey) res.clearCookie(accessTokenKey, options);
+  if (refreshTokenKey) res.clearCookie(refreshTokenKey, options);
 };

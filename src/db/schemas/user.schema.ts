@@ -28,16 +28,10 @@ export const userTable = pgTable(
       .notNull(),
     ...timestamps,
   },
-  (table) => [
-    unique("unique_user").on(table.publicId),
-    unique("unique_userEmail").on(table.email),
-  ],
+  (table) => [unique("unique_user").on(table.publicId), unique("unique_userEmail").on(table.email)],
 );
 
 export type SelectUser = InferSelectModel<typeof userTable>;
 export type InsertUser = InferInsertModel<typeof userTable>;
 export type SelectPublicUser = Omit<SelectUser, PrivateFields>;
-export type InsertPublicUser = Omit<
-  InsertUser,
-  PrivateFields & AutomaticFields
->;
+export type InsertPublicUser = Omit<InsertUser, PrivateFields & AutomaticFields>;

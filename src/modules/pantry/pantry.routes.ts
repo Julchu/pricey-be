@@ -1,9 +1,6 @@
 import { Router } from "express";
 import { batchUpdatePantry, getPantry } from "./pantry.service.ts";
-import {
-  type BatchUpdatePantryInput,
-  batchUpdatePantrySchema,
-} from "./pantry.validation.ts";
+import { type BatchUpdatePantryInput, batchUpdatePantrySchema } from "./pantry.validation.ts";
 import type { AuthRequest } from "../../types";
 
 export const pantryRouter = Router();
@@ -23,32 +20,29 @@ pantryRouter.get("/", async (req: AuthRequest, res) => {
   }
 });
 
-pantryRouter.patch(
-  "/",
-  async (req: AuthRequest<unknown, unknown, BatchUpdatePantryInput>, res) => {
-    if (!req.userId) {
-      res.status(401).json({ success: false, error: "Invalid user ID" });
-      return;
-    }
+pantryRouter.patch("/", async (req: AuthRequest<unknown, unknown, BatchUpdatePantryInput>, res) => {
+  if (!req.userId) {
+    res.status(401).json({ success: false, error: "Invalid user ID" });
+    return;
+  }
 
-    const { data, error } = batchUpdatePantrySchema.safeParse(req.body);
-    if (error) {
-      res.status(400).json({ success: false, error: error.message });
-      return;
-    }
+  const { data, error } = batchUpdatePantrySchema.safeParse(req.body);
+  if (error) {
+    res.status(400).json({ success: false, error: error.message });
+    return;
+  }
 
-    try {
-      const pantryIngredients = await batchUpdatePantry({
-        userId: req.userId,
-        newIngredients: data.newIngredients,
-        updatedIngredients: data.updatedIngredients,
-        deletedIngredientIds: data.deletedIngredientIds,
-      });
+  try {
+    const pantryIngredients = await batchUpdatePantry({
+      userId: req.userId,
+      newIngredients: data.newIngredients,
+      updatedIngredients: data.updatedIngredients,
+      deletedIngredientIds: data.deletedIngredientIds,
+    });
 
-      res.json({ success: true, data: pantryIngredients });
-    } catch (error) {
-      console.error("Failed to update pantry", error);
-      res.status(500).json({ success: false, error: "Internal Server Error" });
-    }
-  },
-);
+    res.json({ success: true, data: pantryIngredients });
+  } catch (error) {
+    console.error("Failed to update pantry", error);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+});

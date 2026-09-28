@@ -1,10 +1,4 @@
-import {
-  boolean,
-  integer,
-  pgTable,
-  unique,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, unique, varchar } from "drizzle-orm/pg-core";
 import {
   type AutomaticFields,
   type PrivateFields,
@@ -37,7 +31,4 @@ export const recipeTable = pgTable(
 export type SelectRecipe = InferSelectModel<typeof recipeTable>;
 export type InsertRecipe = InferInsertModel<typeof recipeTable>;
 export type SelectPublicRecipe = Omit<SelectRecipe, PrivateFields>;
-export type InsertPublicRecipe = Omit<
-  InsertRecipe,
-  PrivateFields | AutomaticFields
->;
+export type InsertPublicRecipe = Omit<InsertRecipe, PrivateFields | AutomaticFields>;
