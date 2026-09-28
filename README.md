@@ -55,7 +55,7 @@ CREATE DATABASE your_database_name;
 
 Running MinIO (S3-like image storage) with Docker locally
 
-```docker
+```bash
 docker run -d \
   --name pricey_images \
   -p 8003:9000 \
@@ -65,6 +65,25 @@ docker run -d \
   -v minio-data:/data \
   minio/minio server /data --console-address ":9001"
 ```
+
+- `-p 8003:9000`: S3 API on the host — presigned uploads and public image URLs (use this port in `S3_ENDPOINT`, not `9000`)
+- `-p 8004:9001`: MinIO web console at `http://localhost:8004`
+- `-e MINIO_ROOT_USER` / `-e MINIO_ROOT_PASSWORD`: root credentials (same values as S3 access key / secret below)
+
+**MinIO console login:** username `pricey_admin`, password `pricey_password`
+
+**`.env.development` (local only):** point the backend at MinIO with the host-mapped API port:
+
+```env
+S3_REGION="us-east-1"
+S3_ENDPOINT="http://localhost:8003"
+S3_ACCESS_KEY_ID="pricey_admin"
+S3_SECRET_ACCESS_KEY="pricey_password"
+```
+
+Leave `S3_ENDPOINT` unset in staging/production so the AWS SDK uses real S3.
+
+Restart an existing MinIO container: `docker start pricey_images`
 
 Running Redis with Docker locally
 
@@ -78,6 +97,7 @@ Running Redis with Docker locally
   ```
   docker container ls -a
   docker container start pricey-db
+  docker container start pricey_images
   docker container start redis-dev
   ```
 
