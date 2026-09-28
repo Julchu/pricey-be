@@ -10,7 +10,6 @@ export const seedUsers: InsertPublicUser[] = [
   {
     name: "Alice Johnson",
     email: "alice@example.com",
-    image: "https://example.com/images/alice.jpg",
     preferences: {
       units: { mass: Unit.KILOGRAM, volume: Unit.LITRE },
       colorMode: Color.LIGHT,
@@ -20,7 +19,6 @@ export const seedUsers: InsertPublicUser[] = [
   {
     name: "Bob Smith",
     email: "bob@example.com",
-    image: "https://example.com/images/bob.jpg",
     preferences: {
       units: { mass: Unit.POUND, volume: Unit.QUART },
       colorMode: Color.DARK,
@@ -30,7 +28,6 @@ export const seedUsers: InsertPublicUser[] = [
   {
     name: "Cathy Lee",
     email: "cathy@example.com",
-    image: "https://example.com/images/cathy.jpg",
     preferences: {
       units: { mass: Unit.KILOGRAM, volume: Unit.LITRE },
       colorMode: Color.DARK,
@@ -40,7 +37,6 @@ export const seedUsers: InsertPublicUser[] = [
   {
     name: "David Kim",
     email: "david@example.com",
-    image: "https://example.com/images/david.jpg",
     preferences: {
       units: { mass: Unit.POUND, volume: Unit.QUART },
       colorMode: Color.LIGHT,
@@ -50,7 +46,6 @@ export const seedUsers: InsertPublicUser[] = [
   {
     name: "Ella Martinez",
     email: "ella@example.com",
-    image: "https://example.com/images/ella.jpg",
     preferences: {
       units: { mass: Unit.KILOGRAM, volume: Unit.LITRE },
       colorMode: Color.LIGHT,
@@ -60,7 +55,6 @@ export const seedUsers: InsertPublicUser[] = [
   {
     name: "Frank Zhao",
     email: "frank@example.com",
-    image: "https://example.com/images/frank.jpg",
     preferences: {
       units: { mass: Unit.POUND, volume: Unit.QUART },
       colorMode: Color.DARK,
@@ -70,7 +64,6 @@ export const seedUsers: InsertPublicUser[] = [
   {
     name: "Grace Park",
     email: "grace@example.com",
-    image: "https://example.com/images/grace.jpg",
     preferences: {
       units: { mass: Unit.KILOGRAM, volume: Unit.LITRE },
       colorMode: Color.DARK,
@@ -80,7 +73,6 @@ export const seedUsers: InsertPublicUser[] = [
   {
     name: "Henry Chen",
     email: "henry@example.com",
-    image: "https://example.com/images/henry.jpg",
     preferences: {
       units: { mass: Unit.POUND, volume: Unit.QUART },
       colorMode: Color.LIGHT,
@@ -90,7 +82,6 @@ export const seedUsers: InsertPublicUser[] = [
   {
     name: "Isla Nguyen",
     email: "isla@example.com",
-    image: "https://example.com/images/isla.jpg",
     preferences: {
       units: { mass: Unit.KILOGRAM, volume: Unit.LITRE },
       colorMode: Color.LIGHT,
@@ -100,7 +91,6 @@ export const seedUsers: InsertPublicUser[] = [
   {
     name: "Jake Rivera",
     email: "jake@example.com",
-    image: "https://example.com/images/jake.jpg",
     preferences: {
       units: { mass: Unit.POUND, volume: Unit.QUART },
       colorMode: Color.DARK,
@@ -126,7 +116,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Olive Oil",
     price: 1000,
     unit: Unit.LITRE,
-    image: "https://example.com/olive_oil.jpg",
     capacity: 1,
     quantity: 2,
   },
@@ -134,7 +123,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Basil",
     price: 150,
     unit: Unit.PIECES,
-    image: "https://example.com/basil.jpg",
     capacity: 3,
     quantity: 1,
     season: Season.SPRING,
@@ -143,7 +131,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Chicken Breast",
     price: 700,
     unit: Unit.KILOGRAM,
-    image: "https://example.com/chicken.jpg",
     capacity: 2,
     quantity: 1,
   },
@@ -151,7 +138,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Garlic",
     price: 300,
     unit: Unit.KILOGRAM,
-    image: "https://example.com/garlic.jpg",
     capacity: 2,
     quantity: 1,
   },
@@ -159,7 +145,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Tomato",
     price: 250,
     unit: Unit.KILOGRAM,
-    image: "https://example.com/tomato.jpg",
     capacity: 5,
     quantity: 2,
     season: Season.SUMMER,
@@ -168,7 +153,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Spaghetti",
     price: 350,
     unit: Unit.PIECES,
-    image: "https://example.com/spaghetti.jpg",
     capacity: 1,
     quantity: 3,
   },
@@ -176,7 +160,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Ground Beef",
     price: 1200,
     unit: Unit.KILOGRAM,
-    image: "https://example.com/beef.jpg",
     capacity: 1,
     quantity: 2,
   },
@@ -184,7 +167,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Onion",
     price: 150,
     unit: Unit.KILOGRAM,
-    image: "https://example.com/onion.jpg",
     capacity: 1,
     quantity: 5,
     season: Season.FALL,
@@ -193,7 +175,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Carrot",
     price: 200,
     unit: Unit.KILOGRAM,
-    image: "https://example.com/carrot.jpg",
     capacity: 1,
     quantity: 4,
     season: Season.WINTER,
@@ -202,7 +183,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Bell Pepper",
     price: 400,
     unit: Unit.PIECES,
-    image: "https://example.com/pepper.jpg",
     capacity: 1,
     quantity: 6,
     season: Season.SUMMER,
@@ -211,7 +191,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Milk",
     price: 500,
     unit: Unit.LITRE,
-    image: "https://example.com/milk.jpg",
     capacity: 2,
     quantity: 1,
   },
@@ -219,7 +198,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Eggs",
     price: 600,
     unit: Unit.PIECES,
-    image: "https://example.com/eggs.jpg",
     capacity: 12,
     quantity: 1,
   },
@@ -227,7 +205,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Flour",
     price: 300,
     unit: Unit.KILOGRAM,
-    image: "https://example.com/flour.jpg",
     capacity: 5,
     quantity: 1,
   },
@@ -235,7 +212,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Sugar",
     price: 250,
     unit: Unit.KILOGRAM,
-    image: "https://example.com/sugar.jpg",
     capacity: 2,
     quantity: 1,
   },
@@ -243,7 +219,6 @@ export const seedIngredients: InsertPublicIngredient[] = [
     name: "Butter",
     price: 800,
     unit: Unit.PIECES,
-    image: "https://example.com/butter.jpg",
     capacity: 1,
     quantity: 2,
   },
@@ -423,10 +398,7 @@ export interface GroceryListIngredientSeed {
   image?: string;
 }
 
-export const seedGroceryListIngredients: Record<
-  number,
-  GroceryListIngredientSeed[]
-> = {
+export const seedGroceryListIngredients: Record<number, GroceryListIngredientSeed[]> = {
   // Soup
   0: [
     { ingredientName: "Carrot", capacity: 1, quantity: 5, unit: Unit.PIECES },
