@@ -7,10 +7,10 @@ Installation reminders
 
 Cleaning up migrations
 
-- Find the old .sql file(s) in `./drizzle` and copy name(s)
+- Find the old .sql file (s) in `./drizzle` and copy name (s)
 - In Terminal run `shasum -a 256 <file-path>`
 - Remove the corresponding entry in `db/drizzle/__drizzle_migrations`
-- Remove the .sql file(s)
+- Remove the .sql file (s)
 - Remove the entries in `./drizzle/meta/_journal.json`
 
 Running Postgres with Docker locally
@@ -24,50 +24,54 @@ Running Postgres with Docker locally
   psql -U priceyadmin -d pricey_db
   ```
 
-  - URL to connect to: `postgres://priceyadmin:priceypassword@localhost:5432/pricey_db`
-  - `--name pricey-db`: Container name (kebab-case, env-scoped — mirrors AWS RDS identifier convention)
-  - `-e POSTGRES_USER=priceyadmin`: Db master username (no hyphens/underscores — mirrors AWS RDS master username
-    rules)
-  - `-e POSTGRES_PASSWORD=priceypassword`: Replace with a strong password (avoid `@`, `/`, `?` — safe for connection
-    strings)
-  - `-e POSTGRES_DB=pricey_db`: Database name (snake_case, env-scoped — PostgreSQL identifiers cannot contain hyphens)
-  - `-p 5432:5432`: Exposes PostgreSQL on port 5432
-  - `-d postgres`: Runs the official PostgreSQL image in the background
+    - URL to connect to: `postgres://priceyadmin:priceypassword@localhost:5432/pricey_db`
+    - `--name pricey-db`: Container name (kebab-case, env-scoped — mirrors AWS RDS identifier convention)
+    - `-e POSTGRES_USER=priceyadmin`: Db master username (no hyphens/underscores — mirrors AWS RDS master username
+      rules)
+    - `-e POSTGRES_PASSWORD=priceypassword`: Replace with a strong password (avoid `@`, `/`, `?` — safe for connection
+      strings)
+    - `-e POSTGRES_DB=pricey_db`: Database name (snake_case, env-scoped — PostgreSQL identifiers cannot contain hyphens)
+    - `-p 5432:5432`: Exposes PostgreSQL on port 5432
+    - `-d postgres`: Runs the official PostgreSQL image in the background
 
 - Drop and recreate DB: log into separate database (`postgres`) to modify/delete main database (`pricey_db`)
-  - `-U`: user
-  - `-d`: database name
+    - `-U`: user
+    - `-d`: database name
 
 ```
 psql -U priceyadmin -d postgres
 ```
 
 - Inside psql:
-  - `\l`: view all databases
-  - `\du`: view all users
-  - Note: don't drop `postgres`, `template0`, or `template1` databases
-  - Sometimes might need to enter postgres db to delete other db: `\c postgres`
+    - `\l`: view all databases
+    - `\du`: view all users
+    - Note: don't drop `postgres`, `template0`, or `template1` databases
+    - Sometimes might need to enter postgres db to delete other db: `\c postgres`
 
 ```postgresql
 DROP DATABASE your_database_name;
 CREATE DATABASE your_database_name;
+DROP USER user;
 ```
 
 Running MinIO (S3-like image storage) with Docker locally
 
 ```bash
 docker run -d \
-  --name pricey_images \
-  -p 8003:9000 \
-  -p 8004:9001 \
+  --name pricey-images \
+  -p 8003:8003 \
+  -p 8004:8004 \
   -e MINIO_ROOT_USER=pricey_admin \
   -e MINIO_ROOT_PASSWORD=pricey_password \
   -v minio-data:/data \
-  minio/minio server /data --console-address ":9001"
+  minio/minio server /data \
+    --address ":8003" \
+    --console-address ":8004"
 ```
 
-- `-p 8003:9000`: S3 API on the host — presigned uploads and public image URLs (use this port in `S3_ENDPOINT`, not `9000`)
-- `-p 8004:9001`: MinIO web console at `http://localhost:8004`
+- `-p 8003:8003`: S3 API on the host — presigned uploads and public image URLs (use this port in `S3_ENDPOINT`, not
+  `8003`)
+- `-p 8004:8004`: MinIO web console at `http://localhost:8004`
 - `-e MINIO_ROOT_USER` / `-e MINIO_ROOT_PASSWORD`: root credentials (same values as S3 access key / secret below)
 
 **MinIO console login:** username `pricey_admin`, password `pricey_password`

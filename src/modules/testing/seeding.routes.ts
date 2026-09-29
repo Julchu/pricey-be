@@ -26,7 +26,7 @@ seedingRouter.get("/test-user-required", userSetter, async (req: AuthRequest, re
   res.json({ title: "The Pricey App" });
 });
 
-seedingRouter.post("/seed/reset", userSetter, async (req, res) => {
+seedingRouter.post("/seed/reset", async (req, res) => {
   try {
     const token = req.header("Authorization")?.split("Bearer ")[1];
     if (allowsDevMasterKey(token)) {
