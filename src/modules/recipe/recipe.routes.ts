@@ -37,6 +37,7 @@ recipeRouter.get("/", async (req: AuthRequest, res) => {
   }
 });
 
+// Check if used, remove otherwise
 recipeRouter.get("/:recipeId", async (req: AuthRequest<{ recipeId: string }>, res) => {
   if (!req.userId) {
     res.status(401).json({ success: false, error: "Invalid user ID" });
